@@ -1,122 +1,93 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from 'react';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      height: '100vh', 
+      fontFamily: 'Arial, sans-serif',
+      margin: 0,
+      backgroundColor: '#f4f6f9'
+    }}>
+      
+      {/* 1. HEADER (TOPO DE ACORDO COM O DESENHO) */}
+      <header style={{
+        height: '60px',
+        backgroundColor: '#1E3A8A', // Azul escuro corporativo
+        color: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 20px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }}>
+        <h1 style={{ margin: 0, fontSize: '20px' }}>GeoSaneamento - Portal de Gestão</h1>
+        
+        {/* Botão pedido pelo grupo */}
+        <button style={{
+          backgroundColor: '#3B82F6', // Azul claro
+          color: 'white',
+          border: 'none',
+          padding: '8px 16px',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          fontWeight: 'bold'
+        }} onClick={() => alert('Questionário aberto!')}>
+          Questionário
         </button>
-      </section>
+      </header>
 
-      <div className="ticks"></div>
+      {/* ÁREA INFERIOR (BARRA LATERAL + MEIO EM BRANCO) */}
+      <div style={{ display: 'flex', flex: 1 }}>
+        
+        {/* 2. BARRA LATERAL (SANEAMENTO) */}
+        <aside style={{
+          width: '280px',
+          backgroundColor: 'white',
+          borderRight: '1px solid #e5e7eb',
+          padding: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '15px'
+        }}>
+          <h2 style={{ fontSize: '18px', color: '#111827', margin: '0 0 10px 0' }}>Informações de Saneamento</h2>
+          
+          {/* Blocos de informação simulados para preencher a barra */}
+          <div style={{ padding: '12px', backgroundColor: '#EFF6FF', borderRadius: '6px' }}>
+            <h3 style={{ margin: '0 0 5px 0', fontSize: '14px', color: '#1E4A9A' }}>Índice de Tratamento</h3>
+            <p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold' }}>62.4%</p>
+          </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <div style={{ padding: '12px', backgroundColor: '#FEF3C7', borderRadius: '6px' }}>
+            <h3 style={{ margin: '0 0 5px 0', fontSize: '14px', color: '#B45309' }}>Alertas de Vazamento</h3>
+            <p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold' }}>14 Ativos</p>
+          </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          <div style={{ padding: '12px', backgroundColor: '#F3F4F6', borderRadius: '6px' }}>
+            <h3 style={{ margin: '0 0 5px 0', fontSize: '14px', color: '#374151' }}>Região Monitorada</h3>
+            <p style={{ margin: 0, fontSize: '14px' }}>Zona Sul e Centro Expandido</p>
+          </div>
+        </aside>
+
+        {/* 3. MEIO (EM BRANCO PARA O MAPA) */}
+        <main style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#e5e7eb', // Cor cinza simulando o espaço do mapa
+          position: 'relative'
+        }}>
+          <span style={{ color: '#6b7280', fontWeight: 'bold', fontSize: '16px' }}>
+            [ Espaço Reservado para o Mapa ]
+          </span>
+        </main>
+
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
+
