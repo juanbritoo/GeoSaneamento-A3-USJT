@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Map from "./components/Map/Map";
 
 function App() {
   return (
@@ -70,18 +71,26 @@ function App() {
           </div>
         </aside>
 
-        {/* 3. MEIO (EM BRANCO PARA O MAPA) */}
-        <main style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#e5e7eb', // Cor cinza simulando o espaço do mapa
-          position: 'relative'
-        }}>
-          <span style={{ color: '#6b7280', fontWeight: 'bold', fontSize: '16px' }}>
-            [ Espaço Reservado para o Mapa ]
-          </span>
+                {/* 3. MEIO (MAPA) */}
+        <main
+          style={{
+            flex: 1,
+            display: 'flex',
+            backgroundColor: '#FFFFFF',
+            position: 'relative',
+            minHeight: '500px'
+          }}
+        >
+          <div
+            className="map-area"
+            style={{
+              width: 'calc(100% - 30px)',
+              height: 'calc(100% - 30px',
+              mrgin:'15px'
+            }}
+          >
+            <Map />
+          </div>
         </main>
 
       </div>
