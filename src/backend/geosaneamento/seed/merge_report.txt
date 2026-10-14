@@ -1,0 +1,29 @@
+Distritos oficiais: 96 | do JSON: 88 | completados (mock): 8
+Linhas em valor_indicador_json.csv: 384
+
+Acentuação corrigida (distritos.csv e JSON):
+
+Nomes do JSON corrigidos:
+  Itaaim Bibi -> Itaim Bibi
+  São Miguel Paulista -> São Miguel
+  Parque São Rafael -> São Rafael
+
+Removidos do JSON (não são distritos oficiais ou duplicados):
+  Carandiru
+  Cidade Patriarca
+  Parque Anhembi
+  Anhanguera (Zona Norte)
+  Bairro do Limão
+  Centro Histórico
+  Parque São Lucas
+  Vila Jacuí (Leste)
+
+Adicionados com valor fictício (ausentes no JSON):
+  Brás
+  Butantã
+  Cidade Tiradentes
+  José Bonifácio
+  Parque do Carmo
+  Vila Andrade
+  Vila Leopoldina
+  Lajeado
