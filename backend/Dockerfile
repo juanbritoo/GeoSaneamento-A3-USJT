@@ -9,6 +9,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
+COPY seed/schema.sql seed/init_db.py ./seed/
 
 EXPOSE 8000
 

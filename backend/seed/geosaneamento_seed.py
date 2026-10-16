@@ -156,53 +156,15 @@ def build_sidra():
     pd.concat(frames, ignore_index=True).to_csv(OUT / "sidra_municipio_sp.csv", index=False)
 
 
-SCHEMA = """-- GeoSaneamento - schema inicial (PostgreSQL + PostGIS)
-CREATE EXTENSION IF NOT EXISTS postgis;
-
-CREATE TABLE IF NOT EXISTS territorio (
-    id_territorial TEXT PRIMARY KEY,            -- código IBGE do distrito (RF10/RN03)
-    nome           TEXT NOT NULL,
-    id_municipio   TEXT NOT NULL DEFAULT '3550308',
-    fonte          TEXT NOT NULL,
-    periodo        TEXT NOT NULL,
-    geom           geometry(MultiPolygon, 4326)  -- preenchido a partir de distritos.geojson
-);
-CREATE INDEX IF NOT EXISTS idx_territorio_geom ON territorio USING GIST (geom);
-
-CREATE TABLE IF NOT EXISTS indicador (
-    codigo  TEXT PRIMARY KEY,
-    nome    TEXT NOT NULL,
-    unidade TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS valor_indicador (
-    id_territorial TEXT NOT NULL REFERENCES territorio(id_territorial),
-    indicador      TEXT NOT NULL REFERENCES indicador(codigo),
-    valor          NUMERIC,
-    unidade        TEXT,
-    fonte          TEXT NOT NULL,               -- DT07: fonte sempre visível
-    periodo        TEXT NOT NULL,               -- DT07: período sempre visível
-    is_mock        BOOLEAN NOT NULL DEFAULT FALSE,
-    PRIMARY KEY (id_territorial, indicador, periodo, fonte)
-);
-
--- Carga (psql):
--- \\copy territorio(id_territorial,nome,id_municipio,fonte,periodo) FROM 'seed/distritos.csv' CSV HEADER
--- \\copy indicador(codigo,nome,unidade) FROM 'seed/indicador_catalogo.csv' CSV HEADER
--- \\copy valor_indicador(id_territorial,indicador,valor,unidade,fonte,periodo,is_mock) FROM 'seed/valor_indicador_json.csv' CSV HEADER
--- Geometria: ogr2ogr -f PostgreSQL PG:"dbname=geosaneamento" seed/distritos.geojson -nln territorio_stg
---   depois: UPDATE territorio t SET geom = ST_Multi(s.wkb_geometry) FROM territorio_stg s WHERE s.codarea = t.id_territorial;
-"""
+SCHEMA_PATH = Path(__file__).resolve().with_name("schema.sql")
+SCHEMA = SCHEMA_PATH.read_text(encoding="utf-8")
 
 
-def build_schema(com_mock=False):
-    inserts = ""
-    if com_mock:  # só quando não há JSON de distritos (indicadores_mock.csv)
-        inserts = "\n".join(
-            f"INSERT INTO indicador VALUES ('{c}', '{n}', '{u}') ON CONFLICT DO NOTHING;"
-            for c, n, u, _lo, _hi in MOCK_INDICADORES
-        )
-    (OUT / "schema.sql").write_text(SCHEMA + "\n" + inserts + "\n", encoding="utf-8")
+def build_schema():
+    # schema.sql é a única definição canônica; o gerador de dados não a recria.
+    destination = OUT / "schema.sql"
+    if destination.resolve() != SCHEMA_PATH.resolve():
+        destination.write_text(SCHEMA, encoding="utf-8")
 
 
 def main():
@@ -216,9 +178,9 @@ def main():
     json_path = merge_json.achar_json()
     tem_json = Path(json_path).exists()
 
-    build_schema(com_mock=not tem_json)
+    build_schema()
     if args.offline:
-        print("schema.sql gerado.")
+        print("schema.sql canônico preservado.")
         return
     d = build_distritos()
     print(f"distritos.csv: {len(d)} distritos")
