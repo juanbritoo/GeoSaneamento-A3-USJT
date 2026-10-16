@@ -1,171 +1,400 @@
 #!/usr/bin/env python3
-"""
-Carrega os arquivos gerados em seed/ no PostgreSQL/PostGIS.
+"""Add prepared municipal and district records without replacing existing rows.
 
-Coloque este arquivo na pasta seed/ (junto dos outros) e rode:
-  pip install "psycopg[binary]"
-  python load_db.py                       # usa DATABASE_URL ou o padrão abaixo
-  python load_db.py --db postgresql://usuario:senha@localhost:5432/geosaneamento
-
-Importa dados preparados sem TRUNCATE. Registros com a mesma chave natural são atualizados;
-linhas que não aparecem nos arquivos permanecem no banco.
-
-Ordem: schema.sql -> territorio -> indicador -> valor_indicador -> geometria -> validação.
+The schema must already be initialized with ``python seed/init_db.py``.
 """
 import argparse
+import csv
 import json
 import os
 import sys
+from collections import Counter
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 import psycopg
+from psycopg.types.json import Jsonb
 
-BASE = Path(__file__).resolve().parent
-SEED = BASE if BASE.name == "seed" else BASE / "seed"
-DEFAULT_DB = "postgresql://postgres:postgres@localhost:5432/geosaneamento"
-
-ARQUIVOS = [
-    "schema.sql", "distritos.csv", "indicador_catalogo.csv",
-    "valor_indicador_json.csv", "distritos.geojson",
-]
+SEED = Path(__file__).resolve().parent
+DEFAULT_DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/geosaneamento"
+MUNICIPALITY_ID = "3550308"
+GEOMETRY_PROVENANCE = "Original provenance of the district boundary is undocumented in the project's GeoJSON."
 
 
-def copiar_csv(cur, tabela_colunas, arquivo):
-    sql = f"COPY {tabela_colunas} FROM STDIN WITH (FORMAT csv, HEADER true)"
-    with cur.copy(sql) as cp, open(SEED / arquivo, "rb") as f:
-        while chunk := f.read(65536):
-            cp.write(chunk)
+def read_csv(filename):
+    with (SEED / filename).open(encoding="utf-8-sig", newline="") as stream:
+        return list(csv.DictReader(stream))
+
+
+def source_for_district(label):
+    if label.startswith("JSON do projeto"):
+        return "projeto_json_nao_verificado"
+    if label.upper().startswith("MOCK"):
+        return "projeto_valor_ficticio"
+    raise ValueError(f"Unknown district value provenance: {label!r}")
+
+
+def sidra_rows():
+    path = SEED / "sidra_municipio_sp.csv"
+    with path.open(encoding="utf-8-sig", newline="") as stream:
+        reader = csv.DictReader(stream)
+        headers = reader.fieldnames or []
+        raw_rows = list(reader)
+    prepared = []
+    required_headers = {
+        "tabela", "descricao_tabela", "Nível Territorial (Código)",
+        "Nível Territorial", "Unidade de Medida (Código)", "Unidade de Medida",
+        "Valor", "Município (Código)", "Município", "Variável (Código)",
+        "Variável", "Ano (Código)", "Ano", "fonte",
+    }
+    if len(headers) != len(set(headers)):
+        raise ValueError("SIDRA CSV has duplicate column names; column mapping is ambiguous")
+    missing_headers = required_headers - set(headers)
+    if missing_headers:
+        raise ValueError(f"SIDRA CSV is missing required columns: {sorted(missing_headers)}")
+    classification_headers = [
+        name for name in headers
+        if name.endswith(" (Código)") and name not in required_headers
+    ]
+    classification_pairs = []
+    for code_header in classification_headers:
+        label_header = code_header.removesuffix(" (Código)")
+        if label_header not in headers:
+            raise ValueError(
+                f"SIDRA classification column {code_header!r} has no matching label column {label_header!r}"
+            )
+        classification_pairs.append((code_header, label_header))
+    if not classification_pairs:
+        raise ValueError("SIDRA CSV has no identifiable classification code/label columns")
+
+    seen_series = set()
+    for line_number, raw in enumerate(raw_rows, start=2):
+        if None in raw or any(value is None for value in raw.values()):
+            raise ValueError(f"SIDRA CSV row {line_number} has a missing or extra field")
+        table, description = raw["tabela"].strip(), raw["descricao_tabela"].strip()
+        unit_code = raw["Unidade de Medida (Código)"].strip()
+        unit_name, value = raw["Unidade de Medida"].strip(), raw["Valor"].strip()
+        territory, source = raw["Município (Código)"].strip(), raw["fonte"].strip()
+        variable_code, period = raw["Variável (Código)"].strip(), raw["Ano"].strip()
+        category_codes = [raw[code].strip() for code, _ in classification_pairs if raw[code].strip()]
+        category_labels = [raw[label].strip() for code, label in classification_pairs if raw[code].strip()]
+        if not category_codes:
+            raise ValueError(f"SIDRA observation without a classification code: table {table}")
+        source_code = {
+            "6803": "ibge_sidra_6803",
+            "6805": "ibge_sidra_6805",
+            "6892": "ibge_sidra_6892",
+        }.get(table)
+        if source_code is None:
+            raise ValueError(f"SIDRA table without a catalogued source: {table}")
+        indicator_code = "SIDRA_" + "_".join([table, variable_code, unit_code, *category_codes])
+        if indicator_code in seen_series:
+            raise ValueError(f"SIDRA series code is ambiguous or duplicated at CSV row {line_number}: {indicator_code}")
+        seen_series.add(indicator_code)
+        name = description
+        if category_labels:
+            name += " - " + " / ".join(category_labels)
+        dimensions = {
+            key: value
+            for key, value in raw.items()
+            if key not in {"Valor", "fonte"}
+        }
+        try:
+            numeric_value = Decimal(value.replace(",", "."))
+        except (InvalidOperation, ValueError) as exc:
+            raise ValueError(f"Non-numeric SIDRA value: table {table}, value {value!r}") from exc
+        prepared.append({
+            "territory": territory,
+            "indicator": indicator_code,
+            "name": name,
+            "unit": unit_name,
+            "value": numeric_value,
+            "source": source,
+            "source_code": source_code,
+            "period": period,
+            "dimensions": dimensions,
+        })
+    return prepared
+
+
+def audit_existing(cur, districts, catalog, district_values, sidra, feature_by_id):
+    """Compare all incoming natural keys without writing to the database."""
+    counts = Counter()
+    conflicts = []
+
+    def compare(kind, key, existing, incoming):
+        if existing is None:
+            counts[(kind, "new")] += 1
+        elif existing == incoming:
+            counts[(kind, "identical")] += 1
+        else:
+            counts[(kind, "conflict")] += 1
+            conflicts.append({
+                "record_type": kind,
+                "key": key,
+                "existing": existing,
+                "incoming": incoming,
+            })
+
+    municipality = (
+        "São Paulo", MUNICIPALITY_ID, "IBGE - Localidades", "2022",
+        "municipio", "ibge_localidades",
+    )
+    cur.execute("""
+        SELECT nome,id_municipio,fonte,periodo,nivel,id_fonte
+        FROM territorio WHERE id_territorial=%s
+    """, (MUNICIPALITY_ID,))
+    compare("municipality", MUNICIPALITY_ID, cur.fetchone(), municipality)
+
+    for row in districts:
+        district_id = row["id_territorial"].strip()
+        expected = (
+            row["nome"].strip(), row["id_municipio"].strip(), row["fonte"].strip(),
+            row["periodo"].strip(), "distrito", "ibge_localidades",
+        )
+        cur.execute("""
+            SELECT nome,id_municipio,fonte,periodo,nivel,id_fonte
+            FROM territorio WHERE id_territorial=%s
+        """, (district_id,))
+        compare("territory", district_id, cur.fetchone(), expected)
+
+    indicator_by_code = {
+        (row["codigo"].strip()): (row["nome"].strip(), row["unidade"].strip())
+        for row in catalog
+    }
+    for row in sidra:
+        code = row["indicator"]
+        expected = (row["name"], row["unit"])
+        previous = indicator_by_code.setdefault(code, expected)
+        if previous != expected:
+            conflicts.append({
+                "record_type": "incoming_indicator_definition",
+                "key": code,
+                "existing": previous,
+                "incoming": expected,
+            })
+            counts[("incoming_indicator_definition", "conflict")] += 1
+    for code, expected in indicator_by_code.items():
+        cur.execute("SELECT nome,unidade FROM indicador WHERE codigo=%s", (code,))
+        compare("indicator", code, cur.fetchone(), expected)
+
+    for row in district_values:
+        territory = row["id_territorial"].strip()
+        indicator = row["indicador"].strip()
+        period = row["periodo"].strip()
+        source = row["fonte"].strip()
+        expected = (
+            Decimal(row["valor"].strip()), row["unidade"].strip(),
+            row["is_mock"].strip().lower() == "true", source_for_district(source), {},
+        )
+        key = (territory, indicator, period, source)
+        cur.execute("""
+            SELECT valor,unidade,is_mock,id_fonte,dimensoes FROM valor_indicador
+            WHERE id_territorial=%s AND indicador=%s AND periodo=%s AND fonte=%s
+        """, key)
+        compare("district_value", key, cur.fetchone(), expected)
+
+    for row in sidra:
+        key = (row["territory"], row["indicator"], row["period"], row["source"])
+        expected = (
+            row["value"], row["unit"], False, row["source_code"], row["dimensions"],
+        )
+        cur.execute("""
+            SELECT valor,unidade,is_mock,id_fonte,dimensoes FROM valor_indicador
+            WHERE id_territorial=%s AND indicador=%s AND periodo=%s AND fonte=%s
+        """, key)
+        compare("municipal_value", key, cur.fetchone(), expected)
+
+    for district_id, feature in feature_by_id.items():
+        geometry = json.dumps(feature["geometry"], ensure_ascii=False)
+        cur.execute("""
+            SELECT geom IS NOT NULL,
+                   CASE WHEN geom IS NULL THEN NULL ELSE ST_Equals(
+                       geom, ST_SetSRID(ST_GeomFromGeoJSON(%s),4326)
+                   ) END,
+                   id_fonte_geom,procedencia_geom
+            FROM territorio WHERE id_territorial=%s AND nivel='distrito'
+        """, (geometry, district_id))
+        existing = cur.fetchone()
+        incoming_provenance = (
+            "malha_nao_verificada", GEOMETRY_PROVENANCE,
+        )
+        if existing is None or not existing[0]:
+            compare("geometry", district_id, None, incoming_provenance)
+        elif existing[1] is True and existing[2:] == incoming_provenance:
+            compare("geometry", district_id, incoming_provenance, incoming_provenance)
+        else:
+            compare(
+                "geometry", district_id,
+                {"spatially_equal": existing[1], "source_id": existing[2], "provenance": existing[3]},
+                {"spatially_equal": True, "source_id": incoming_provenance[0], "provenance": incoming_provenance[1]},
+            )
+
+    return counts, conflicts
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--db", default=os.getenv("DATABASE_URL", DEFAULT_DB))
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--db",
+        default=os.getenv("DATABASE_URL", DEFAULT_DATABASE_URL),
+        help="Database URL (defaults to DATABASE_URL).",
+    )
+    parser.add_argument(
+        "--check-only",
+        action="store_true",
+        help="Compare incoming records with the database without writing anything.",
+    )
+    args = parser.parse_args()
 
-    faltando = [a for a in ARQUIVOS if not (SEED / a).exists()]
-    if faltando:
-        sys.exit(f"Arquivos ausentes em {SEED}: {faltando}. Rode antes o geosaneamento_seed.py.")
+    districts = read_csv("distritos.csv")
+    catalog = read_csv("indicador_catalogo.csv")
+    district_values = read_csv("valor_indicador_json.csv")
+    sidra = sidra_rows()
+    geojson = json.loads((SEED / "distritos.geojson").read_text(encoding="utf-8-sig"))
+    features = geojson.get("features", [])
 
-    destino = args.db.split("@")[-1]  # não imprime usuário/senha
-    print(f"Conectando em {destino} ...", flush=True)
+    expected_district_ids = {row["id_territorial"].strip() for row in districts}
+    feature_by_id = {str(feature.get("properties", {}).get("codarea", "")).strip(): feature for feature in features}
+    if len(feature_by_id) != len(features) or set(feature_by_id) != expected_district_ids:
+        raise ValueError("GeoJSON codes do not exactly match districts.csv")
+    if any(feature.get("geometry", {}).get("type") not in {"Polygon", "MultiPolygon"} for feature in features):
+        raise ValueError("Unsupported geometry type in district GeoJSON")
+
+    destination = args.db.split("@")[-1]
+    print(f"Connecting to {destination} ...", flush=True)
     try:
         conn = psycopg.connect(args.db, connect_timeout=10)
-    except psycopg.OperationalError as e:
-        sys.exit(
-            f"\n[erro] não foi possível conectar ao banco ({destino}).\n"
-            "Confira: 1) o PostgreSQL/Docker está rodando? 2) usuário, senha, porta e nome do banco "
-            "(use --db postgresql://usuario:senha@localhost:5432/geosaneamento); "
-            "3) o banco 'geosaneamento' foi criado?\n"
-            f"Detalhe: {str(e).strip()}"
-        )
-    print("Conectado. Aplicando o esquema e importando sem apagar linhas existentes ...", flush=True)
+    except psycopg.OperationalError as exc:
+        sys.exit(f"Could not connect to database ({destination}): {exc}")
 
     with conn:
         with conn.cursor() as cur:
-            cur.execute((SEED / "schema.sql").read_text(encoding="utf-8"), prepare=False)
+            if args.check_only:
+                cur.execute("SET TRANSACTION READ ONLY")
+            cur.execute("""
+                SELECT to_regclass('territorio'), to_regclass('indicador'),
+                       to_regclass('valor_indicador'), to_regclass('fonte_dado')
+            """)
+            if any(value is None for value in cur.fetchone()):
+                raise RuntimeError("Schema is missing/incomplete; run seed/init_db.py before loading")
+
+            audit_counts, conflicts = audit_existing(
+                cur, districts, catalog, district_values, sidra, feature_by_id
+            )
+            print("Existing records: idempotent matches and pending additive inserts")
+            for (kind, state), count in sorted(audit_counts.items()):
+                print(f"  {kind}: {state}={count}")
+            if conflicts:
+                print(f"Conflicts found: {len(conflicts)}; no data will be written.")
+                for conflict in conflicts:
+                    print(json.dumps(conflict, ensure_ascii=False, default=str, sort_keys=True))
+                raise RuntimeError("Resolve the listed content conflicts before running the additive load")
+            if args.check_only:
+                print("Check-only finished; database was opened read-only and no load was run.")
+                return
+
+            cur.execute("SELECT id_territorial,nome,id_municipio,nivel FROM territorio WHERE id_territorial = %s", (MUNICIPALITY_ID,))
+            municipality = cur.fetchone()
+            if municipality is None or municipality[2:] != (MUNICIPALITY_ID, "municipio"):
+                raise RuntimeError("Existing municipality identity is missing or conflicts with Sao Paulo/3550308")
+
+            for district in districts:
+                district_id = district["id_territorial"].strip()
+                cur.execute("SELECT nome,id_municipio,nivel FROM territorio WHERE id_territorial=%s", (district_id,))
+                existing = cur.fetchone()
+                expected = (district["nome"].strip(), district["id_municipio"].strip(), "distrito")
+                if existing is not None and existing != expected:
+                    raise RuntimeError(f"Existing territory identity conflicts for {district_id}; load cancelled")
+                cur.execute("""
+                    INSERT INTO territorio (id_territorial,nome,id_municipio,fonte,periodo,nivel,id_fonte)
+                    VALUES (%s,%s,%s,%s,%s,'distrito','ibge_localidades')
+                    ON CONFLICT (id_territorial) DO NOTHING
+                """, (district_id, expected[0], expected[1], district["fonte"].strip(), district["periodo"].strip()))
+
+            all_indicators = [
+                (row["codigo"].strip(), row["nome"].strip(), row["unidade"].strip())
+                for row in catalog
+            ] + [(row["indicator"], row["name"], row["unit"]) for row in sidra]
+            indicator_by_code = {}
+            for code, name, unit in all_indicators:
+                previous = indicator_by_code.setdefault(code, (name, unit))
+                if previous != (name, unit):
+                    raise RuntimeError(f"Ambiguous indicator catalog entry for {code}")
+            for code, (name, unit) in indicator_by_code.items():
+                cur.execute("SELECT nome,unidade FROM indicador WHERE codigo=%s", (code,))
+                existing = cur.fetchone()
+                if existing is not None and existing != (name, unit):
+                    raise RuntimeError(f"Existing indicator conflicts for {code}; load cancelled")
+                cur.execute("""
+                    INSERT INTO indicador (codigo,nome,unidade) VALUES (%s,%s,%s)
+                    ON CONFLICT (codigo) DO NOTHING
+                """, (code, name, unit))
+
+            loaded = {"district_values": 0, "municipal_values": 0, "geometries": 0}
+            preserved = {"district_values": 0, "municipal_values": 0, "geometries": 0}
+            for row in district_values:
+                source_code = source_for_district(row["fonte"].strip())
+                cur.execute("""
+                    INSERT INTO valor_indicador
+                      (id_territorial,indicador,valor,unidade,fonte,periodo,is_mock,id_fonte)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+                    ON CONFLICT (id_territorial,indicador,periodo,fonte) DO NOTHING
+                """, (
+                    row["id_territorial"].strip(), row["indicador"].strip(), row["valor"].strip(),
+                    row["unidade"].strip(), row["fonte"].strip(), row["periodo"].strip(),
+                    row["is_mock"].strip().lower() == "true", source_code,
+                ))
+                loaded["district_values"] += cur.rowcount
+                preserved["district_values"] += 1 - cur.rowcount
+
+            for row in sidra:
+                cur.execute("""
+                    INSERT INTO valor_indicador
+                      (id_territorial,indicador,valor,unidade,fonte,periodo,is_mock,id_fonte,dimensoes)
+                    VALUES (%s,%s,%s,%s,%s,%s,FALSE,%s,%s)
+                    ON CONFLICT (id_territorial,indicador,periodo,fonte) DO NOTHING
+                """, (
+                    row["territory"], row["indicator"], row["value"], row["unit"],
+                    row["source"], row["period"], row["source_code"], Jsonb(row["dimensions"]),
+                ))
+                loaded["municipal_values"] += cur.rowcount
+                preserved["municipal_values"] += 1 - cur.rowcount
+
+            for district_id, feature in feature_by_id.items():
+                geometry = json.dumps(feature["geometry"], ensure_ascii=False)
+                cur.execute("""
+                    UPDATE territorio
+                    SET geom=ST_Multi(ST_SetSRID(ST_GeomFromGeoJSON(%s),4326)),
+                        id_fonte_geom='malha_nao_verificada', procedencia_geom=%s
+                    WHERE id_territorial=%s AND nivel='distrito' AND geom IS NULL
+                """, (geometry, GEOMETRY_PROVENANCE, district_id))
+                loaded["geometries"] += cur.rowcount
+                preserved["geometries"] += 1 - cur.rowcount
 
             cur.execute("""
-                INSERT INTO territorio
-                    (id_territorial,nome,id_municipio,fonte,periodo,nivel,id_fonte)
-                VALUES ('3550308','São Paulo','3550308','IBGE - Localidades','2022','municipio','ibge_localidades')
-                ON CONFLICT (id_territorial) DO NOTHING
-            """)
-
-            cur.execute("""
-                CREATE TEMP TABLE stg_territorio (
-                    id_territorial TEXT, nome TEXT, id_municipio TEXT, fonte TEXT, periodo TEXT
-                ) ON COMMIT DROP
-            """)
-            copiar_csv(cur, "stg_territorio(id_territorial,nome,id_municipio,fonte,periodo)", "distritos.csv")
-            cur.execute("""
-                INSERT INTO territorio
-                    (id_territorial,nome,id_municipio,fonte,periodo,nivel,id_fonte)
-                SELECT id_territorial,nome,id_municipio,fonte,periodo,'distrito','ibge_localidades'
-                FROM stg_territorio
-                ON CONFLICT (id_territorial) DO UPDATE SET
-                    nome=EXCLUDED.nome, id_municipio=EXCLUDED.id_municipio,
-                    fonte=EXCLUDED.fonte, periodo=EXCLUDED.periodo,
-                    nivel='distrito', id_fonte='ibge_localidades'
-            """)
-
-            cur.execute("CREATE TEMP TABLE stg_indicador (codigo TEXT, nome TEXT, unidade TEXT) ON COMMIT DROP")
-            copiar_csv(cur, "stg_indicador(codigo,nome,unidade)", "indicador_catalogo.csv")
-            cur.execute("""
-                INSERT INTO indicador (codigo,nome,unidade)
-                SELECT codigo,nome,unidade FROM stg_indicador
-                ON CONFLICT (codigo) DO UPDATE SET nome=EXCLUDED.nome, unidade=EXCLUDED.unidade
-            """)
-
-            cur.execute("""
-                CREATE TEMP TABLE stg_valor_indicador (
-                    id_territorial TEXT, indicador TEXT, valor NUMERIC, unidade TEXT,
-                    fonte TEXT, periodo TEXT, is_mock BOOLEAN
-                ) ON COMMIT DROP
-            """)
-            copiar_csv(cur,
-                       "stg_valor_indicador(id_territorial,indicador,valor,unidade,fonte,periodo,is_mock)",
-                       "valor_indicador_json.csv")
-            cur.execute("""
-                WITH preparados AS (
-                    SELECT *, CASE
-                        WHEN fonte ILIKE '%mock%' OR fonte ILIKE '%fictício%' OR fonte ILIKE '%ficticio%'
-                            THEN 'projeto_valor_ficticio'
-                        WHEN fonte ILIKE '%JSON do projeto%' THEN 'projeto_json_nao_verificado'
-                        WHEN fonte ILIKE '%SIDRA%6803%' THEN 'ibge_sidra_6803'
-                        WHEN fonte ILIKE '%SIDRA%6805%' THEN 'ibge_sidra_6805'
-                        WHEN fonte ILIKE '%SIDRA%6892%' THEN 'ibge_sidra_6892'
-                        ELSE 'nao_classificada'
-                    END AS id_fonte
-                    FROM stg_valor_indicador
+                SELECT count(*) FILTER (WHERE geom IS NOT NULL AND NOT ST_IsValid(geom))
+                FROM territorio WHERE nivel='distrito' AND id_municipio=%s
+            """, (MUNICIPALITY_ID,))
+            invalid_geometries = cur.fetchone()[0]
+            if invalid_geometries:
+                raise RuntimeError(
+                    f"{invalid_geometries} invalid district geometries found; transaction cancelled without repairing them"
                 )
-                INSERT INTO valor_indicador
-                    (id_territorial,indicador,valor,unidade,fonte,periodo,is_mock,id_fonte)
-                SELECT p.id_territorial,p.indicador,p.valor,p.unidade,p.fonte,p.periodo,p.is_mock,p.id_fonte
-                FROM preparados p JOIN fonte_dado f USING (id_fonte)
-                ON CONFLICT (id_territorial,indicador,periodo,fonte) DO UPDATE SET
-                    valor=EXCLUDED.valor, unidade=EXCLUDED.unidade,
-                    is_mock=EXCLUDED.is_mock, id_fonte=EXCLUDED.id_fonte
-            """)
-
-            gj = json.loads((SEED / "distritos.geojson").read_text(encoding="utf-8"))
-            sem_par = []
-            for feat in gj["features"]:
-                cod = str(feat["properties"]["codarea"])
-                cur.execute(
-                    "UPDATE territorio SET geom = ST_Multi(ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)), "
-                    "id_fonte_geom = 'malha_nao_verificada', "
-                    "procedencia_geom = 'Origem não documentada no GeoJSON fornecido pelo projeto.' "
-                    "WHERE id_territorial = %s AND nivel = 'distrito'",
-                    (json.dumps(feat["geometry"]), cod),
-                )
-                if cur.rowcount == 0:
-                    sem_par.append(cod)
-
-            # EX03 / RN04: geometrias inválidas são corrigidas; as irrecuperáveis são reportadas
-            cur.execute("UPDATE territorio SET geom = ST_Multi(ST_CollectionExtract(ST_MakeValid(geom), 3)) "
-                        "WHERE nivel = 'distrito' AND geom IS NOT NULL AND NOT ST_IsValid(geom)")
-            corrigidas = cur.rowcount
-
-            cur.execute("SELECT count(*), count(geom), count(*) FILTER (WHERE geom IS NOT NULL AND NOT ST_IsValid(geom)) "
-                        "FROM territorio WHERE nivel = 'distrito' AND id_municipio = '3550308'")
-            total, com_geom, invalidas = cur.fetchone()
+            cur.execute("""
+                SELECT count(*) FILTER (WHERE nivel='distrito'),
+                       count(*) FILTER (WHERE nivel='distrito' AND geom IS NOT NULL)
+                FROM territorio WHERE id_municipio=%s
+            """, (MUNICIPALITY_ID,))
+            district_count, geometry_count = cur.fetchone()
             cur.execute("SELECT count(*) FROM valor_indicador")
-            n_valores = cur.fetchone()[0]
-            cur.execute("SELECT count(*) FROM (SELECT t.id_territorial "
-                        "FROM territorio t LEFT JOIN valor_indicador v USING (id_territorial) "
-                        "WHERE t.nivel = 'distrito' AND t.id_municipio = '3550308' "
-                        "GROUP BY t.id_territorial "
-                        "HAVING count(DISTINCT v.indicador) FILTER (WHERE v.indicador IS NOT NULL) "
-                        "<> (SELECT count(*) FROM indicador)) x")
-            incompletos = cur.fetchone()[0]
+            value_count = cur.fetchone()[0]
 
-    print(f"territorio: {total} distritos | com geometria: {com_geom} | inválidas: {invalidas} "
-          f"| corrigidas com ST_MakeValid: {corrigidas}")
-    print(f"valor_indicador: {n_valores} linhas | distritos com indicadores incompletos: {incompletos}")
-    if sem_par:
-        print(f"[aviso] feições da malha sem distrito correspondente: {sem_par}")
-    problemas = (total != 96) or (com_geom != total) or invalidas or incompletos or sem_par
-    print("OK" if not problemas else "[atenção] revise as mensagens acima")
+    print(f"Districts: {district_count}; with geometry: {geometry_count}; invalid geometries: {invalid_geometries}")
+    print(f"Inserted: {loaded}; existing data preserved: {preserved}")
+    print(f"Total indicator values in database: {value_count}")
+    if invalid_geometries:
+        print("[warning] invalid geometries were preserved without automatic repair")
 
 
 if __name__ == "__main__":
