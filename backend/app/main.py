@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from typing import Any, Literal, Optional
 
 import psycopg
-from fastapi import FastAPI, HTTPException, Path, Query, Request, status
+from fastapi import FastAPI, HTTPException, Path, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -155,7 +155,8 @@ def health():
     description=(
         "Consulta valores disponíveis na escala municipal ou distrital. "
         "A escala municipal usa São Paulo como padrão; sem identificador distrital, "
-        "consulta distritos. A resposta preserva fonte, procedência e is_mock."
+        "consulta distritos. Territórios existentes sem valores são retornados com "
+        "indicadores como lista vazia. A resposta preserva fonte, procedência e is_mock."
     ),
     responses={
         404: {"model": ErroAPI, "description": "Território não encontrado na escala informada."},
@@ -238,9 +239,8 @@ def consultar_saneamento(
         id_valor = valor.pop("id_territorial")
         por_territorio[id_valor]["indicadores"].append(valor)
 
-    # Nenhum valor correspondente aos filtros resulta em 200 com lista vazia.
-    resultados = [item for item in por_territorio.values() if item["indicadores"]]
-    return {"escala": escala, "territorios": resultados}
+    # Mantem o territorio na resposta, mesmo quando nao ha indicadores correspondentes.
+    return {"escala": escala, "territorios": list(por_territorio.values())}
 
 
 @app.get(
@@ -304,22 +304,6 @@ def detalhar_distrito(id_territorial: str = Path(pattern=ID_PATTERN)):
             raise HTTPException(404, "Distrito não encontrado.")
         d["indicadores"] = _indicadores(cur, id_territorial)
     return d
-
-
-@app.get(
-    "/distritos/{id_territorial}/indicadores", response_model=list[IndicadorValor],
-    responses={
-        404: {"model": ErroAPI, "description": "Distrito não encontrado."},
-        503: {"model": ErroAPI, "description": "Banco de dados indisponível."},
-    },
-    tags=["Compatibilidade"],
-)
-def indicadores_do_distrito(id_territorial: str = Path(pattern=ID_PATTERN)):
-    with cursor() as cur:
-        cur.execute("SELECT 1 FROM territorio WHERE id_territorial = %s AND nivel = 'distrito'", (id_territorial,))
-        if cur.fetchone() is None:
-            raise HTTPException(404, "Distrito não encontrado.")
-        return _indicadores(cur, id_territorial)
 
 
 @app.get(
