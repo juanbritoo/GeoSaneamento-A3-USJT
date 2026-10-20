@@ -1,0 +1,1644 @@
+{
+  "municipio": "São Paulo",
+  "uf": "SP",
+  "codigo_municipio": "3550308",
+  "unidade_territorial": "Distrito",
+  "periodo_referencia": "2022",
+  "fonte_base": "IBGE - Localidades (ids e nomes); valores de teste",
+  "aviso": "Indicadores de TESTE (is_mock=true). Ids e nomes dos distritos: IBGE - Localidades. Valores: JSON do projeto (origem não verificada) ou fictícios onde ausentes.",
+  "total_regioes": 96,
+  "regioes": [
+    {
+      "id_regiao": "355030801",
+      "nome": "Água Rasa",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.7,
+        "destino_lixo_coleta_direta_pct": 99.9,
+        "esgotamento_sanitario_rede_geral_pct": 98.9,
+        "existencia_banheiro_exclusivo_pct": 99.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030802",
+      "nome": "Alto de Pinheiros",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.9,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "esgotamento_sanitario_rede_geral_pct": 99.8,
+        "existencia_banheiro_exclusivo_pct": 99.9
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030803",
+      "nome": "Anhanguera",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 89.2,
+        "destino_lixo_coleta_direta_pct": 93.4,
+        "esgotamento_sanitario_rede_geral_pct": 74.5,
+        "existencia_banheiro_exclusivo_pct": 91.0
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030804",
+      "nome": "Aricanduva",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.2,
+        "destino_lixo_coleta_direta_pct": 99.6,
+        "esgotamento_sanitario_rede_geral_pct": 97.5,
+        "existencia_banheiro_exclusivo_pct": 98.8
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030805",
+      "nome": "Artur Alvim",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.4,
+        "destino_lixo_coleta_direta_pct": 98.9,
+        "esgotamento_sanitario_rede_geral_pct": 94.1,
+        "existencia_banheiro_exclusivo_pct": 97.6
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030806",
+      "nome": "Barra Funda",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.6,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "esgotamento_sanitario_rede_geral_pct": 98.7,
+        "existencia_banheiro_exclusivo_pct": 99.2
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030807",
+      "nome": "Bela Vista",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.5,
+        "destino_lixo_coleta_direta_pct": 99.9,
+        "esgotamento_sanitario_rede_geral_pct": 98.6,
+        "existencia_banheiro_exclusivo_pct": 99.3
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030808",
+      "nome": "Belém",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.7,
+        "destino_lixo_coleta_direta_pct": 99.9,
+        "esgotamento_sanitario_rede_geral_pct": 99.0,
+        "existencia_banheiro_exclusivo_pct": 99.4
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030809",
+      "nome": "Bom Retiro",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.1,
+        "destino_lixo_coleta_direta_pct": 99.5,
+        "esgotamento_sanitario_rede_geral_pct": 97.8,
+        "existencia_banheiro_exclusivo_pct": 98.7
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030810",
+      "nome": "Brás",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 84.0,
+        "destino_lixo_coleta_direta_pct": 80.4,
+        "esgotamento_sanitario_rede_geral_pct": 92.7,
+        "existencia_banheiro_exclusivo_pct": 97.3
+      },
+      "metadata": {
+        "fonte": "MOCK (dado fictício)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "ficticio"
+      }
+    },
+    {
+      "id_regiao": "355030811",
+      "nome": "Brasilândia",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 92.4,
+        "destino_lixo_coleta_direta_pct": 96.0,
+        "esgotamento_sanitario_rede_geral_pct": 80.1,
+        "existencia_banheiro_exclusivo_pct": 93.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030812",
+      "nome": "Butantã",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 84.2,
+        "destino_lixo_coleta_direta_pct": 83.3,
+        "esgotamento_sanitario_rede_geral_pct": 87.1,
+        "existencia_banheiro_exclusivo_pct": 99.5
+      },
+      "metadata": {
+        "fonte": "MOCK (dado fictício)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "ficticio"
+      }
+    },
+    {
+      "id_regiao": "355030813",
+      "nome": "Cachoeirinha",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 95.8,
+        "destino_lixo_coleta_direta_pct": 98.0,
+        "esgotamento_sanitario_rede_geral_pct": 88.2,
+        "existencia_banheiro_exclusivo_pct": 96.2
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030814",
+      "nome": "Cambuci",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.6,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "esgotamento_sanitario_rede_geral_pct": 98.5,
+        "existencia_banheiro_exclusivo_pct": 99.2
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030815",
+      "nome": "Campo Belo",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.8,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "esgotamento_sanitario_rede_geral_pct": 99.4,
+        "existencia_banheiro_exclusivo_pct": 99.8
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030816",
+      "nome": "Campo Grande",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.1,
+        "destino_lixo_coleta_direta_pct": 99.5,
+        "esgotamento_sanitario_rede_geral_pct": 97.2,
+        "existencia_banheiro_exclusivo_pct": 98.6
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030817",
+      "nome": "Campo Limpo",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 93.8,
+        "destino_lixo_coleta_direta_pct": 96.8,
+        "esgotamento_sanitario_rede_geral_pct": 82.5,
+        "existencia_banheiro_exclusivo_pct": 94.4
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030818",
+      "nome": "Cangaíba",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 96.5,
+        "destino_lixo_coleta_direta_pct": 98.2,
+        "esgotamento_sanitario_rede_geral_pct": 90.4,
+        "existencia_banheiro_exclusivo_pct": 96.9
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030819",
+      "nome": "Capão Redondo",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 91.5,
+        "destino_lixo_coleta_direta_pct": 95.2,
+        "esgotamento_sanitario_rede_geral_pct": 78.4,
+        "existencia_banheiro_exclusivo_pct": 92.8
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030820",
+      "nome": "Carrão",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.5,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "esgotamento_sanitario_rede_geral_pct": 98.4,
+        "existencia_banheiro_exclusivo_pct": 99.1
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030821",
+      "nome": "Casa Verde",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.2,
+        "destino_lixo_coleta_direta_pct": 99.2,
+        "esgotamento_sanitario_rede_geral_pct": 95.6,
+        "existencia_banheiro_exclusivo_pct": 98.0
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030822",
+      "nome": "Cidade Ademar",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 94.7,
+        "destino_lixo_coleta_direta_pct": 97.4,
+        "esgotamento_sanitario_rede_geral_pct": 86.8,
+        "existencia_banheiro_exclusivo_pct": 95.1
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030823",
+      "nome": "Cidade Dutra",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 92.1,
+        "destino_lixo_coleta_direta_pct": 95.8,
+        "esgotamento_sanitario_rede_geral_pct": 79.5,
+        "existencia_banheiro_exclusivo_pct": 93.0
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030824",
+      "nome": "Cidade Líder",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 96.8,
+        "destino_lixo_coleta_direta_pct": 98.4,
+        "esgotamento_sanitario_rede_geral_pct": 91.2,
+        "existencia_banheiro_exclusivo_pct": 97.2
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030825",
+      "nome": "Cidade Tiradentes",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 83.8,
+        "destino_lixo_coleta_direta_pct": 86.2,
+        "esgotamento_sanitario_rede_geral_pct": 88.2,
+        "existencia_banheiro_exclusivo_pct": 95.4
+      },
+      "metadata": {
+        "fonte": "MOCK (dado fictício)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "ficticio"
+      }
+    },
+    {
+      "id_regiao": "355030826",
+      "nome": "Consolação",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.6,
+        "destino_lixo_coleta_direta_pct": 99.9,
+        "esgotamento_sanitario_rede_geral_pct": 98.8,
+        "existencia_banheiro_exclusivo_pct": 99.4
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030827",
+      "nome": "Cursino",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.9,
+        "destino_lixo_coleta_direta_pct": 99.4,
+        "esgotamento_sanitario_rede_geral_pct": 96.5,
+        "existencia_banheiro_exclusivo_pct": 98.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030828",
+      "nome": "Ermelino Matarazzo",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.2,
+        "destino_lixo_coleta_direta_pct": 98.6,
+        "esgotamento_sanitario_rede_geral_pct": 92.0,
+        "existencia_banheiro_exclusivo_pct": 97.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030829",
+      "nome": "Freguesia do Ó",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.5,
+        "destino_lixo_coleta_direta_pct": 98.7,
+        "esgotamento_sanitario_rede_geral_pct": 93.2,
+        "existencia_banheiro_exclusivo_pct": 97.8
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030830",
+      "nome": "Grajaú",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 88.5,
+        "destino_lixo_coleta_direta_pct": 93.0,
+        "esgotamento_sanitario_rede_geral_pct": 72.1,
+        "existencia_banheiro_exclusivo_pct": 90.2
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030831",
+      "nome": "Guaianases",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 91.0,
+        "destino_lixo_coleta_direta_pct": 94.8,
+        "esgotamento_sanitario_rede_geral_pct": 77.5,
+        "existencia_banheiro_exclusivo_pct": 92.1
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030832",
+      "nome": "Moema",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.9,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "esgotamento_sanitario_rede_geral_pct": 99.7,
+        "existencia_banheiro_exclusivo_pct": 99.9
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030833",
+      "nome": "Iguatemi",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 89.8,
+        "destino_lixo_coleta_direta_pct": 93.9,
+        "esgotamento_sanitario_rede_geral_pct": 75.0,
+        "existencia_banheiro_exclusivo_pct": 91.3
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030834",
+      "nome": "Ipiranga",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.2,
+        "destino_lixo_coleta_direta_pct": 99.6,
+        "esgotamento_sanitario_rede_geral_pct": 97.6,
+        "existencia_banheiro_exclusivo_pct": 98.9
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030835",
+      "nome": "Itaim Bibi",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.9,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "esgotamento_sanitario_rede_geral_pct": 99.7,
+        "existencia_banheiro_exclusivo_pct": 99.9
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030836",
+      "nome": "Itaim Paulista",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 90.5,
+        "destino_lixo_coleta_direta_pct": 94.5,
+        "esgotamento_sanitario_rede_geral_pct": 76.2,
+        "existencia_banheiro_exclusivo_pct": 91.8
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030837",
+      "nome": "Itaquera",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 94.2,
+        "destino_lixo_coleta_direta_pct": 97.5,
+        "esgotamento_sanitario_rede_geral_pct": 85.6,
+        "existencia_banheiro_exclusivo_pct": 95.0
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030838",
+      "nome": "Jabaquara",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.4,
+        "destino_lixo_coleta_direta_pct": 99.1,
+        "esgotamento_sanitario_rede_geral_pct": 95.0,
+        "existencia_banheiro_exclusivo_pct": 98.1
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030839",
+      "nome": "Jaçanã",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 95.0,
+        "destino_lixo_coleta_direta_pct": 97.6,
+        "esgotamento_sanitario_rede_geral_pct": 87.4,
+        "existencia_banheiro_exclusivo_pct": 95.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030840",
+      "nome": "Jaguara",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.6,
+        "destino_lixo_coleta_direta_pct": 99.2,
+        "esgotamento_sanitario_rede_geral_pct": 95.5,
+        "existencia_banheiro_exclusivo_pct": 98.2
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030841",
+      "nome": "Jaguaré",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.8,
+        "destino_lixo_coleta_direta_pct": 98.9,
+        "esgotamento_sanitario_rede_geral_pct": 93.9,
+        "existencia_banheiro_exclusivo_pct": 97.7
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030842",
+      "nome": "Jaraguá",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 91.2,
+        "destino_lixo_coleta_direta_pct": 95.0,
+        "esgotamento_sanitario_rede_geral_pct": 78.0,
+        "existencia_banheiro_exclusivo_pct": 92.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030843",
+      "nome": "Jardim Ângela",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 87.9,
+        "destino_lixo_coleta_direta_pct": 92.5,
+        "esgotamento_sanitario_rede_geral_pct": 71.0,
+        "existencia_banheiro_exclusivo_pct": 89.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030844",
+      "nome": "Jardim Helena",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 90.1,
+        "destino_lixo_coleta_direta_pct": 94.2,
+        "esgotamento_sanitario_rede_geral_pct": 75.8,
+        "existencia_banheiro_exclusivo_pct": 91.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030845",
+      "nome": "Jardim Paulista",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.9,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "esgotamento_sanitario_rede_geral_pct": 99.8,
+        "existencia_banheiro_exclusivo_pct": 99.9
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030846",
+      "nome": "Jardim São Luís",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 92.0,
+        "destino_lixo_coleta_direta_pct": 95.6,
+        "esgotamento_sanitario_rede_geral_pct": 79.2,
+        "existencia_banheiro_exclusivo_pct": 92.9
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030847",
+      "nome": "José Bonifácio",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 84.4,
+        "destino_lixo_coleta_direta_pct": 91.9,
+        "esgotamento_sanitario_rede_geral_pct": 89.8,
+        "existencia_banheiro_exclusivo_pct": 81.6
+      },
+      "metadata": {
+        "fonte": "MOCK (dado fictício)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "ficticio"
+      }
+    },
+    {
+      "id_regiao": "355030848",
+      "nome": "Lapa",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.4,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "esgotamento_sanitario_rede_geral_pct": 98.3,
+        "existencia_banheiro_exclusivo_pct": 99.1
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030849",
+      "nome": "Liberdade",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.0,
+        "destino_lixo_coleta_direta_pct": 99.5,
+        "esgotamento_sanitario_rede_geral_pct": 97.4,
+        "existencia_banheiro_exclusivo_pct": 98.6
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030850",
+      "nome": "Limão",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.9,
+        "destino_lixo_coleta_direta_pct": 98.9,
+        "esgotamento_sanitario_rede_geral_pct": 94.5,
+        "existencia_banheiro_exclusivo_pct": 98.0
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030851",
+      "nome": "Mandaqui",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.1,
+        "destino_lixo_coleta_direta_pct": 99.1,
+        "esgotamento_sanitario_rede_geral_pct": 95.2,
+        "existencia_banheiro_exclusivo_pct": 98.2
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030852",
+      "nome": "Marsilac",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 75.0,
+        "destino_lixo_coleta_direta_pct": 80.0,
+        "esgotamento_sanitario_rede_geral_pct": 52.0,
+        "existencia_banheiro_exclusivo_pct": 78.0
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030853",
+      "nome": "Mooca",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.5,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "esgotamento_sanitario_rede_geral_pct": 98.4,
+        "existencia_banheiro_exclusivo_pct": 99.1
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030854",
+      "nome": "Morumbi",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.8,
+        "destino_lixo_coleta_direta_pct": 99.4,
+        "esgotamento_sanitario_rede_geral_pct": 96.0,
+        "existencia_banheiro_exclusivo_pct": 98.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030855",
+      "nome": "Parelheiros",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 81.2,
+        "destino_lixo_coleta_direta_pct": 88.0,
+        "esgotamento_sanitario_rede_geral_pct": 60.5,
+        "existencia_banheiro_exclusivo_pct": 84.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030856",
+      "nome": "Pari",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.5,
+        "destino_lixo_coleta_direta_pct": 99.1,
+        "esgotamento_sanitario_rede_geral_pct": 96.1,
+        "existencia_banheiro_exclusivo_pct": 98.0
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030857",
+      "nome": "Parque do Carmo",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 80.7,
+        "destino_lixo_coleta_direta_pct": 93.4,
+        "esgotamento_sanitario_rede_geral_pct": 58.9,
+        "existencia_banheiro_exclusivo_pct": 96.7
+      },
+      "metadata": {
+        "fonte": "MOCK (dado fictício)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "ficticio"
+      }
+    },
+    {
+      "id_regiao": "355030858",
+      "nome": "Pedreira",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 91.8,
+        "destino_lixo_coleta_direta_pct": 95.5,
+        "esgotamento_sanitario_rede_geral_pct": 79.0,
+        "existencia_banheiro_exclusivo_pct": 92.6
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030859",
+      "nome": "Penha",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.3,
+        "destino_lixo_coleta_direta_pct": 99.2,
+        "esgotamento_sanitario_rede_geral_pct": 95.4,
+        "existencia_banheiro_exclusivo_pct": 98.2
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030860",
+      "nome": "Perdizes",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.8,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "esgotamento_sanitario_rede_geral_pct": 99.2,
+        "existencia_banheiro_exclusivo_pct": 99.7
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030861",
+      "nome": "Perus",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 93.5,
+        "destino_lixo_coleta_direta_pct": 96.5,
+        "esgotamento_sanitario_rede_geral_pct": 82.0,
+        "existencia_banheiro_exclusivo_pct": 94.1
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030862",
+      "nome": "Pinheiros",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.8,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "esgotamento_sanitario_rede_geral_pct": 99.5,
+        "existencia_banheiro_exclusivo_pct": 99.9
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030863",
+      "nome": "Pirituba",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.4,
+        "destino_lixo_coleta_direta_pct": 98.6,
+        "esgotamento_sanitario_rede_geral_pct": 93.0,
+        "existencia_banheiro_exclusivo_pct": 97.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030864",
+      "nome": "Ponte Rasa",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 96.0,
+        "destino_lixo_coleta_direta_pct": 98.0,
+        "esgotamento_sanitario_rede_geral_pct": 89.5,
+        "existencia_banheiro_exclusivo_pct": 96.4
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030865",
+      "nome": "Raposo Tavares",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 95.5,
+        "destino_lixo_coleta_direta_pct": 97.8,
+        "esgotamento_sanitario_rede_geral_pct": 88.0,
+        "existencia_banheiro_exclusivo_pct": 96.0
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030866",
+      "nome": "República",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.3,
+        "destino_lixo_coleta_direta_pct": 99.7,
+        "esgotamento_sanitario_rede_geral_pct": 98.0,
+        "existencia_banheiro_exclusivo_pct": 99.0
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030867",
+      "nome": "Rio Pequeno",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.0,
+        "destino_lixo_coleta_direta_pct": 98.4,
+        "esgotamento_sanitario_rede_geral_pct": 92.5,
+        "existencia_banheiro_exclusivo_pct": 97.2
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030868",
+      "nome": "Sacomã",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 96.2,
+        "destino_lixo_coleta_direta_pct": 98.1,
+        "esgotamento_sanitario_rede_geral_pct": 90.0,
+        "existencia_banheiro_exclusivo_pct": 96.8
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030869",
+      "nome": "Santa Cecília",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.5,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "esgotamento_sanitario_rede_geral_pct": 98.4,
+        "existencia_banheiro_exclusivo_pct": 99.2
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030870",
+      "nome": "Santana",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.2,
+        "destino_lixo_coleta_direta_pct": 99.6,
+        "esgotamento_sanitario_rede_geral_pct": 97.8,
+        "existencia_banheiro_exclusivo_pct": 98.9
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030871",
+      "nome": "Santo Amaro",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.0,
+        "destino_lixo_coleta_direta_pct": 99.5,
+        "esgotamento_sanitario_rede_geral_pct": 97.2,
+        "existencia_banheiro_exclusivo_pct": 98.7
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030872",
+      "nome": "São Lucas",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.0,
+        "destino_lixo_coleta_direta_pct": 99.0,
+        "esgotamento_sanitario_rede_geral_pct": 94.6,
+        "existencia_banheiro_exclusivo_pct": 98.1
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030873",
+      "nome": "São Mateus",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 93.2,
+        "destino_lixo_coleta_direta_pct": 96.4,
+        "esgotamento_sanitario_rede_geral_pct": 81.5,
+        "existencia_banheiro_exclusivo_pct": 93.8
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030874",
+      "nome": "São Miguel",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 94.8,
+        "destino_lixo_coleta_direta_pct": 97.5,
+        "esgotamento_sanitario_rede_geral_pct": 85.0,
+        "existencia_banheiro_exclusivo_pct": 95.2
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030875",
+      "nome": "São Rafael",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 92.5,
+        "destino_lixo_coleta_direta_pct": 95.8,
+        "esgotamento_sanitario_rede_geral_pct": 80.2,
+        "existencia_banheiro_exclusivo_pct": 93.1
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030876",
+      "nome": "Sapopemba",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 93.0,
+        "destino_lixo_coleta_direta_pct": 96.2,
+        "esgotamento_sanitario_rede_geral_pct": 81.0,
+        "existencia_banheiro_exclusivo_pct": 93.6
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030877",
+      "nome": "Saúde",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.5,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "esgotamento_sanitario_rede_geral_pct": 98.6,
+        "existencia_banheiro_exclusivo_pct": 99.3
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030878",
+      "nome": "Sé",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.4,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "esgotamento_sanitario_rede_geral_pct": 98.2,
+        "existencia_banheiro_exclusivo_pct": 99.1
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030879",
+      "nome": "Socorro",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 94.5,
+        "destino_lixo_coleta_direta_pct": 97.2,
+        "esgotamento_sanitario_rede_geral_pct": 84.2,
+        "existencia_banheiro_exclusivo_pct": 94.9
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030880",
+      "nome": "Tatuapé",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.7,
+        "destino_lixo_coleta_direta_pct": 99.9,
+        "esgotamento_sanitario_rede_geral_pct": 99.0,
+        "existencia_banheiro_exclusivo_pct": 99.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030881",
+      "nome": "Tremembé",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 95.6,
+        "destino_lixo_coleta_direta_pct": 97.9,
+        "esgotamento_sanitario_rede_geral_pct": 87.8,
+        "existencia_banheiro_exclusivo_pct": 96.0
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030882",
+      "nome": "Tucuruvi",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.0,
+        "destino_lixo_coleta_direta_pct": 99.5,
+        "esgotamento_sanitario_rede_geral_pct": 97.4,
+        "existencia_banheiro_exclusivo_pct": 98.7
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030883",
+      "nome": "Vila Andrade",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 78.9,
+        "destino_lixo_coleta_direta_pct": 89.7,
+        "esgotamento_sanitario_rede_geral_pct": 84.1,
+        "existencia_banheiro_exclusivo_pct": 93.6
+      },
+      "metadata": {
+        "fonte": "MOCK (dado fictício)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "ficticio"
+      }
+    },
+    {
+      "id_regiao": "355030884",
+      "nome": "Vila Curuçá",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 93.8,
+        "destino_lixo_coleta_direta_pct": 96.9,
+        "esgotamento_sanitario_rede_geral_pct": 82.4,
+        "existencia_banheiro_exclusivo_pct": 94.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030885",
+      "nome": "Vila Formosa",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.3,
+        "destino_lixo_coleta_direta_pct": 99.7,
+        "esgotamento_sanitario_rede_geral_pct": 98.0,
+        "existencia_banheiro_exclusivo_pct": 99.0
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030886",
+      "nome": "Vila Guilherme",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.5,
+        "destino_lixo_coleta_direta_pct": 99.2,
+        "esgotamento_sanitario_rede_geral_pct": 95.8,
+        "existencia_banheiro_exclusivo_pct": 98.3
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030887",
+      "nome": "Vila Jacuí",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 94.0,
+        "destino_lixo_coleta_direta_pct": 97.0,
+        "esgotamento_sanitario_rede_geral_pct": 84.5,
+        "existencia_banheiro_exclusivo_pct": 94.7
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030888",
+      "nome": "Vila Leopoldina",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 89.2,
+        "destino_lixo_coleta_direta_pct": 96.5,
+        "esgotamento_sanitario_rede_geral_pct": 69.3,
+        "existencia_banheiro_exclusivo_pct": 79.9
+      },
+      "metadata": {
+        "fonte": "MOCK (dado fictício)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "ficticio"
+      }
+    },
+    {
+      "id_regiao": "355030889",
+      "nome": "Vila Maria",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.7,
+        "destino_lixo_coleta_direta_pct": 99.3,
+        "esgotamento_sanitario_rede_geral_pct": 96.2,
+        "existencia_banheiro_exclusivo_pct": 98.5
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030890",
+      "nome": "Vila Mariana",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.8,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "esgotamento_sanitario_rede_geral_pct": 99.3,
+        "existencia_banheiro_exclusivo_pct": 99.8
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030891",
+      "nome": "Vila Matilde",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.4,
+        "destino_lixo_coleta_direta_pct": 99.1,
+        "esgotamento_sanitario_rede_geral_pct": 95.1,
+        "existencia_banheiro_exclusivo_pct": 98.2
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030892",
+      "nome": "Vila Medeiros",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.5,
+        "destino_lixo_coleta_direta_pct": 98.6,
+        "esgotamento_sanitario_rede_geral_pct": 93.0,
+        "existencia_banheiro_exclusivo_pct": 97.6
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030893",
+      "nome": "Vila Prudente",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.1,
+        "destino_lixo_coleta_direta_pct": 99.6,
+        "esgotamento_sanitario_rede_geral_pct": 97.5,
+        "existencia_banheiro_exclusivo_pct": 98.8
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030894",
+      "nome": "Vila Sônia",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.2,
+        "destino_lixo_coleta_direta_pct": 99.0,
+        "esgotamento_sanitario_rede_geral_pct": 95.0,
+        "existencia_banheiro_exclusivo_pct": 98.1
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030895",
+      "nome": "São Domingos",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.6,
+        "destino_lixo_coleta_direta_pct": 98.8,
+        "esgotamento_sanitario_rede_geral_pct": 93.5,
+        "existencia_banheiro_exclusivo_pct": 97.9
+      },
+      "metadata": {
+        "fonte": "JSON do projeto (origem não verificada)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "json_original"
+      }
+    },
+    {
+      "id_regiao": "355030896",
+      "nome": "Lajeado",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 84.2,
+        "destino_lixo_coleta_direta_pct": 94.6,
+        "esgotamento_sanitario_rede_geral_pct": 91.0,
+        "existencia_banheiro_exclusivo_pct": 93.9
+      },
+      "metadata": {
+        "fonte": "MOCK (dado fictício)",
+        "periodo": "2022",
+        "is_mock": true,
+        "origem_valor": "ficticio"
+      }
+    }
+  ]
+}

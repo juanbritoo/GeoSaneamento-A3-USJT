@@ -1,0 +1,1161 @@
+{
+  "municipio": "São Paulo",
+  "uf": "SP",
+  "fonte_base": "IBGE Censo / SNIS",
+  "periodo_referencia": "2022",
+  "total_regioes": 96,
+  "regioes": [
+    {
+      "id_regiao": "SP-3550308-01",
+      "nome": "Água Rasa",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.7,
+        "esgotamento_sanitario_rede_geral_pct": 98.9,
+        "destino_lixo_coleta_direta_pct": 99.9,
+        "existencia_banheiro_exclusivo_pct": 99.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-02",
+      "nome": "Alto de Pinheiros",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.9,
+        "esgotamento_sanitario_rede_geral_pct": 99.8,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "existencia_banheiro_exclusivo_pct": 99.9
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-03",
+      "nome": "Anhanguera",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 89.2,
+        "esgotamento_sanitario_rede_geral_pct": 74.5,
+        "destino_lixo_coleta_direta_pct": 93.4,
+        "existencia_banheiro_exclusivo_pct": 91.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-04",
+      "nome": "Aricanduva",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.2,
+        "esgotamento_sanitario_rede_geral_pct": 97.5,
+        "destino_lixo_coleta_direta_pct": 99.6,
+        "existencia_banheiro_exclusivo_pct": 98.8
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-05",
+      "nome": "Artur Alvim",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.4,
+        "esgotamento_sanitario_rede_geral_pct": 94.1,
+        "destino_lixo_coleta_direta_pct": 98.9,
+        "existencia_banheiro_exclusivo_pct": 97.6
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-06",
+      "nome": "Barra Funda",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.6,
+        "esgotamento_sanitario_rede_geral_pct": 98.7,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "existencia_banheiro_exclusivo_pct": 99.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-07",
+      "nome": "Bela Vista",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.5,
+        "esgotamento_sanitario_rede_geral_pct": 98.6,
+        "destino_lixo_coleta_direta_pct": 99.9,
+        "existencia_banheiro_exclusivo_pct": 99.3
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-08",
+      "nome": "Belém",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.7,
+        "esgotamento_sanitario_rede_geral_pct": 99.0,
+        "destino_lixo_coleta_direta_pct": 99.9,
+        "existencia_banheiro_exclusivo_pct": 99.4
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-09",
+      "nome": "Bom Retiro",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.1,
+        "esgotamento_sanitario_rede_geral_pct": 97.8,
+        "destino_lixo_coleta_direta_pct": 99.5,
+        "existencia_banheiro_exclusivo_pct": 98.7
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-10",
+      "nome": "Brasilândia",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 92.4,
+        "esgotamento_sanitario_rede_geral_pct": 80.1,
+        "destino_lixo_coleta_direta_pct": 96.0,
+        "existencia_banheiro_exclusivo_pct": 93.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-11",
+      "nome": "Cachoeirinha",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 95.8,
+        "esgotamento_sanitario_rede_geral_pct": 88.2,
+        "destino_lixo_coleta_direta_pct": 98.0,
+        "existencia_banheiro_exclusivo_pct": 96.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-12",
+      "nome": "Cambuci",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.6,
+        "esgotamento_sanitario_rede_geral_pct": 98.5,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "existencia_banheiro_exclusivo_pct": 99.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-13",
+      "nome": "Campo Belo",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.8,
+        "esgotamento_sanitario_rede_geral_pct": 99.4,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "existencia_banheiro_exclusivo_pct": 99.8
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-14",
+      "nome": "Campo Grande",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.1,
+        "esgotamento_sanitario_rede_geral_pct": 97.2,
+        "destino_lixo_coleta_direta_pct": 99.5,
+        "existencia_banheiro_exclusivo_pct": 98.6
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-15",
+      "nome": "Campo Limpo",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 93.8,
+        "esgotamento_sanitario_rede_geral_pct": 82.5,
+        "destino_lixo_coleta_direta_pct": 96.8,
+        "existencia_banheiro_exclusivo_pct": 94.4
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-16",
+      "nome": "Cangaíba",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 96.5,
+        "esgotamento_sanitario_rede_geral_pct": 90.4,
+        "destino_lixo_coleta_direta_pct": 98.2,
+        "existencia_banheiro_exclusivo_pct": 96.9
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-17",
+      "nome": "Capão Redondo",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 91.5,
+        "esgotamento_sanitario_rede_geral_pct": 78.4,
+        "destino_lixo_coleta_direta_pct": 95.2,
+        "existencia_banheiro_exclusivo_pct": 92.8
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-18",
+      "nome": "Carandiru",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.4,
+        "esgotamento_sanitario_rede_geral_pct": 98.1,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "existencia_banheiro_exclusivo_pct": 99.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-19",
+      "nome": "Carrão",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.5,
+        "esgotamento_sanitario_rede_geral_pct": 98.4,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "existencia_banheiro_exclusivo_pct": 99.1
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-20",
+      "nome": "Casa Verde",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.2,
+        "esgotamento_sanitario_rede_geral_pct": 95.6,
+        "destino_lixo_coleta_direta_pct": 99.2,
+        "existencia_banheiro_exclusivo_pct": 98.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-21",
+      "nome": "Cidade Ademar",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 94.7,
+        "esgotamento_sanitario_rede_geral_pct": 86.8,
+        "destino_lixo_coleta_direta_pct": 97.4,
+        "existencia_banheiro_exclusivo_pct": 95.1
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-22",
+      "nome": "Cidade Dutra",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 92.1,
+        "esgotamento_sanitario_rede_geral_pct": 79.5,
+        "destino_lixo_coleta_direta_pct": 95.8,
+        "existencia_banheiro_exclusivo_pct": 93.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-23",
+      "nome": "Cidade Líder",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 96.8,
+        "esgotamento_sanitario_rede_geral_pct": 91.2,
+        "destino_lixo_coleta_direta_pct": 98.4,
+        "existencia_banheiro_exclusivo_pct": 97.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-24",
+      "nome": "Cidade Patriarca",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.0,
+        "esgotamento_sanitario_rede_geral_pct": 94.8,
+        "destino_lixo_coleta_direta_pct": 99.0,
+        "existencia_banheiro_exclusivo_pct": 98.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-25",
+      "nome": "Consolação",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.6,
+        "esgotamento_sanitario_rede_geral_pct": 98.8,
+        "destino_lixo_coleta_direta_pct": 99.9,
+        "existencia_banheiro_exclusivo_pct": 99.4
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-26",
+      "nome": "Cursino",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.9,
+        "esgotamento_sanitario_rede_geral_pct": 96.5,
+        "destino_lixo_coleta_direta_pct": 99.4,
+        "existencia_banheiro_exclusivo_pct": 98.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-27",
+      "nome": "Ermelino Matarazzo",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.2,
+        "esgotamento_sanitario_rede_geral_pct": 92.0,
+        "destino_lixo_coleta_direta_pct": 98.6,
+        "existencia_banheiro_exclusivo_pct": 97.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-28",
+      "nome": "Freguesia do Ó",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.5,
+        "esgotamento_sanitario_rede_geral_pct": 93.2,
+        "destino_lixo_coleta_direta_pct": 98.7,
+        "existencia_banheiro_exclusivo_pct": 97.8
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-29",
+      "nome": "Grajaú",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 88.5,
+        "esgotamento_sanitario_rede_geral_pct": 72.1,
+        "destino_lixo_coleta_direta_pct": 93.0,
+        "existencia_banheiro_exclusivo_pct": 90.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-30",
+      "nome": "Guaianases",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 91.0,
+        "esgotamento_sanitario_rede_geral_pct": 77.5,
+        "destino_lixo_coleta_direta_pct": 94.8,
+        "existencia_banheiro_exclusivo_pct": 92.1
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-31",
+      "nome": "Iguatemi",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 89.8,
+        "esgotamento_sanitario_rede_geral_pct": 75.0,
+        "destino_lixo_coleta_direta_pct": 93.9,
+        "existencia_banheiro_exclusivo_pct": 91.3
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-32",
+      "nome": "Ipiranga",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.2,
+        "esgotamento_sanitario_rede_geral_pct": 97.6,
+        "destino_lixo_coleta_direta_pct": 99.6,
+        "existencia_banheiro_exclusivo_pct": 98.9
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-33",
+      "nome": "Itaaim Bibi",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.9,
+        "esgotamento_sanitario_rede_geral_pct": 99.7,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "existencia_banheiro_exclusivo_pct": 99.9
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-34",
+      "nome": "Itaim Paulista",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 90.5,
+        "esgotamento_sanitario_rede_geral_pct": 76.2,
+        "destino_lixo_coleta_direta_pct": 94.5,
+        "existencia_banheiro_exclusivo_pct": 91.8
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-35",
+      "nome": "Itaquera",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 94.2,
+        "esgotamento_sanitario_rede_geral_pct": 85.6,
+        "destino_lixo_coleta_direta_pct": 97.5,
+        "existencia_banheiro_exclusivo_pct": 95.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-36",
+      "nome": "Jabaquara",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.4,
+        "esgotamento_sanitario_rede_geral_pct": 95.0,
+        "destino_lixo_coleta_direta_pct": 99.1,
+        "existencia_banheiro_exclusivo_pct": 98.1
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-37",
+      "nome": "Jaçanã",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 95.0,
+        "esgotamento_sanitario_rede_geral_pct": 87.4,
+        "destino_lixo_coleta_direta_pct": 97.6,
+        "existencia_banheiro_exclusivo_pct": 95.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-38",
+      "nome": "Jaguara",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.6,
+        "esgotamento_sanitario_rede_geral_pct": 95.5,
+        "destino_lixo_coleta_direta_pct": 99.2,
+        "existencia_banheiro_exclusivo_pct": 98.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-39",
+      "nome": "Jaguaré",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.8,
+        "esgotamento_sanitario_rede_geral_pct": 93.9,
+        "destino_lixo_coleta_direta_pct": 98.9,
+        "existencia_banheiro_exclusivo_pct": 97.7
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-40",
+      "nome": "Jaraguá",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 91.2,
+        "esgotamento_sanitario_rede_geral_pct": 78.0,
+        "destino_lixo_coleta_direta_pct": 95.0,
+        "existencia_banheiro_exclusivo_pct": 92.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-41",
+      "nome": "Jardim Ângela",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 87.9,
+        "esgotamento_sanitario_rede_geral_pct": 71.0,
+        "destino_lixo_coleta_direta_pct": 92.5,
+        "existencia_banheiro_exclusivo_pct": 89.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-42",
+      "nome": "Jardim Helena",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 90.1,
+        "esgotamento_sanitario_rede_geral_pct": 75.8,
+        "destino_lixo_coleta_direta_pct": 94.2,
+        "existencia_banheiro_exclusivo_pct": 91.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-43",
+      "nome": "Jardim Paulista",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.9,
+        "esgotamento_sanitario_rede_geral_pct": 99.8,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "existencia_banheiro_exclusivo_pct": 99.9
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-44",
+      "nome": "Jardim São Luís",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 92.0,
+        "esgotamento_sanitario_rede_geral_pct": 79.2,
+        "destino_lixo_coleta_direta_pct": 95.6,
+        "existencia_banheiro_exclusivo_pct": 92.9
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-45",
+      "nome": "Lapa",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.4,
+        "esgotamento_sanitario_rede_geral_pct": 98.3,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "existencia_banheiro_exclusivo_pct": 99.1
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-46",
+      "nome": "Liberdade",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.0,
+        "esgotamento_sanitario_rede_geral_pct": 97.4,
+        "destino_lixo_coleta_direta_pct": 99.5,
+        "existencia_banheiro_exclusivo_pct": 98.6
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-47",
+      "nome": "Limão",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.9,
+        "esgotamento_sanitario_rede_geral_pct": 94.5,
+        "destino_lixo_coleta_direta_pct": 98.9,
+        "existencia_banheiro_exclusivo_pct": 98.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-48",
+      "nome": "Mandaqui",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.1,
+        "esgotamento_sanitario_rede_geral_pct": 95.2,
+        "destino_lixo_coleta_direta_pct": 99.1,
+        "existencia_banheiro_exclusivo_pct": 98.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-49",
+      "nome": "Marsilac",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 75.0,
+        "esgotamento_sanitario_rede_geral_pct": 52.0,
+        "destino_lixo_coleta_direta_pct": 80.0,
+        "existencia_banheiro_exclusivo_pct": 78.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-50",
+      "nome": "Moema",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.9,
+        "esgotamento_sanitario_rede_geral_pct": 99.7,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "existencia_banheiro_exclusivo_pct": 99.9
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-51",
+      "nome": "Mooca",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.5,
+        "esgotamento_sanitario_rede_geral_pct": 98.4,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "existencia_banheiro_exclusivo_pct": 99.1
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-52",
+      "nome": "Morumbi",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.8,
+        "esgotamento_sanitario_rede_geral_pct": 96.0,
+        "destino_lixo_coleta_direta_pct": 99.4,
+        "existencia_banheiro_exclusivo_pct": 98.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-53",
+      "nome": "Parelheiros",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 81.2,
+        "esgotamento_sanitario_rede_geral_pct": 60.5,
+        "destino_lixo_coleta_direta_pct": 88.0,
+        "existencia_banheiro_exclusivo_pct": 84.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-54",
+      "nome": "Pari",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.5,
+        "esgotamento_sanitario_rede_geral_pct": 96.1,
+        "destino_lixo_coleta_direta_pct": 99.1,
+        "existencia_banheiro_exclusivo_pct": 98.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-55",
+      "nome": "Parque Anhembi",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.0,
+        "esgotamento_sanitario_rede_geral_pct": 97.5,
+        "destino_lixo_coleta_direta_pct": 99.5,
+        "existencia_banheiro_exclusivo_pct": 98.8
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-56",
+      "nome": "Pedreira",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 91.8,
+        "esgotamento_sanitario_rede_geral_pct": 79.0,
+        "destino_lixo_coleta_direta_pct": 95.5,
+        "existencia_banheiro_exclusivo_pct": 92.6
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-57",
+      "nome": "Penha",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.3,
+        "esgotamento_sanitario_rede_geral_pct": 95.4,
+        "destino_lixo_coleta_direta_pct": 99.2,
+        "existencia_banheiro_exclusivo_pct": 98.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-58",
+      "nome": "Perdizes",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.8,
+        "esgotamento_sanitario_rede_geral_pct": 99.2,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "existencia_banheiro_exclusivo_pct": 99.7
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-59",
+      "nome": "Perus",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 93.5,
+        "esgotamento_sanitario_rede_geral_pct": 82.0,
+        "destino_lixo_coleta_direta_pct": 96.5,
+        "existencia_banheiro_exclusivo_pct": 94.1
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-60",
+      "nome": "Pinheiros",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.8,
+        "esgotamento_sanitario_rede_geral_pct": 99.5,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "existencia_banheiro_exclusivo_pct": 99.9
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-61",
+      "nome": "Pirituba",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.4,
+        "esgotamento_sanitario_rede_geral_pct": 93.0,
+        "destino_lixo_coleta_direta_pct": 98.6,
+        "existencia_banheiro_exclusivo_pct": 97.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-62",
+      "nome": "Ponte Rasa",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 96.0,
+        "esgotamento_sanitario_rede_geral_pct": 89.5,
+        "destino_lixo_coleta_direta_pct": 98.0,
+        "existencia_banheiro_exclusivo_pct": 96.4
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-63",
+      "nome": "Raposo Tavares",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 95.5,
+        "esgotamento_sanitario_rede_geral_pct": 88.0,
+        "destino_lixo_coleta_direta_pct": 97.8,
+        "existencia_banheiro_exclusivo_pct": 96.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-64",
+      "nome": "República",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.3,
+        "esgotamento_sanitario_rede_geral_pct": 98.0,
+        "destino_lixo_coleta_direta_pct": 99.7,
+        "existencia_banheiro_exclusivo_pct": 99.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-65",
+      "nome": "Rio Pequeno",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.0,
+        "esgotamento_sanitario_rede_geral_pct": 92.5,
+        "destino_lixo_coleta_direta_pct": 98.4,
+        "existencia_banheiro_exclusivo_pct": 97.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-66",
+      "nome": "Sacomã",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 96.2,
+        "esgotamento_sanitario_rede_geral_pct": 90.0,
+        "destino_lixo_coleta_direta_pct": 98.1,
+        "existencia_banheiro_exclusivo_pct": 96.8
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-67",
+      "nome": "Santa Cecília",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.5,
+        "esgotamento_sanitario_rede_geral_pct": 98.4,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "existencia_banheiro_exclusivo_pct": 99.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-68",
+      "nome": "Santana",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.2,
+        "esgotamento_sanitario_rede_geral_pct": 97.8,
+        "destino_lixo_coleta_direta_pct": 99.6,
+        "existencia_banheiro_exclusivo_pct": 98.9
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-69",
+      "nome": "Santo Amaro",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.0,
+        "esgotamento_sanitario_rede_geral_pct": 97.2,
+        "destino_lixo_coleta_direta_pct": 99.5,
+        "existencia_banheiro_exclusivo_pct": 98.7
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-70",
+      "nome": "São Domingos",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.6,
+        "esgotamento_sanitario_rede_geral_pct": 93.5,
+        "destino_lixo_coleta_direta_pct": 98.8,
+        "existencia_banheiro_exclusivo_pct": 97.9
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-71",
+      "nome": "São Lucas",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.0,
+        "esgotamento_sanitario_rede_geral_pct": 94.6,
+        "destino_lixo_coleta_direta_pct": 99.0,
+        "existencia_banheiro_exclusivo_pct": 98.1
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-72",
+      "nome": "São Mateus",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 93.2,
+        "esgotamento_sanitario_rede_geral_pct": 81.5,
+        "destino_lixo_coleta_direta_pct": 96.4,
+        "existencia_banheiro_exclusivo_pct": 93.8
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-73",
+      "nome": "São Miguel Paulista",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 94.8,
+        "esgotamento_sanitario_rede_geral_pct": 85.0,
+        "destino_lixo_coleta_direta_pct": 97.5,
+        "existencia_banheiro_exclusivo_pct": 95.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-74",
+      "nome": "Sapopemba",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 93.0,
+        "esgotamento_sanitario_rede_geral_pct": 81.0,
+        "destino_lixo_coleta_direta_pct": 96.2,
+        "existencia_banheiro_exclusivo_pct": 93.6
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-75",
+      "nome": "Saúde",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.5,
+        "esgotamento_sanitario_rede_geral_pct": 98.6,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "existencia_banheiro_exclusivo_pct": 99.3
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-76",
+      "nome": "Sé",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.4,
+        "esgotamento_sanitario_rede_geral_pct": 98.2,
+        "destino_lixo_coleta_direta_pct": 99.8,
+        "existencia_banheiro_exclusivo_pct": 99.1
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-77",
+      "nome": "Socorro",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 94.5,
+        "esgotamento_sanitario_rede_geral_pct": 84.2,
+        "destino_lixo_coleta_direta_pct": 97.2,
+        "existencia_banheiro_exclusivo_pct": 94.9
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-78",
+      "nome": "Tatuapé",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.7,
+        "esgotamento_sanitario_rede_geral_pct": 99.0,
+        "destino_lixo_coleta_direta_pct": 99.9,
+        "existencia_banheiro_exclusivo_pct": 99.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-79",
+      "nome": "Tremembé",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 95.6,
+        "esgotamento_sanitario_rede_geral_pct": 87.8,
+        "destino_lixo_coleta_direta_pct": 97.9,
+        "existencia_banheiro_exclusivo_pct": 96.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-80",
+      "nome": "Tucuruvi",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.0,
+        "esgotamento_sanitario_rede_geral_pct": 97.4,
+        "destino_lixo_coleta_direta_pct": 99.5,
+        "existencia_banheiro_exclusivo_pct": 98.7
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-81",
+      "nome": "Vila Formosa",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.3,
+        "esgotamento_sanitario_rede_geral_pct": 98.0,
+        "destino_lixo_coleta_direta_pct": 99.7,
+        "existencia_banheiro_exclusivo_pct": 99.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-82",
+      "nome": "Vila Guilherme",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.5,
+        "esgotamento_sanitario_rede_geral_pct": 95.8,
+        "destino_lixo_coleta_direta_pct": 99.2,
+        "existencia_banheiro_exclusivo_pct": 98.3
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-83",
+      "nome": "Vila Jacuí",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 94.0,
+        "esgotamento_sanitario_rede_geral_pct": 84.5,
+        "destino_lixo_coleta_direta_pct": 97.0,
+        "existencia_banheiro_exclusivo_pct": 94.7
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-84",
+      "nome": "Vila Maria",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.7,
+        "esgotamento_sanitario_rede_geral_pct": 96.2,
+        "destino_lixo_coleta_direta_pct": 99.3,
+        "existencia_banheiro_exclusivo_pct": 98.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-85",
+      "nome": "Vila Mariana",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.8,
+        "esgotamento_sanitario_rede_geral_pct": 99.3,
+        "destino_lixo_coleta_direta_pct": 100.0,
+        "existencia_banheiro_exclusivo_pct": 99.8
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-86",
+      "nome": "Vila Matilde",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.4,
+        "esgotamento_sanitario_rede_geral_pct": 95.1,
+        "destino_lixo_coleta_direta_pct": 99.1,
+        "existencia_banheiro_exclusivo_pct": 98.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-87",
+      "nome": "Vila Medeiros",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.5,
+        "esgotamento_sanitario_rede_geral_pct": 93.0,
+        "destino_lixo_coleta_direta_pct": 98.6,
+        "existencia_banheiro_exclusivo_pct": 97.6
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-88",
+      "nome": "Vila Prudente",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.1,
+        "esgotamento_sanitario_rede_geral_pct": 97.5,
+        "destino_lixo_coleta_direta_pct": 99.6,
+        "existencia_banheiro_exclusivo_pct": 98.8
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-89",
+      "nome": "Vila Sônia",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.2,
+        "esgotamento_sanitario_rede_geral_pct": 95.0,
+        "destino_lixo_coleta_direta_pct": 99.0,
+        "existencia_banheiro_exclusivo_pct": 98.1
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-90",
+      "nome": "Anhanguera (Zona Norte)",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 91.0,
+        "esgotamento_sanitario_rede_geral_pct": 77.0,
+        "destino_lixo_coleta_direta_pct": 95.0,
+        "existencia_banheiro_exclusivo_pct": 92.0
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-91",
+      "nome": "Bairro do Limão",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 97.8,
+        "esgotamento_sanitario_rede_geral_pct": 94.0,
+        "destino_lixo_coleta_direta_pct": 98.8,
+        "existencia_banheiro_exclusivo_pct": 97.8
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-92",
+      "nome": "Centro Histórico",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 99.2,
+        "esgotamento_sanitario_rede_geral_pct": 97.9,
+        "destino_lixo_coleta_direta_pct": 99.6,
+        "existencia_banheiro_exclusivo_pct": 98.9
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-93",
+      "nome": "Parque São Lucas",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 98.1,
+        "esgotamento_sanitario_rede_geral_pct": 94.8,
+        "destino_lixo_coleta_direta_pct": 99.0,
+        "existencia_banheiro_exclusivo_pct": 98.2
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-94",
+      "nome": "Parque São Rafael",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 92.5,
+        "esgotamento_sanitario_rede_geral_pct": 80.2,
+        "destino_lixo_coleta_direta_pct": 95.8,
+        "existencia_banheiro_exclusivo_pct": 93.1
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-95",
+      "nome": "Vila Curuçá",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 93.8,
+        "esgotamento_sanitario_rede_geral_pct": 82.4,
+        "destino_lixo_coleta_direta_pct": 96.9,
+        "existencia_banheiro_exclusivo_pct": 94.5
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    },
+    {
+      "id_regiao": "SP-3550308-96",
+      "nome": "Vila Jacuí (Leste)",
+      "tipo_unidade": "Distrito",
+      "indicadores": {
+        "abastecimento_agua_rede_geral_pct": 94.2,
+        "esgotamento_sanitario_rede_geral_pct": 83.9,
+        "destino_lixo_coleta_direta_pct": 97.1,
+        "existencia_banheiro_exclusivo_pct": 94.8
+      },
+      "metadata": {"fonte": "IBGE - Censo Demográfico", "periodo": "2022"}
+    }
+  ]
+}
