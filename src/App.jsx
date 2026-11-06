@@ -1,5 +1,9 @@
+
 import { useEffect, useState } from 'react';
+
 import Map from "./components/Map/Map";
+import Questionario from "./components/Questionario/Questionario";
+
 import logoImg from './logo.png';
 import { buscarSaneamento } from "./services/api";
 
@@ -8,6 +12,10 @@ function App() {
   const [dadosSaneamento, setDadosSaneamento] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erroAPI, setErroAPI] = useState("");
+
+  // ==========================================
+  // BUSCAR DADOS DE SANEAMENTO NA API
+  // ==========================================
 
   useEffect(() => {
     buscarSaneamento("municipio")
@@ -23,6 +31,10 @@ function App() {
       });
   }, []);
 
+  // ==========================================
+  // RENDERIZAÇÃO
+  // ==========================================
+
   return (
     <div
       style={{
@@ -34,7 +46,11 @@ function App() {
         backgroundColor: '#f4f6f9'
       }}
     >
+
+      {/* ====================================== */}
       {/* HEADER */}
+      {/* ====================================== */}
+
       <header
         style={{
           height: '75px',
@@ -51,7 +67,10 @@ function App() {
           <img
             src={logoImg}
             alt="Logo GeoSaneamento"
-            style={{ height: '55px', objectFit: 'contain' }}
+            style={{
+              height: '55px',
+              objectFit: 'contain'
+            }}
           />
         </div>
 
@@ -72,9 +91,16 @@ function App() {
         </button>
       </header>
 
+      {/* ====================================== */}
       {/* ÁREA INFERIOR */}
+      {/* ====================================== */}
+
       <div style={{ display: 'flex', flex: 1 }}>
+
+        {/* ==================================== */}
         {/* BARRA LATERAL */}
+        {/* ==================================== */}
+
         <aside
           style={{
             width: '280px',
@@ -87,6 +113,7 @@ function App() {
             overflowY: 'auto'
           }}
         >
+
           <h2
             style={{
               fontSize: '18px',
@@ -97,7 +124,13 @@ function App() {
             Informações de Saneamento
           </h2>
 
-          {carregando && <p>Carregando indicadores...</p>}
+          {/* Carregamento */}
+
+          {carregando && (
+            <p>Carregando indicadores...</p>
+          )}
+
+          {/* Erro da API */}
 
           {erroAPI && (
             <p style={{ color: '#b91c1c' }}>
@@ -105,10 +138,13 @@ function App() {
             </p>
           )}
 
+          {/* Dados recebidos da API */}
+
           {!carregando && !erroAPI && dadosSaneamento && (
             <>
               {dadosSaneamento.territorios.map((territorio) => (
                 <div key={territorio.id_territorial}>
+
                   <h3
                     style={{
                       fontSize: '15px',
@@ -119,9 +155,14 @@ function App() {
                     {territorio.nome}
                   </h3>
 
+                  {/* Verificar indicadores disponíveis */}
+
                   {territorio.indicadores.length === 0 ? (
-                    <p>Nenhum indicador disponível para este município.</p>
+                    <p>
+                      Nenhum indicador disponível para este município.
+                    </p>
                   ) : (
+
                     territorio.indicadores.map((indicador, index) => (
                       <div
                         key={`${indicador.codigo}-${indicador.periodo}-${index}`}
@@ -132,6 +173,7 @@ function App() {
                           marginBottom: '10px'
                         }}
                       >
+
                         <h4
                           style={{
                             margin: '0 0 5px 0',
@@ -150,15 +192,20 @@ function App() {
                           }}
                         >
                           {indicador.valor ?? 'Não informado'}
-                          {indicador.unidade ? ` ${indicador.unidade}` : ''}
+
+                          {indicador.unidade
+                            ? ` ${indicador.unidade}`
+                            : ''}
                         </p>
 
                         <small>
                           Período: {indicador.periodo ?? 'Não informado'}
                         </small>
+
                       </div>
                     ))
                   )}
+
                 </div>
               ))}
             </>
@@ -166,7 +213,10 @@ function App() {
 
         </aside>
 
+        {/* ==================================== */}
         {/* MAPA */}
+        {/* ==================================== */}
+
         <main
           style={{
             flex: 1,
@@ -176,6 +226,7 @@ function App() {
             minHeight: '500px'
           }}
         >
+
           <div
             className="map-area"
             style={{
@@ -187,120 +238,19 @@ function App() {
             <Map />
           </div>
 
-          {/* QUESTIONÁRIO */}
-          {mostrarQuestionario && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                backgroundColor: 'white',
-                padding: '25px',
-                borderRadius: '8px',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                width: '350px',
-                zIndex: 1000
-              }}
-            >
-              <h3
-                style={{
-                  margin: '0 0 15px 0',
-                  color: '#121212'
-                }}
-              >
-                Questionário de Saneamento
-              </h3>
-
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '10px',
-                  fontSize: '14px'
-                }}
-              >
-                Sua região sofre com falta de água?
-
-                <select
-                  defaultValue=""
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    marginTop: '5px',
-                    padding: '5px'
-                  }}
-                >
-                  <option value="" disabled>Selecione...</option>
-                  <option>Sim, frequentemente</option>
-                  <option>Às vezes</option>
-                  <option>Não, nunca</option>
-                </select>
-              </label>
-
-              <label
-                style={{
-                  display: 'block',
-                  marginBottom: '15px',
-                  fontSize: '14px'
-                }}
-              >
-                Já presenciou esgoto a céu aberto na sua rua?
-
-                <select
-                  defaultValue=""
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    marginTop: '5px',
-                    padding: '5px'
-                  }}
-                >
-                  <option value="" disabled>Selecione...</option>
-                  <option>Sim</option>
-                  <option>Não</option>
-                </select>
-              </label>
-
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  gap: '10px'
-                }}
-              >
-                <button
-                  onClick={() => setMostrarQuestionario(false)}
-                  style={{
-                    padding: '6px 12px',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Cancelar
-                </button>
-
-                <button
-                  onClick={() => {
-                    alert('Obrigado por responder!');
-                    setMostrarQuestionario(false);
-                  }}
-                  style={{
-                    padding: '6px 12px',
-                    backgroundColor: '#1E70E6',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Enviar
-                </button>
-              </div>
-            </div>
-          )}
         </main>
+
       </div>
+
+      {/* ====================================== */}
+      {/* QUESTIONÁRIO */}
+      {/* ====================================== */}
+
+      <Questionario
+        aberto={mostrarQuestionario}
+        onFechar={() => setMostrarQuestionario(false)}
+      />
+
     </div>
   );
 }
