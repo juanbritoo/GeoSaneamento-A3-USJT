@@ -6,6 +6,7 @@ import Questionario from "./components/Questionario/Questionario";
 
 import logoImg from './logo.png';
 import { buscarSaneamento } from "./services/api";
+import "./App.css";
 
 function App() {
   const [mostrarQuestionario, setMostrarQuestionario] = useState(false);
@@ -37,10 +38,10 @@ function App() {
 
   return (
     <div
+      className="app-shell"
       style={{
         display: 'flex',
         flexDirection: 'column',
-        height: '100vh',
         fontFamily: 'Arial, sans-serif',
         margin: 0,
         backgroundColor: '#f4f6f9'
@@ -54,6 +55,7 @@ function App() {
       <header
         style={{
           height: '75px',
+          flexShrink: 0,
           backgroundColor: '#121212',
           color: 'white',
           display: 'flex',
@@ -95,15 +97,15 @@ function App() {
       {/* ÁREA INFERIOR */}
       {/* ====================================== */}
 
-      <div style={{ display: 'flex', flex: 1 }}>
+      <div className="app-workspace">
 
         {/* ==================================== */}
         {/* BARRA LATERAL */}
         {/* ==================================== */}
 
         <aside
+          className="app-sidebar"
           style={{
-            width: '280px',
             backgroundColor: 'white',
             borderRight: '1px solid #e5e7eb',
             padding: '20px',
@@ -218,22 +220,17 @@ function App() {
         {/* ==================================== */}
 
         <main
+          className="app-map"
           style={{
             flex: 1,
             display: 'flex',
             backgroundColor: '#FFFFFF',
-            position: 'relative',
-            minHeight: '500px'
+            position: 'relative'
           }}
         >
 
           <div
             className="map-area"
-            style={{
-              width: 'calc(100% - 30px)',
-              height: 'calc(100% - 30px)',
-              margin: '15px'
-            }}
           >
             <Map />
           </div>

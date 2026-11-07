@@ -46,7 +46,47 @@ function AjustarMapa({ geojson }) {
 
     if (!limites.isValid()) return;
 
-    map.fitBounds(limites);
+    const container = map.getContainer();
+    let quadro;
+    let larguraAnterior = 0;
+    let alturaAnterior = 0;
+
+    const enquadrar = () => {
+      const largura = container.clientWidth;
+      const altura = container.clientHeight;
+      // Aguarda um tamanho util e evita repetir o ajuste para o mesmo tamanho.
+      if (largura <= 32 || altura <= 32) return;
+      if (largura === larguraAnterior && altura === alturaAnterior) return;
+
+      map.stop();
+      map.invalidateSize({ pan: false, animate: false });
+      // getBoundsZoom considera o minZoom atual: libere-o antes do calculo.
+      map.setMinZoom(0);
+      const zoomMinimo = map.getBoundsZoom(limites, false, L.point(32, 32));
+      map.fitBounds(limites, {
+        padding: [16, 16],
+        maxZoom: zoomMinimo,
+        animate: false
+      });
+      map.setMinZoom(zoomMinimo);
+      larguraAnterior = largura;
+      alturaAnterior = altura;
+    };
+
+    const agendarEnquadramento = () => {
+      cancelAnimationFrame(quadro);
+      quadro = requestAnimationFrame(enquadrar);
+    };
+
+    agendarEnquadramento();
+    // Observa tambem mudancas de tamanho do container sem resize da janela.
+    const observador = new ResizeObserver(agendarEnquadramento);
+    observador.observe(container);
+
+    return () => {
+      observador.disconnect();
+      cancelAnimationFrame(quadro);
+    };
   }, [geojson, map]);
 
   return null;
@@ -140,6 +180,16 @@ function Map() {
       <MapContainer
         center={[-23.55, -46.63]}
         zoom={10}
+        zoomSnap={0.25}
+        maxZoom={18}
+        dragging={false}
+        scrollWheelZoom={false}
+        doubleClickZoom={false}
+        touchZoom={false}
+        boxZoom={false}
+        keyboard={false}
+        zoomControl={true}
+        trackResize={false}
         style={{
           height: "100%",
           width: "100%"

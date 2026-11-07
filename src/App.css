@@ -1,0 +1,45 @@
+.app-shell {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-workspace {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.app-sidebar {
+  box-sizing: border-box;
+  width: clamp(220px, 26vw, 320px);
+  flex-shrink: 0;
+  min-height: 0;
+  overflow-wrap: anywhere;
+}
+
+.app-map {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  padding: 15px;
+}
+
+.map-area {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (max-width: 640px) {
+  .app-workspace {
+    flex-direction: column;
+  }
+
+  .app-sidebar {
+    width: 100%;
+    flex-basis: 30%;
+    border-bottom: 1px solid #e5e7eb;
+  }
+}
