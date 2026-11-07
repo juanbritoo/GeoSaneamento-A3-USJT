@@ -22,9 +22,11 @@ async function requisicaoAPI(endpoint, options = {}) {
     }
 
     const tipoConteudo = resposta.headers.get("content-type") || "";
+    const conteudoJSON = tipoConteudo.includes("application/json") ||
+        tipoConteudo.includes("application/geo+json");
     let dados = null;
 
-    if (tipoConteudo.includes("application/json")) {
+    if (conteudoJSON) {
         try {
             dados = await resposta.json();
         } catch {
@@ -45,7 +47,7 @@ async function requisicaoAPI(endpoint, options = {}) {
         throw erroAPI;
     }
 
-    if (!tipoConteudo.includes("application/json")) {
+    if (!conteudoJSON) {
         throw new Error(
             "A API respondeu com um formato diferente de JSON."
         );

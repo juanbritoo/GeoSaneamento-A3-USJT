@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   MapContainer,
@@ -11,10 +11,10 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-import { buscarSaneamento } from "../../services/api";
+import { buscarGeoJSONDistritos } from "../../services/api";
 
 // ==========================================
-// ESTILOS DOS MUNICÍPIOS
+// ESTILOS DOS DISTRITOS
 // ==========================================
 
 const estiloNormal = {
@@ -29,13 +29,6 @@ const estiloHover = {
   weight: 3,
   fillColor: "#c8e6c1",
   fillOpacity: 0.65
-};
-
-const estiloSelecionado = {
-  color: "#1565c0",
-  weight: 4,
-  fillColor: "#90caf9",
-  fillOpacity: 0.75
 };
 
 // ==========================================
@@ -54,44 +47,9 @@ function AjustarMapa({ geojson }) {
     if (!limites.isValid()) return;
 
     map.fitBounds(limites);
-    map.setMaxBounds(limites);
-    map.options.maxBoundsViscosity = 1.0;
   }, [geojson, map]);
 
   return null;
-}
-
-// ==========================================
-// TRATAMENTO DE ERROS DA API
-// ==========================================
-
-function obterMensagemErro(error) {
-  const status = error?.status;
-  const mensagem = error?.message ?? "";
-
-  if (status === 404 || mensagem.includes("HTTP 404")) {
-    return "Município não encontrado no banco de dados de saneamento.";
-  }
-
-  if (status === 422 || mensagem.includes("HTTP 422")) {
-    return "O código territorial enviado é inválido. Verifique o código IBGE.";
-  }
-
-  if (status === 503 || mensagem.includes("HTTP 503")) {
-    return mensagem ||
-      "O banco de dados está indisponível no momento.";
-  }
-
-  if (
-    error?.cause ||
-    mensagem.includes("Failed to fetch") ||
-    mensagem.includes("conectar à API")
-  ) {
-    return "Não foi possível conectar ao backend. Verifique se a API está disponível.";
-  }
-
-  return mensagem ||
-    "Não foi possível carregar os indicadores. Consulte o Console para detalhes.";
 }
 
 // ==========================================
@@ -99,7 +57,7 @@ function obterMensagemErro(error) {
 // ==========================================
 
 function Map() {
-  const [municipios, setMunicipios] = useState(null);
+  const [distritos, setDistritos] = useState(null);
   const [erroMapa, setErroMapa] = useState("");
 
   const [municipioSelecionado, setMunicipioSelecionado] = useState(null);
@@ -107,22 +65,8 @@ function Map() {
   const [carregandoSaneamento, setCarregandoSaneamento] = useState(false);
   const [erroSaneamento, setErroSaneamento] = useState("");
 
-  const camadaSelecionada = useRef(null);
-  const requisicaoAtual = useRef(0);
-
-  // ==========================================
-  // FECHAR PAINEL DO MUNICÍPIO
-  // ==========================================
-
+  // Painel preservado; seleção municipal temporariamente desativada.
   const fecharPainel = () => {
-    if (camadaSelecionada.current) {
-      camadaSelecionada.current.setStyle(estiloNormal);
-      camadaSelecionada.current = null;
-    }
-
-    // Invalida qualquer requisição anterior ainda em andamento.
-    requisicaoAtual.current += 1;
-
     setMunicipioSelecionado(null);
     setDadosSaneamento(null);
     setCarregandoSaneamento(false);
@@ -130,129 +74,40 @@ function Map() {
   };
 
   // ==========================================
-  // CARREGAR GEOJSON DOS MUNICÍPIOS
+  // CARREGAR GEOJSON DOS DISTRITOS
   // ==========================================
 
   useEffect(() => {
     let ativo = true;
 
-    async function carregarMunicipios() {
+    async function carregarDistritos() {
       try {
-        const resposta = await fetch(
-          "/maps/sao_paulo_municipios.geojson"
-        );
-
-        if (!resposta.ok) {
-          throw new Error(`HTTP ${resposta.status}`);
-        }
-
-        const geojson = await resposta.json();
+        const geojson = await buscarGeoJSONDistritos();
 
         if (ativo) {
-          setMunicipios(geojson);
+          setDistritos(geojson);
           setErroMapa("");
         }
       } catch (error) {
         console.error(
-          "Erro ao carregar o GeoJSON dos municípios:",
+          "Erro ao carregar o GeoJSON dos distritos:",
           error
         );
 
         if (ativo) {
           setErroMapa(
-            "Não foi possível carregar o mapa dos municípios."
+            "Falha ao carregar o mapa dos distritos de São Paulo. Verifique a API e a malha distrital."
           );
         }
       }
     }
 
-    carregarMunicipios();
+    carregarDistritos();
 
     return () => {
       ativo = false;
     };
   }, []);
-
-  // ==========================================
-  // SELECIONAR MUNICÍPIO E CONSULTAR BACKEND
-  // ==========================================
-
-  const selecionarMunicipio = async (propriedades, camada) => {
-    // Restaura o estilo do município selecionado anteriormente.
-    if (camadaSelecionada.current) {
-      camadaSelecionada.current.setStyle(estiloNormal);
-    }
-
-    camada.setStyle(estiloSelecionado);
-    camadaSelecionada.current = camada;
-
-    setMunicipioSelecionado(propriedades);
-    setDadosSaneamento(null);
-    setErroSaneamento("");
-    setCarregandoSaneamento(true);
-
-    // Identificador para impedir que respostas antigas
-    // sobrescrevam os dados do município mais recente.
-    const idRequisicao = ++requisicaoAtual.current;
-
-    try {
-      const codigoOriginal = propriedades.CD_MUN;
-
-      if (
-        codigoOriginal === null ||
-        codigoOriginal === undefined ||
-        !/^\d{7}$/.test(String(codigoOriginal))
-      ) {
-        throw new Error(
-          `Código IBGE municipal inválido: ${codigoOriginal}`
-        );
-      }
-
-      const codigoIBGE = String(codigoOriginal);
-
-      console.log(
-        "Município selecionado:",
-        propriedades.NM_MUN
-      );
-
-      console.log(
-        "Código IBGE enviado ao backend:",
-        codigoIBGE
-      );
-
-      // Consulta o endpoint de saneamento da API FastAPI.
-      const dados = await buscarSaneamento(
-        "municipio",
-        codigoIBGE
-      );
-
-      // Ignora a resposta caso outro município tenha sido selecionado.
-      if (idRequisicao !== requisicaoAtual.current) {
-        return;
-      }
-
-      setDadosSaneamento(dados);
-    } catch (error) {
-      if (idRequisicao !== requisicaoAtual.current) {
-        return;
-      }
-
-      console.error(
-        "Erro ao buscar dados de saneamento:",
-        error
-      );
-
-      setErroSaneamento(obterMensagemErro(error));
-    } finally {
-      if (idRequisicao === requisicaoAtual.current) {
-        setCarregandoSaneamento(false);
-      }
-    }
-  };
-
-  // ==========================================
-  // RENDERIZAÇÃO
-  // ==========================================
 
   return (
     <div
@@ -262,7 +117,7 @@ function Map() {
         position: "relative"
       }}
     >
-      {/* Erro ao carregar o arquivo GeoJSON */}
+      {/* Erro ao carregar a malha distrital */}
       {erroMapa && (
         <div
           role="alert"
@@ -283,8 +138,8 @@ function Map() {
 
       {/* Mapa interativo */}
       <MapContainer
-        center={[-22.2, -48.8]}
-        zoom={7}
+        center={[-23.55, -46.63]}
+        zoom={10}
         style={{
           height: "100%",
           width: "100%"
@@ -295,71 +150,21 @@ function Map() {
           attribution="&copy; OpenStreetMap contributors"
         />
 
-        {municipios && (
+        {distritos && (
           <>
             <GeoJSON
-              data={municipios}
+              data={distritos}
               style={estiloNormal}
-              onEachFeature={(feature, layer) => {
-                const propriedades = feature.properties ?? {};
-
-                // Popup com informações geográficas do município.
-                layer.bindPopup(`
-                  <div>
-                    <h3>${propriedades.NM_MUN ?? "Município"}</h3>
-                    <p>
-                      <strong>Código IBGE:</strong>
-                      ${propriedades.CD_MUN ?? "Não informado"}
-                    </p>
-                    <p>
-                      <strong>UF:</strong>
-                      ${propriedades.SIGLA_UF ?? "SP"}
-                    </p>
-                    <p>
-                      <strong>Área:</strong>
-                      ${propriedades.AREA_KM2 ?? "Não informada"} km²
-                    </p>
-                  </div>
-                `);
-
+              onEachFeature={(_feature, layer) => {
+                // Popups e cliques municipais desativados nesta etapa.
                 layer.on({
-                  mouseover: (evento) => {
-                    evento.target.openPopup();
-
-                    if (
-                      camadaSelecionada.current === evento.target
-                    ) {
-                      evento.target.setStyle(estiloSelecionado);
-                    } else {
-                      evento.target.setStyle(estiloHover);
-                    }
-                  },
-
-                  mouseout: (evento) => {
-                    evento.target.closePopup();
-
-                    if (
-                      camadaSelecionada.current === evento.target
-                    ) {
-                      evento.target.setStyle(estiloSelecionado);
-                    } else {
-                      evento.target.setStyle(estiloNormal);
-                    }
-                  },
-
-                  click: (evento) => {
-                    evento.target.closePopup();
-
-                    selecionarMunicipio(
-                      propriedades,
-                      evento.target
-                    );
-                  }
+                  mouseover: (evento) => evento.target.setStyle(estiloHover),
+                  mouseout: (evento) => evento.target.setStyle(estiloNormal)
                 });
               }}
             />
 
-            <AjustarMapa geojson={municipios} />
+            <AjustarMapa geojson={distritos} />
           </>
         )}
       </MapContainer>

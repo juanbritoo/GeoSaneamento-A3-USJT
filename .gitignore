@@ -25,3 +25,7 @@ backend/.env.*
 *.njsproj
 *.sln
 *.sw?
+
+# Historico local do Codex
+/CODEX_PASSOS.md
+/AGENTS.md
