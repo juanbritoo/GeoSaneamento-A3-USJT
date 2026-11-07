@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   MapContainer,
@@ -30,6 +30,58 @@ const estiloHover = {
   fillColor: "#c8e6c1",
   fillOpacity: 0.65
 };
+
+const estiloSelecionado = {
+  color: "#1565c0",
+  weight: 3,
+  fillColor: "#90caf9",
+  fillOpacity: 0.7
+};
+
+function CamadaDistritos({ distritos, idSelecionado, onSelecionarDistrito }) {
+  const camadaRef = useRef(null);
+  const selecaoRef = useRef(null);
+
+  useEffect(() => {
+    selecaoRef.current = idSelecionado;
+    camadaRef.current?.eachLayer((camada) => {
+      const selecionado = camada.feature.properties.id_territorial === idSelecionado;
+      camada.setStyle(selecionado ? estiloSelecionado : estiloNormal);
+    });
+  }, [idSelecionado, distritos]);
+
+  const configurarDistrito = useCallback((feature, camada) => {
+    const { id_territorial, nome } = feature.properties;
+    // Conteudo textual evita interpretar nomes territoriais como HTML.
+    const nomeTooltip = document.createElement("span");
+    nomeTooltip.textContent = nome;
+    camada.bindTooltip(nomeTooltip, {
+      sticky: true,
+      direction: "auto",
+      opacity: 0.95
+    });
+    camada.on({
+      mouseover: () => {
+        if (selecaoRef.current !== id_territorial) camada.setStyle(estiloHover);
+      },
+      mouseout: () => {
+        camada.setStyle(
+          selecaoRef.current === id_territorial ? estiloSelecionado : estiloNormal
+        );
+      },
+      click: () => onSelecionarDistrito({ id_territorial, nome })
+    });
+  }, [onSelecionarDistrito]);
+
+  return (
+    <GeoJSON
+      ref={camadaRef}
+      data={distritos}
+      style={estiloNormal}
+      onEachFeature={configurarDistrito}
+    />
+  );
+}
 
 // ==========================================
 // AJUSTE AUTOMÁTICO DO MAPA
@@ -96,26 +148,9 @@ function AjustarMapa({ geojson }) {
 // COMPONENTE PRINCIPAL DO MAPA
 // ==========================================
 
-function Map() {
+function Map({ distritoSelecionado, onSelecionarDistrito }) {
   const [distritos, setDistritos] = useState(null);
   const [erroMapa, setErroMapa] = useState("");
-
-  const [municipioSelecionado, setMunicipioSelecionado] = useState(null);
-  const [dadosSaneamento, setDadosSaneamento] = useState(null);
-  const [carregandoSaneamento, setCarregandoSaneamento] = useState(false);
-  const [erroSaneamento, setErroSaneamento] = useState("");
-
-  // Painel preservado; seleção municipal temporariamente desativada.
-  const fecharPainel = () => {
-    setMunicipioSelecionado(null);
-    setDadosSaneamento(null);
-    setCarregandoSaneamento(false);
-    setErroSaneamento("");
-  };
-
-  // ==========================================
-  // CARREGAR GEOJSON DOS DISTRITOS
-  // ==========================================
 
   useEffect(() => {
     let ativo = true;
@@ -202,16 +237,10 @@ function Map() {
 
         {distritos && (
           <>
-            <GeoJSON
-              data={distritos}
-              style={estiloNormal}
-              onEachFeature={(_feature, layer) => {
-                // Popups e cliques municipais desativados nesta etapa.
-                layer.on({
-                  mouseover: (evento) => evento.target.setStyle(estiloHover),
-                  mouseout: (evento) => evento.target.setStyle(estiloNormal)
-                });
-              }}
+            <CamadaDistritos
+              distritos={distritos}
+              idSelecionado={distritoSelecionado?.id_territorial ?? null}
+              onSelecionarDistrito={onSelecionarDistrito}
             />
 
             <AjustarMapa geojson={distritos} />
@@ -219,199 +248,6 @@ function Map() {
         )}
       </MapContainer>
 
-      {/* Painel lateral de informações */}
-      {municipioSelecionado && (
-        <div
-          style={{
-            position: "absolute",
-            top: 20,
-            right: 20,
-            width: 320,
-            maxWidth: "calc(100% - 70px)",
-            maxHeight: "calc(100% - 60px)",
-            overflowY: "auto",
-            boxSizing: "border-box",
-            padding: 20,
-            backgroundColor: "white",
-            borderRadius: 10,
-            boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-            zIndex: 1000
-          }}
-        >
-          <button
-            type="button"
-            onClick={fecharPainel}
-            aria-label="Fechar painel"
-            style={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              border: "none",
-              background: "transparent",
-              fontSize: 20,
-              cursor: "pointer"
-            }}
-          >
-            ✕
-          </button>
-
-          <h2
-            style={{
-              marginTop: 0,
-              paddingRight: 20
-            }}
-          >
-            {municipioSelecionado.NM_MUN ?? "Município"}
-          </h2>
-
-          <p>
-            <strong>Código IBGE:</strong>
-            <br />
-            {municipioSelecionado.CD_MUN ?? "Não informado"}
-          </p>
-
-          <p>
-            <strong>UF:</strong>
-            <br />
-            {municipioSelecionado.SIGLA_UF ?? "SP"}
-          </p>
-
-          <p>
-            <strong>Área:</strong>
-            <br />
-            {municipioSelecionado.AREA_KM2 ?? "Não informada"} km²
-          </p>
-
-          <hr />
-
-          <h3>Indicadores de Saneamento</h3>
-
-          {/* Estado de carregamento */}
-          {carregandoSaneamento && (
-            <p role="status">
-              Carregando indicadores...
-            </p>
-          )}
-
-          {/* Erros da consulta ao backend */}
-          {erroSaneamento && (
-            <p
-              role="alert"
-              style={{
-                color: "#b91c1c",
-                fontSize: 14
-              }}
-            >
-              {erroSaneamento}
-            </p>
-          )}
-
-          {/* Dados recebidos da API */}
-          {!carregandoSaneamento &&
-            !erroSaneamento &&
-            dadosSaneamento && (
-              <>
-                {Array.isArray(dadosSaneamento.territorios) &&
-                dadosSaneamento.territorios.length > 0 ? (
-                  dadosSaneamento.territorios.map((territorio) => (
-                    <div
-                      key={territorio.id_territorial}
-                    >
-                      {Array.isArray(territorio.indicadores) &&
-                      territorio.indicadores.length > 0 ? (
-                        territorio.indicadores.map(
-                          (indicador, index) => (
-                            <div
-                              key={`${indicador.codigo}-${indicador.periodo}-${index}`}
-                              style={{
-                                padding: 12,
-                                marginBottom: 10,
-                                backgroundColor: "#EFF6FF",
-                                borderRadius: 6
-                              }}
-                            >
-                              <h4
-                                style={{
-                                  margin: "0 0 8px",
-                                  color: "#1E4A9A"
-                                }}
-                              >
-                                {indicador.nome ?? indicador.codigo}
-                              </h4>
-
-                              <p
-                                style={{
-                                  margin: "0 0 8px",
-                                  fontSize: 20,
-                                  fontWeight: "bold"
-                                }}
-                              >
-                                {indicador.valor ?? "Não informado"}
-                                {indicador.unidade
-                                  ? ` ${indicador.unidade}`
-                                  : ""}
-                              </p>
-
-                              <div
-                                style={{
-                                  fontSize: 12,
-                                  color: "#475569"
-                                }}
-                              >
-                                <p style={{ margin: "4px 0" }}>
-                                  <strong>Período:</strong>{" "}
-                                  {indicador.periodo ?? "Não informado"}
-                                </p>
-
-                                <p style={{ margin: "4px 0" }}>
-                                  <strong>Fonte:</strong>{" "}
-                                  {indicador.fonte ?? "Não informada"}
-                                </p>
-
-                                <p style={{ margin: "4px 0" }}>
-                                  <strong>Classificação:</strong>{" "}
-                                  {indicador.classificacao_fonte ??
-                                    "Não informada"}
-                                </p>
-
-                                <p style={{ margin: "4px 0" }}>
-                                  <strong>Procedência:</strong>{" "}
-                                  {indicador.procedencia ??
-                                    "Não informada"}
-                                </p>
-                              </div>
-
-                              {indicador.is_mock && (
-                                <p
-                                  style={{
-                                    marginBottom: 0,
-                                    color: "#92400e",
-                                    fontSize: 12,
-                                    fontWeight: "bold"
-                                  }}
-                                >
-                                  ⚠ Dado simulado
-                                </p>
-                              )}
-                            </div>
-                          )
-                        )
-                      ) : (
-                        <p>
-                          Não há indicadores cadastrados para este município.
-                        </p>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p>
-                    Não foram encontrados dados para este município.
-                  </p>
-                )}
-              </>
-            )}
-        </div>
-      )}
     </div>
   );
 }
