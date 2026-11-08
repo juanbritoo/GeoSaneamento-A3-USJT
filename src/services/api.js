@@ -12,6 +12,7 @@ async function requisicaoAPI(endpoint, options = {}) {
             ...options,
         });
     } catch (erro) {
+        if (erro.name === "AbortError") throw erro;
         const erroConexao = new Error(
             `Não foi possível conectar à API em ${API_URL}. ` +
             "Verifique a disponibilidade do backend e a configuração de rede."
@@ -64,7 +65,8 @@ export function buscarSaneamento(
     escala,
     idTerritorial,
     indicador,
-    periodo
+    periodo,
+    options = {}
 ) {
     const parametros = new URLSearchParams();
     parametros.set("escala", escala);
@@ -88,7 +90,8 @@ export function buscarSaneamento(
     }
 
     return requisicaoAPI(
-        `/api/v1/saneamento?${parametros.toString()}`
+        `/api/v1/saneamento?${parametros.toString()}`,
+        options
     );
 }
 

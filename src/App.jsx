@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import Map from "./components/Map/Map";
+import IndicadoresDistrito from "./components/IndicadoresDistrito";
 import Questionario from "./components/Questionario/Questionario";
 
 import logoImg from './logo.png';
@@ -142,7 +143,6 @@ function App() {
               <p><strong>Código territorial:</strong> {distritoSelecionado.id_territorial}</p>
               <p><strong>Município:</strong> São Paulo</p>
               <p><strong>UF:</strong> SP</p>
-              <p>Os indicadores de saneamento deste distrito serão disponibilizados na próxima etapa.</p>
               <button
                 type="button"
                 onClick={() => setDistritoSelecionado(null)}
@@ -151,6 +151,10 @@ function App() {
               >
                 Limpar seleção
               </button>
+              <IndicadoresDistrito
+                key={distritoSelecionado.id_territorial}
+                idTerritorial={distritoSelecionado.id_territorial}
+              />
             </section>
           ) : (
             <>
