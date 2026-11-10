@@ -50,9 +50,7 @@ function App() {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        fontFamily: 'Arial, sans-serif',
-        margin: 0,
-        backgroundColor: '#f4f6f9'
+        margin: 0
       }}
     >
 

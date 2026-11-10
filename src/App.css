@@ -1,4 +1,5 @@
 .app-shell {
+  background-color: var(--color-background-secondary);
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
