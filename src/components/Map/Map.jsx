@@ -18,24 +18,24 @@ import { buscarGeoJSONDistritos } from "../../services/api";
 // ==========================================
 
 const estiloNormal = {
-  color: "#1b5e20",
-  weight: 1,
-  fillColor: "#c8e6c1",
-  fillOpacity: 0.35
+  color: "var(--color-primary)",
+  weight: 1.5,
+  fillColor: "var(--color-background)",
+  fillOpacity: 0.15
 };
 
 const estiloHover = {
-  color: "#000000",
+  color: "var(--map-district-hover)",
   weight: 3,
-  fillColor: "#c8e6c1",
-  fillOpacity: 0.65
+  fillColor: "var(--color-primary-light)",
+  fillOpacity: 0.5
 };
 
 const estiloSelecionado = {
-  color: "#1565c0",
+  color: "var(--color-primary)",
   weight: 3,
-  fillColor: "#90caf9",
-  fillOpacity: 0.7
+  fillColor: "var(--color-primary)",
+  fillOpacity: 0.25
 };
 
 function CamadaDistritos({ distritos, idSelecionado, onSelecionarDistrito }) {
@@ -75,6 +75,7 @@ function CamadaDistritos({ distritos, idSelecionado, onSelecionarDistrito }) {
 
   return (
     <GeoJSON
+      className="district-polygon"
       ref={camadaRef}
       data={distritos}
       style={estiloNormal}
@@ -185,27 +186,12 @@ function Map({ distritoSelecionado, onSelecionarDistrito }) {
   }, []);
 
   return (
-    <div
-      style={{
-        height: "100%",
-        width: "100%",
-        position: "relative"
-      }}
-    >
+    <div className="map-view">
       {/* Erro ao carregar a malha distrital */}
       {erroMapa && (
         <div
           role="alert"
-          style={{
-            position: "absolute",
-            top: 10,
-            left: 10,
-            zIndex: 1000,
-            padding: 12,
-            backgroundColor: "white",
-            color: "#b91c1c",
-            borderRadius: 6
-          }}
+          className="map-error"
         >
           {erroMapa}
         </div>
@@ -225,10 +211,6 @@ function Map({ distritoSelecionado, onSelecionarDistrito }) {
         keyboard={false}
         zoomControl={true}
         trackResize={false}
-        style={{
-          height: "100%",
-          width: "100%"
-        }}
       >
         <TileLayer
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"

@@ -311,9 +311,105 @@
 }
 
 .map-area {
+  --map-district-border: #64748b;
+  --map-district-hover: #76b9ff;
+  --map-shadow: 0 2px 10px rgb(20 33 61 / 10%);
   flex: 1;
   min-width: 0;
   min-height: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-background);
+  box-shadow: var(--map-shadow);
+}
+
+.map-view,
+.map-view .leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+.map-view {
+  position: relative;
+}
+
+.map-view .leaflet-container {
+  font-family: var(--font-family);
+}
+
+.map-area .leaflet-overlay-pane path.district-polygon:focus {
+  outline: none;
+}
+
+.map-area .leaflet-overlay-pane path.district-polygon:focus-visible {
+  stroke: var(--color-primary);
+  stroke-width: 4;
+  stroke-dasharray: 6 3;
+}
+
+.map-area .leaflet-control-zoom {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: var(--map-shadow);
+}
+
+.map-area .leaflet-control-zoom a {
+  border-radius: 0;
+  border-bottom-color: var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.map-area .leaflet-control-zoom a:hover:not(.leaflet-disabled) {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.map-area .leaflet-control-zoom a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -3px;
+}
+
+.map-area .leaflet-control-zoom a.leaflet-disabled {
+  background: var(--color-background-secondary);
+  color: var(--map-district-border);
+}
+
+.map-area .leaflet-tooltip {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-background);
+  color: var(--color-text);
+  box-shadow: var(--map-shadow);
+  font-family: var(--font-family);
+  font-size: 13px;
+}
+
+.map-area .leaflet-control-attribution {
+  margin: 0 6px 6px 0;
+  border-radius: 4px;
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+.map-error {
+  position: absolute;
+  top: 10px;
+  left: 50px;
+  right: 10px;
+  z-index: 1000;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-background);
+  color: var(--color-text);
+  box-shadow: var(--map-shadow);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 @media (max-width: 640px) {
