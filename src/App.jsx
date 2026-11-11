@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Building2, ClipboardList, Layers, Map as MapIcon, MapPin, RotateCcw } from 'lucide-react';
 
 import Map from "./components/Map/Map";
-import IndicadoresDistrito from "./components/IndicadoresDistrito";
+import IndicadoresDistrito, { CardIndicador } from "./components/IndicadoresDistrito";
 import Questionario from "./components/Questionario/Questionario";
 
-import logoImg from './logo.png';
+import logoImg from './logo_whiteVersion.png';
 import { buscarDistritos, buscarSaneamento } from "./services/api";
 import "./App.css";
 
@@ -189,94 +189,39 @@ function App() {
                 idTerritorial={distritoSelecionado.id_territorial}
               />
           ) : (
-            <>
-              {/* Carregamento */}
-
+            <section className="indicators-section" aria-label="Indicadores municipais">
+              <h3>Indicadores municipais</h3>
               {carregando && (
-                <p>Carregando indicadores...</p>
+                <p className="indicator-state" role="status">Carregando indicadores municipais...</p>
               )}
-
-              {/* Erro da API */}
-
               {erroAPI && (
-                <p style={{ color: '#b91c1c' }}>
-                  {erroAPI}
-                </p>
+                <p className="indicator-state" role="alert">{erroAPI}</p>
               )}
-
-              {/* Dados recebidos da API */}
-
-              {!carregando && !erroAPI && dadosSaneamento && (
+              {!carregando && !erroAPI && (
                 <>
-                  {dadosSaneamento.territorios.map((territorio) => (
+                  {!dadosSaneamento?.territorios?.length && (
+                    <p className="indicator-state">Nenhum indicador disponível para o município de São Paulo. Isso não significa ausência de saneamento.</p>
+                  )}
+                  {dadosSaneamento?.territorios?.map((territorio) => (
                     <div key={territorio.id_territorial}>
-
-                      <h3
-                        style={{
-                          fontSize: '15px',
-                          color: '#1E4A9A',
-                          marginBottom: '10px'
-                        }}
-                      >
-                        {territorio.nome}
-                      </h3>
-
-                      {/* Verificar indicadores disponíveis */}
-
+                      <p className="indicator-territory">Município: <strong>{territorio.nome}</strong></p>
                       {territorio.indicadores.length === 0 ? (
-                        <p>
-                          Nenhum indicador disponível para este município.
+                        <p className="indicator-state">
+                          Nenhum indicador disponível para este município. Isso não significa ausência de saneamento.
                         </p>
                       ) : (
-
-                        territorio.indicadores.map((indicador, index) => (
-                          <div
-                            key={`${indicador.codigo}-${indicador.periodo}-${index}`}
-                            style={{
-                              padding: '12px',
-                              backgroundColor: '#EFF6FF',
-                              borderRadius: '6px',
-                              marginBottom: '10px'
-                            }}
-                          >
-
-                            <h4
-                              style={{
-                                margin: '0 0 5px 0',
-                                fontSize: '14px',
-                                color: '#1E4A9A'
-                              }}
-                            >
-                              {indicador.nome}
-                            </h4>
-
-                            <p
-                              style={{
-                                margin: 0,
-                                fontSize: '20px',
-                                fontWeight: 'bold'
-                              }}
-                            >
-                              {indicador.valor ?? 'Não informado'}
-
-                              {indicador.unidade
-                                ? ` ${indicador.unidade}`
-                                : ''}
-                            </p>
-
-                            <small>
-                              Período: {indicador.periodo ?? 'Não informado'}
-                            </small>
-
-                          </div>
-                        ))
+                        <details className="municipal-series">
+                          <summary>Consultar todas as séries ({territorio.indicadores.length})</summary>
+                          {territorio.indicadores.map((indicador, index) => (
+                            <CardIndicador key={`${indicador.codigo}-${indicador.periodo}-${index}`} indicador={indicador} />
+                          ))}
+                        </details>
                       )}
-
                     </div>
                   ))}
                 </>
               )}
-            </>
+            </section>
           )}
 
         </aside>
