@@ -5,6 +5,104 @@
   overflow: hidden;
 }
 
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  min-height: 80px;
+  padding: 12px 24px;
+  background: var(--color-primary);
+  color: var(--color-background);
+}
+
+.app-logo {
+  height: 56px;
+  width: auto;
+  object-fit: contain;
+}
+
+.app-current-page,
+.questionnaire-trigger,
+.territorial-clear,
+.territorial-name,
+.territorial-details dt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-current-page {
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 18%);
+  font-weight: 600;
+}
+
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+  min-width: 0;
+}
+
+.district-selector {
+  width: 18rem;
+  min-width: 0;
+}
+
+.district-selector select,
+.questionnaire-trigger,
+.territorial-clear {
+  box-sizing: border-box;
+  min-height: 42px;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-background);
+  color: var(--color-primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.district-selector select {
+  width: 100%;
+  color: var(--color-text);
+  text-overflow: ellipsis;
+}
+
+.district-selector select:disabled {
+  cursor: default;
+}
+
+.district-selector p {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.questionnaire-trigger {
+  font-weight: 600;
+}
+
+.questionnaire-trigger:hover,
+.territorial-clear:hover {
+  background: var(--color-primary-light);
+}
+
+.app-header :focus-visible,
+.territorial-clear:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 3px;
+}
+
+.app-header svg,
+.territorial-panel svg {
+  flex-shrink: 0;
+}
+
 .app-workspace {
   display: flex;
   flex: 1;
@@ -18,6 +116,66 @@
   flex-shrink: 0;
   min-height: 0;
   overflow-wrap: anywhere;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 16px;
+  background: var(--color-background);
+  border-right: 1px solid var(--color-border);
+}
+
+.territorial-panel {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-background);
+}
+
+.territorial-panel h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.territorial-name {
+  margin: 16px 0 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 20px;
+}
+
+.territorial-details {
+  margin: 4px 0 16px;
+  font-size: 13px;
+}
+
+.territorial-details > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.territorial-details dt {
+  font-weight: 600;
+}
+
+.territorial-details svg {
+  color: var(--color-primary);
+}
+
+.territorial-details dd {
+  margin: 0;
+}
+
+.territorial-clear {
+  justify-content: center;
+  width: 100%;
 }
 
 .app-map {

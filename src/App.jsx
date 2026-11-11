@@ -1,12 +1,13 @@
 
 import { useEffect, useRef, useState } from 'react';
+import { Building2, ClipboardList, Layers, Map as MapIcon, MapPin, RotateCcw } from 'lucide-react';
 
 import Map from "./components/Map/Map";
 import IndicadoresDistrito from "./components/IndicadoresDistrito";
 import Questionario from "./components/Questionario/Questionario";
 
 import logoImg from './logo.png';
-import { buscarSaneamento } from "./services/api";
+import { buscarDistritos, buscarSaneamento } from "./services/api";
 import "./App.css";
 
 function App() {
@@ -15,12 +16,40 @@ function App() {
   const [dadosSaneamento, setDadosSaneamento] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [erroAPI, setErroAPI] = useState("");
+  const [distritos, setDistritos] = useState([]);
+  const [carregandoDistritos, setCarregandoDistritos] = useState(true);
+  const [erroDistritos, setErroDistritos] = useState("");
   const painelRef = useRef(null);
 
   useEffect(() => {
     // A identificacao deve aparecer mesmo se os indicadores estavam rolados.
     painelRef.current.scrollTop = 0;
   }, [distritoSelecionado]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    buscarDistritos({ signal: controller.signal })
+      .then((dados) => {
+        if (controller.signal.aborted) return;
+        if (!Array.isArray(dados) || dados.some((distrito) =>
+          !distrito || typeof distrito.id_territorial !== 'string' || typeof distrito.nome !== 'string'
+        )) {
+          throw new Error('Lista de distritos inválida.');
+        }
+        setDistritos(dados);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setErroDistritos('Não foi possível carregar os distritos. Selecione pelo mapa.');
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setCarregandoDistritos(false);
+      });
+
+    return () => controller.abort();
+  }, []);
 
   // ==========================================
   // BUSCAR DADOS DE SANEAMENTO NA API
@@ -54,49 +83,55 @@ function App() {
       }}
     >
 
-      {/* ====================================== */}
-      {/* HEADER */}
-      {/* ====================================== */}
-
-      <header
-        style={{
-          height: '75px',
-          flexShrink: 0,
-          backgroundColor: '#121212',
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 20px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img
-            src={logoImg}
-            alt="Logo GeoSaneamento"
-            style={{
-              height: '55px',
-              objectFit: 'contain'
-            }}
-          />
+      <header className="app-header">
+        <img className="app-logo" src={logoImg} alt="Logo GeoSaneamento" />
+        <nav aria-label="Tela atual">
+          <span className="app-current-page" aria-current="page">
+            <MapIcon size={22} aria-hidden="true" />
+            Mapa
+          </span>
+        </nav>
+        <div className="app-header-actions">
+          <div className="district-selector">
+            <select
+              aria-label="Selecione um distrito"
+              aria-describedby={erroDistritos ? 'district-error' : undefined}
+              aria-busy={carregandoDistritos}
+              value={distritoSelecionado?.id_territorial ?? ''}
+              disabled={carregandoDistritos || !!erroDistritos || distritos.length === 0}
+              onChange={(event) => setDistritoSelecionado(
+                distritos.find((distrito) => distrito.id_territorial === event.target.value) ?? null
+              )}
+            >
+              <option value="">
+                {carregandoDistritos ? 'Carregando distritos...' : erroDistritos
+                  ? 'Distritos indisponíveis' : distritos.length === 0
+                    ? 'Nenhum distrito disponível' : 'Selecione um distrito...'}
+              </option>
+              {distritoSelecionado && !distritos.some((distrito) =>
+                distrito.id_territorial === distritoSelecionado.id_territorial
+              ) && (
+                <option value={distritoSelecionado.id_territorial}>
+                  {distritoSelecionado.nome}
+                </option>
+              )}
+              {distritos.map((distrito) => (
+                <option key={distrito.id_territorial} value={distrito.id_territorial}>
+                  {distrito.nome}
+                </option>
+              ))}
+            </select>
+            {erroDistritos && <p id="district-error" role="alert">{erroDistritos}</p>}
+          </div>
+          <button
+            type="button"
+            className="questionnaire-trigger"
+            onClick={() => setMostrarQuestionario(true)}
+          >
+            <ClipboardList size={22} aria-hidden="true" />
+            Questionário
+          </button>
         </div>
-
-        <button
-          style={{
-            backgroundColor: '#1E70E6',
-            color: 'white',
-            border: 'none',
-            padding: '8px 16px',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            transition: '0.2s'
-          }}
-          onClick={() => setMostrarQuestionario(true)}
-        >
-          Questionário
-        </button>
       </header>
 
       {/* ====================================== */}
@@ -112,48 +147,47 @@ function App() {
         <aside
           ref={painelRef}
           className="app-sidebar"
-          style={{
-            backgroundColor: 'white',
-            borderRight: '1px solid #e5e7eb',
-            padding: '20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '15px',
-            overflowY: 'auto'
-          }}
         >
-
-          <h2
-            style={{
-              fontSize: '18px',
-              color: '#111827',
-              margin: '0 0 10px 0'
-            }}
-          >
-            Informações de Saneamento
-          </h2>
+          <section className="territorial-panel" aria-live="polite" aria-label="Informações territoriais">
+            <h2>Informações de Saneamento</h2>
+            {distritoSelecionado && (
+              <>
+                <h3 className="territorial-name">
+                  <MapPin size={24} aria-hidden="true" />
+                  {distritoSelecionado.nome}
+                </h3>
+                <dl className="territorial-details">
+                  <div>
+                    <dt><MapIcon size={20} aria-hidden="true" />Código territorial</dt>
+                    <dd>{distritoSelecionado.id_territorial}</dd>
+                  </div>
+                  <div>
+                    <dt><Building2 size={20} aria-hidden="true" />Município</dt>
+                    <dd>São Paulo</dd>
+                  </div>
+                  <div>
+                    <dt><Layers size={20} aria-hidden="true" />UF</dt>
+                    <dd>SP</dd>
+                  </div>
+                </dl>
+                <button
+                  type="button"
+                  className="territorial-clear"
+                  onClick={() => setDistritoSelecionado(null)}
+                  aria-label="Limpar seleção distrital"
+                >
+                  <RotateCcw size={18} aria-hidden="true" />
+                  Limpar seleção
+                </button>
+              </>
+            )}
+          </section>
 
           {distritoSelecionado ? (
-            <section aria-live="polite" aria-label="Distrito selecionado">
-              <h3 style={{ color: '#1E4A9A', marginTop: 0 }}>
-                {distritoSelecionado.nome}
-              </h3>
-              <p><strong>Código territorial:</strong> {distritoSelecionado.id_territorial}</p>
-              <p><strong>Município:</strong> São Paulo</p>
-              <p><strong>UF:</strong> SP</p>
-              <button
-                type="button"
-                onClick={() => setDistritoSelecionado(null)}
-                aria-label="Limpar seleção distrital"
-                style={{ cursor: 'pointer', padding: '6px 10px' }}
-              >
-                Limpar seleção
-              </button>
               <IndicadoresDistrito
                 key={distritoSelecionado.id_territorial}
                 idTerritorial={distritoSelecionado.id_territorial}
               />
-            </section>
           ) : (
             <>
               {/* Carregamento */}
