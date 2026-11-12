@@ -38,38 +38,61 @@ const estiloSelecionado = {
   fillOpacity: 0.25
 };
 
-function CamadaDistritos({ distritos, idSelecionado, onSelecionarDistrito }) {
+// ==========================================
+// CAMADA DOS DISTRITOS
+// ==========================================
+
+function CamadaDistritos({
+  distritos,
+  idSelecionado,
+  onSelecionarDistrito
+}) {
   const camadaRef = useRef(null);
   const selecaoRef = useRef(null);
 
   useEffect(() => {
     selecaoRef.current = idSelecionado;
+
     camadaRef.current?.eachLayer((camada) => {
-      const selecionado = camada.feature.properties.id_territorial === idSelecionado;
-      camada.setStyle(selecionado ? estiloSelecionado : estiloNormal);
+      const selecionado =
+        camada.feature.properties.id_territorial === idSelecionado;
+
+      camada.setStyle(
+        selecionado ? estiloSelecionado : estiloNormal
+      );
     });
   }, [idSelecionado, distritos]);
 
   const configurarDistrito = useCallback((feature, camada) => {
     const { id_territorial, nome } = feature.properties;
-    // Conteudo textual evita interpretar nomes territoriais como HTML.
+
     const nomeTooltip = document.createElement("span");
     nomeTooltip.textContent = nome;
+
     camada.bindTooltip(nomeTooltip, {
       sticky: true,
       direction: "auto",
       opacity: 0.95
     });
+
     camada.on({
       mouseover: () => {
-        if (selecaoRef.current !== id_territorial) camada.setStyle(estiloHover);
+        if (selecaoRef.current !== id_territorial) {
+          camada.setStyle(estiloHover);
+        }
       },
+
       mouseout: () => {
         camada.setStyle(
-          selecaoRef.current === id_territorial ? estiloSelecionado : estiloNormal
+          selecaoRef.current === id_territorial
+            ? estiloSelecionado
+            : estiloNormal
         );
       },
-      click: () => onSelecionarDistrito({ id_territorial, nome })
+
+      click: () => {
+        onSelecionarDistrito({ id_territorial, nome });
+      }
     });
   }, [onSelecionarDistrito]);
 
@@ -85,14 +108,71 @@ function CamadaDistritos({ distritos, idSelecionado, onSelecionarDistrito }) {
 }
 
 // ==========================================
-// AJUSTE AUTOMÁTICO DO MAPA
+// MOVIMENTAÇÃO LIMITADA DO MAPA
+// ==========================================
+
+function LimitarArraste({ limites }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!limites?.isValid()) return;
+
+    let ajustando = false;
+
+    const limitarMovimentacao = () => {
+      if (ajustando) return;
+
+      const centro = map.getCenter();
+
+      // Mantém o centro dentro da extensão geográfica
+      // dos distritos, sem utilizar setMaxBounds.
+      const latitude = Math.max(
+        limites.getSouth(),
+        Math.min(limites.getNorth(), centro.lat)
+      );
+
+      const longitude = Math.max(
+        limites.getWest(),
+        Math.min(limites.getEast(), centro.lng)
+      );
+
+      // Só corrige quando o centro ultrapassa os limites.
+      if (
+        latitude !== centro.lat ||
+        longitude !== centro.lng
+      ) {
+        ajustando = true;
+
+        map.panTo(
+          [latitude, longitude],
+          { animate: false }
+        );
+
+        ajustando = false;
+      }
+    };
+
+    // Limita durante o arraste, não depois que o usuário solta.
+    map.on("drag", limitarMovimentacao);
+
+    return () => {
+      map.off("drag", limitarMovimentacao);
+    };
+  }, [map, limites]);
+
+  return null;
+}
+
+// ==========================================
+// AJUSTE INICIAL DO MAPA
 // ==========================================
 
 function AjustarMapa({ geojson }) {
   const map = useMap();
+  const inicializado = useRef(false);
 
   useEffect(() => {
-    if (!geojson) return;
+    if (!geojson || inicializado.current) return;
 
     const camada = L.geoJSON(geojson);
     const limites = camada.getBounds();
@@ -100,47 +180,64 @@ function AjustarMapa({ geojson }) {
     if (!limites.isValid()) return;
 
     const container = map.getContainer();
+
     let quadro;
-    let larguraAnterior = 0;
-    let alturaAnterior = 0;
 
-    const enquadrar = () => {
-      const largura = container.clientWidth;
-      const altura = container.clientHeight;
-      // Aguarda um tamanho util e evita repetir o ajuste para o mesmo tamanho.
-      if (largura <= 32 || altura <= 32) return;
-      if (largura === larguraAnterior && altura === alturaAnterior) return;
+    const enquadrarInicialmente = () => {
+      if (
+        container.clientWidth <= 32 ||
+        container.clientHeight <= 32
+      ) {
+        return;
+      }
 
-      map.stop();
-      map.invalidateSize({ pan: false, animate: false });
-      // getBoundsZoom considera o minZoom atual: libere-o antes do calculo.
-      map.setMinZoom(0);
-      const zoomMinimo = map.getBoundsZoom(limites, false, L.point(32, 32));
-      map.fitBounds(limites, {
-        padding: [16, 16],
-        maxZoom: zoomMinimo,
+      map.invalidateSize({
+        pan: false,
         animate: false
       });
-      map.setMinZoom(zoomMinimo);
-      larguraAnterior = largura;
-      alturaAnterior = altura;
+
+      const zoomInicial = map.getBoundsZoom(
+        limites,
+        false,
+        L.point(32, 32)
+      );
+
+      // Enquadramento inicial da malha territorial.
+      map.setMinZoom(zoomInicial);
+
+      map.setView(
+        limites.getCenter(),
+        Math.min(zoomInicial, 18),
+        { animate: false }
+      );
+
+      inicializado.current = true;
     };
 
-    const agendarEnquadramento = () => {
+    quadro = requestAnimationFrame(enquadrarInicialmente);
+
+    return () => {
       cancelAnimationFrame(quadro);
-      quadro = requestAnimationFrame(enquadrar);
     };
+  }, [geojson, map]);
 
-    agendarEnquadramento();
-    // Observa tambem mudancas de tamanho do container sem resize da janela.
-    const observador = new ResizeObserver(agendarEnquadramento);
+  // Redimensiona sem reposicionar o mapa.
+  useEffect(() => {
+    const container = map.getContainer();
+
+    const observador = new ResizeObserver(() => {
+      map.invalidateSize({
+        pan: false,
+        animate: false
+      });
+    });
+
     observador.observe(container);
 
     return () => {
       observador.disconnect();
-      cancelAnimationFrame(quadro);
     };
-  }, [geojson, map]);
+  }, [map]);
 
   return null;
 }
@@ -149,9 +246,14 @@ function AjustarMapa({ geojson }) {
 // COMPONENTE PRINCIPAL DO MAPA
 // ==========================================
 
-function Map({ distritoSelecionado, onSelecionarDistrito }) {
+function Map({
+  distritoSelecionado,
+  onSelecionarDistrito
+}) {
   const [distritos, setDistritos] = useState(null);
   const [erroMapa, setErroMapa] = useState("");
+
+  const [limites, setLimites] = useState(null);
 
   useEffect(() => {
     let ativo = true;
@@ -161,7 +263,15 @@ function Map({ distritoSelecionado, onSelecionarDistrito }) {
         const geojson = await buscarGeoJSONDistritos();
 
         if (ativo) {
+          const camada = L.geoJSON(geojson);
+          const bounds = camada.getBounds();
+
+          if (!bounds.isValid()) {
+            throw new Error("GeoJSON sem limites geográficos válidos.");
+          }
+
           setDistritos(geojson);
+          setLimites(bounds);
           setErroMapa("");
         }
       } catch (error) {
@@ -187,23 +297,24 @@ function Map({ distritoSelecionado, onSelecionarDistrito }) {
 
   return (
     <div className="map-view">
-      {/* Erro ao carregar a malha distrital */}
+
       {erroMapa && (
-        <div
-          role="alert"
-          className="map-error"
-        >
+        <div role="alert" className="map-error">
           {erroMapa}
         </div>
       )}
 
-      {/* Mapa interativo */}
       <MapContainer
         center={[-23.55, -46.63]}
         zoom={10}
         zoomSnap={0.25}
+        minZoom={5}
         maxZoom={18}
-        dragging={false}
+
+        // Arraste habilitado.
+        dragging={true}
+
+        // Mantém os controles originais.
         scrollWheelZoom={false}
         doubleClickZoom={false}
         touchZoom={false}
@@ -217,15 +328,19 @@ function Map({ distritoSelecionado, onSelecionarDistrito }) {
           attribution="&copy; OpenStreetMap contributors"
         />
 
-        {distritos && (
+        {distritos && limites && (
           <>
             <CamadaDistritos
               distritos={distritos}
-              idSelecionado={distritoSelecionado?.id_territorial ?? null}
+              idSelecionado={
+                distritoSelecionado?.id_territorial ?? null
+              }
               onSelecionarDistrito={onSelecionarDistrito}
             />
 
             <AjustarMapa geojson={distritos} />
+
+            <LimitarArraste limites={limites} />
           </>
         )}
       </MapContainer>
@@ -235,4 +350,3 @@ function Map({ distritoSelecionado, onSelecionarDistrito }) {
 }
 
 export default Map;
-
