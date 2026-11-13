@@ -19,9 +19,12 @@
 /* Modal principal */
 
 .questionario-modal {
+  box-sizing: border-box;
   width: 100%;
   max-width: 620px;
   max-height: 90vh;
+  max-height: min(90dvh, calc(100dvh - 40px));
+  overflow-wrap: anywhere;
 
   display: flex;
   flex-direction: column;
@@ -41,6 +44,8 @@
 
 .questionario-header {
   display: flex;
+  flex-shrink: 0;
+  gap: 12px;
   align-items: center;
   justify-content: space-between;
 
@@ -51,6 +56,7 @@
 
 .questionario-identidade {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 12px;
 }
@@ -82,8 +88,9 @@
   align-items: center;
   justify-content: center;
 
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
 
   border: none;
   border-radius: 8px;
@@ -101,8 +108,10 @@
 /* Conteúdo */
 
 .questionario-conteudo {
+  min-height: 0;
   padding: 24px;
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /* Introdução */
@@ -355,13 +364,14 @@
 
 /* Responsividade */
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .questionario-overlay {
     padding: 10px;
   }
 
   .questionario-modal {
     max-height: 95vh;
+    max-height: calc(100dvh - 20px);
     border-radius: 12px;
   }
 
