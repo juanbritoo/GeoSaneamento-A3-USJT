@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { CircleCheck, X } from "lucide-react";
 import "./Questionario.css";
 
 const perguntas = [
@@ -134,9 +135,7 @@ export default function Questionario({ aberto, onFechar }) {
       >
         <header className="questionario-header">
           <div className="questionario-identidade">
-            <span className="questionario-icone">
-              💧
-            </span>
+            <img className="questionario-icone" src="/icon_gota.png" alt="" />
 
             <div>
               <h2 id="questionario-titulo">
@@ -153,7 +152,7 @@ export default function Questionario({ aberto, onFechar }) {
             onClick={fechar}
             aria-label="Fechar questionário"
           >
-            ×
+            <X size={22} aria-hidden="true" />
           </button>
         </header>
 
@@ -250,7 +249,7 @@ export default function Questionario({ aberto, onFechar }) {
           ) : (
             <div className="questionario-sucesso">
               <div className="questionario-sucesso-icone">
-                ✓
+                <CircleCheck size={36} aria-hidden="true" />
               </div>
 
               <h3>Questionário concluído!</h3>

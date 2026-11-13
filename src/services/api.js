@@ -98,3 +98,7 @@ export function buscarSaneamento(
 export function buscarGeoJSONDistritos() {
     return requisicaoAPI("/distritos/geojson");
 }
+
+export function buscarDistritos(options = {}) {
+    return requisicaoAPI("/distritos", options);
+}
