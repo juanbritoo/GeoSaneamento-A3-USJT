@@ -1,7 +1,15 @@
 
 import { useState } from "react";
 import { CircleCheck, X } from "lucide-react";
+import { enviarQuestionario } from "../../services/api";
 import "./Questionario.css";
+
+const NIVEIS = {
+  critico: "Crítico",
+  precario: "Precário",
+  regular: "Regular",
+  adequado: "Adequado",
+};
 
 const perguntas = [
   {
@@ -65,10 +73,19 @@ const perguntas = [
   },
 ];
 
-export default function Questionario({ aberto, onFechar }) {
+export default function Questionario({
+  aberto,
+  onFechar,
+  distritos = [],
+  distritoSelecionado = null,
+  onSelecionarDistrito,
+}) {
   const [etapa, setEtapa] = useState(0);
   const [respostas, setRespostas] = useState({});
   const [concluido, setConcluido] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [erroEnvio, setErroEnvio] = useState("");
+  const [resultado, setResultado] = useState(null);
 
   if (!aberto) {
     return null;
@@ -88,7 +105,7 @@ export default function Questionario({ aberto, onFechar }) {
     }));
   }
 
-  function avancar() {
+  async function avancar() {
     if (!respostaAtual) return;
 
     if (etapa < perguntas.length - 1) {
@@ -96,11 +113,28 @@ export default function Questionario({ aberto, onFechar }) {
       return;
     }
 
-    setConcluido(true);
+    if (!distritoSelecionado) {
+      setErroEnvio("Selecione o distrito antes de concluir.");
+      return;
+    }
 
-    // Nesta etapa, as respostas ficam no frontend.
-    // Futuramente, podemos enviá-las para a API FastAPI.
-    console.log("Respostas do questionário:", respostas);
+    setEnviando(true);
+    setErroEnvio("");
+
+    try {
+      const registro = await enviarQuestionario(
+        distritoSelecionado.id_territorial,
+        respostas
+      );
+      setResultado(registro);
+      setConcluido(true);
+    } catch (erro) {
+      setErroEnvio(
+        erro.message || "Não foi possível enviar o questionário."
+      );
+    } finally {
+      setEnviando(false);
+    }
   }
 
   function voltar() {
@@ -113,6 +147,8 @@ export default function Questionario({ aberto, onFechar }) {
     setEtapa(0);
     setRespostas({});
     setConcluido(false);
+    setErroEnvio("");
+    setResultado(null);
     onFechar();
   }
 
@@ -174,6 +210,35 @@ export default function Questionario({ aberto, onFechar }) {
                 </p>
               </div>
 
+              <div className="questionario-regiao">
+                <label htmlFor="questionario-distrito">
+                  Região avaliada
+                </label>
+
+                <select
+                  id="questionario-distrito"
+                  value={distritoSelecionado?.id_territorial ?? ""}
+                  onChange={(evento) =>
+                    onSelecionarDistrito?.(
+                      distritos.find(
+                        (distrito) =>
+                          distrito.id_territorial === evento.target.value
+                      ) ?? null
+                    )
+                  }
+                >
+                  <option value="">Selecione um distrito...</option>
+                  {distritos.map((distrito) => (
+                    <option
+                      key={distrito.id_territorial}
+                      value={distrito.id_territorial}
+                    >
+                      {distrito.nome}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="questionario-progresso">
                 <div className="questionario-progresso-info">
                   <span>
@@ -224,6 +289,12 @@ export default function Questionario({ aberto, onFechar }) {
                 </div>
               </div>
 
+              {erroEnvio && (
+                <p className="questionario-erro" role="alert">
+                  {erroEnvio}
+                </p>
+              )}
+
               <footer className="questionario-footer">
                 <button
                   type="button"
@@ -238,10 +309,16 @@ export default function Questionario({ aberto, onFechar }) {
                   type="button"
                   className="questionario-botao-principal"
                   onClick={avancar}
-                  disabled={!respostaAtual}
+                  disabled={
+                    !respostaAtual ||
+                    enviando ||
+                    (etapa === perguntas.length - 1 && !distritoSelecionado)
+                  }
                 >
                   {etapa === perguntas.length - 1
-                    ? "Concluir"
+                    ? enviando
+                      ? "Enviando..."
+                      : "Concluir"
                     : "Próxima pergunta"}
                 </button>
               </footer>
@@ -259,6 +336,17 @@ export default function Questionario({ aberto, onFechar }) {
                 Sua contribuição é importante para compreender
                 as condições de saneamento básico.
               </p>
+
+              {resultado && (
+                <p className="questionario-resultado">
+                  {resultado.nome_territorio}: nível de saneamento{" "}
+                  <strong>
+                    {NIVEIS[resultado.nivel_saneamento] ??
+                      resultado.nivel_saneamento}
+                  </strong>{" "}
+                  ({Math.round(resultado.pontuacao)}/100)
+                </p>
+              )}
 
               <button
                 type="button"
