@@ -1,7 +1,74 @@
 import { useEffect, useState } from "react";
+import { ChartNoAxesColumn, Droplet, House, Trash2, Waves } from "lucide-react";
 import { buscarSaneamento } from "../services/api";
 
 const formatoNumero = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 20 });
+
+const indicadoresDistritais = {
+  ABASTECIMENTO_AGUA_REDE_GERAL: { titulo: "Abastecimento de água", Icone: Droplet },
+  ESGOTAMENTO_SANITARIO_REDE_GERAL: { titulo: "Esgotamento sanitário", Icone: Waves },
+  DESTINO_LIXO_COLETA_DIRETA: { titulo: "Coleta de lixo", Icone: Trash2 },
+  EXISTENCIA_BANHEIRO_EXCLUSIVO: { titulo: "Banheiro exclusivo", Icone: House },
+};
+
+const classificacoes = {
+  oficial: "Fonte oficial",
+  nao_verificada: "Fonte não verificada",
+  ficticia: "Fonte fictícia",
+};
+
+export function CardIndicador({ indicador, distrital = false }) {
+  const apresentacao = distrital ? indicadoresDistritais[indicador.codigo] : null;
+  const Icone = apresentacao?.Icone ?? ChartNoAxesColumn;
+  const nome = indicador.nome || indicador.descricao || indicador.codigo || "Indicador sem nome";
+  const dimensoes = indicador.dimensoes;
+  const camposDimensoes = dimensoes != null && typeof dimensoes === "object" && !Array.isArray(dimensoes)
+    ? Object.entries(dimensoes).filter(([, valor]) => valor != null && valor !== "")
+    : dimensoes != null && dimensoes !== "" ? [["Dimensões", dimensoes]] : [];
+
+  return (
+    <article className="indicator-card">
+      <h4><Icone size={22} aria-hidden="true" />{apresentacao?.titulo ?? nome}</h4>
+      <p className="indicator-value">
+        {indicador.valor == null ? "Não informado" : (
+          typeof indicador.valor === "number" ? formatoNumero.format(indicador.valor) : indicador.valor
+        )}
+        {indicador.valor != null && indicador.unidade && <span> {indicador.unidade}</span>}
+      </p>
+      <p className="indicator-period">Período: {indicador.periodo ?? "Não informado"}</p>
+      {(indicador.classificacao_fonte || indicador.is_mock === true) && (
+        <div className="indicator-badges">
+          {indicador.classificacao_fonte && (
+            <span>{classificacoes[indicador.classificacao_fonte] ?? indicador.classificacao_fonte}</span>
+          )}
+          {indicador.is_mock === true && <span>Dado simulado</span>}
+        </div>
+      )}
+      <details className="indicator-source">
+        <summary>Detalhes da fonte</summary>
+        <dl>
+          <div><dt>Fonte</dt><dd>{indicador.fonte || "Não informada"}</dd></div>
+          {indicador.procedencia && <div><dt>Procedência</dt><dd>{indicador.procedencia}</dd></div>}
+          {indicador.id_fonte && <div><dt>Identificador da fonte</dt><dd>{indicador.id_fonte}</dd></div>}
+          {apresentacao && <div><dt>Nome na API</dt><dd>{nome}</dd></div>}
+        </dl>
+        {camposDimensoes.length > 0 && (
+          <details className="indicator-dimensions">
+            <summary>Dimensões adicionais</summary>
+            <dl>
+              {camposDimensoes.map(([campo, valor]) => (
+                <div key={campo}>
+                  <dt>{campo}</dt>
+                  <dd>{typeof valor === "object" ? JSON.stringify(valor) : String(valor)}</dd>
+                </div>
+              ))}
+            </dl>
+          </details>
+        )}
+      </details>
+    </article>
+  );
+}
 
 function extrairIndicadores(dados, idTerritorial) {
   if (dados == null) return [];
@@ -61,45 +128,24 @@ export default function IndicadoresDistrito({ idTerritorial }) {
   }, [idTerritorial, tentativa]);
 
   return (
-    <div aria-label="Indicadores distritais">
-      <h3>Indicadores de saneamento do distrito</h3>
-      {consulta.status === "carregando" && <p role="status">Carregando indicadores do distrito...</p>}
+    <section className="indicators-section" aria-label="Indicadores distritais">
+      <h3>Indicadores de saneamento</h3>
+      {consulta.status === "carregando" && <p className="indicator-state" role="status">Carregando indicadores do distrito...</p>}
       {consulta.status === "erro" && (
         <>
-          <p role="alert" style={{ color: "#b91c1c" }}>{consulta.mensagem}</p>
-          <button type="button" onClick={() => {
+          <p className="indicator-state" role="alert">{consulta.mensagem}</p>
+          <button className="indicator-retry" type="button" onClick={() => {
             setConsulta({ status: "carregando" });
             setTentativa((atual) => atual + 1);
           }}>Tentar novamente</button>
         </>
       )}
       {consulta.status === "sucesso" && consulta.indicadores.length === 0 && (
-        <p>Nenhum indicador de saneamento disponível para este distrito.</p>
+        <p className="indicator-state">Nenhum indicador de saneamento disponível para este distrito. Isso não significa ausência de saneamento.</p>
       )}
       {consulta.status === "sucesso" && consulta.indicadores.map((indicador, index) => (
-        <article key={`${indicador.codigo}-${indicador.periodo}-${index}`} style={{
-          padding: "12px", backgroundColor: "#EFF6FF", borderRadius: "6px", marginBottom: "10px"
-        }}>
-          <h4 style={{ margin: "0 0 5px", fontSize: "14px", color: "#1E4A9A" }}>
-            {indicador.nome || indicador.descricao || indicador.codigo || "Indicador sem nome"}
-          </h4>
-          <p style={{ margin: 0, fontSize: "20px", fontWeight: "bold" }}>
-            {indicador.valor == null ? "Não informado" : (
-              typeof indicador.valor === "number" ? formatoNumero.format(indicador.valor) : indicador.valor
-            )}
-            {indicador.valor != null && indicador.unidade ? ` ${indicador.unidade}` : ""}
-          </p>
-          <p><strong>Período:</strong> {indicador.periodo ?? "Não informado"}</p>
-          <p><strong>Fonte:</strong> {indicador.fonte || "Não informada"}</p>
-          {indicador.classificacao_fonte && <p><strong>Classificação da fonte:</strong> {indicador.classificacao_fonte}</p>}
-          {indicador.procedencia && <p><strong>Procedência:</strong> {indicador.procedencia}</p>}
-          {indicador.is_mock === true && (
-            <p style={{ color: "#854d0e", backgroundColor: "#fef3c7", padding: "8px", fontWeight: "bold" }}>
-              Dado simulado — utilizado para fins acadêmicos.
-            </p>
-          )}
-        </article>
+        <CardIndicador key={`${indicador.codigo}-${indicador.periodo}-${index}`} indicador={indicador} distrital />
       ))}
-    </div>
+    </section>
   );
 }
