@@ -15,7 +15,7 @@ backend/.env
 backend/.env.*
 !backend/env.example
 
-# Editor directories and files
+
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -26,6 +26,10 @@ backend/.env.*
 *.sln
 *.sw?
 
-# Historico local do Codex
+
 /CODEX_PASSOS.md
 /AGENTS.md
+
+/backend/geosaneamento.sql
+
+/backend/geosaneamento_supabase.sql
