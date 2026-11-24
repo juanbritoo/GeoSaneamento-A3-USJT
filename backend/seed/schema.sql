@@ -137,8 +137,9 @@ CREATE INDEX IF NOT EXISTS idx_territorio_municipio ON territorio (id_municipio)
 CREATE INDEX IF NOT EXISTS idx_territorio_geom ON territorio USING GIST (geom);
 CREATE INDEX IF NOT EXISTS idx_valor_indicador_periodo ON valor_indicador (id_territorial, periodo, indicador);
 
--- Respostas do questionário (POST /api/v1/questionario), já com a classificação calculada.
--- Tabela nova e independente: não altera nem remove nada do que já existe.
+-- BEGIN QUESTIONARIO MIGRATION
+-- Bloco canonico compartilhado pela instalacao completa e --questionario-only.
+-- Base V1 seguida de ALTERs: mesmos constraints em bancos novos e existentes.
 CREATE TABLE IF NOT EXISTS resposta_questionario (
     id               BIGSERIAL PRIMARY KEY,
     id_territorial   TEXT NOT NULL REFERENCES territorio(id_territorial),
@@ -150,3 +151,39 @@ CREATE TABLE IF NOT EXISTS resposta_questionario (
 
 CREATE INDEX IF NOT EXISTS idx_resposta_questionario_territorio
     ON resposta_questionario (id_territorial, criado_em DESC);
+
+-- DEFAULT 1 identifica o legado e preserva o INSERT atual, que omite a versao.
+-- Nao inferir respostas ou vinculo territorial para registros anteriores.
+ALTER TABLE resposta_questionario
+    ADD COLUMN IF NOT EXISTS versao_questionario INTEGER NOT NULL DEFAULT 1,
+    ADD COLUMN IF NOT EXISTS vinculo_territorial TEXT,
+    ADD COLUMN IF NOT EXISTS comentario VARCHAR(500);
+
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint
+                   WHERE conrelid = 'resposta_questionario'::regclass
+                     AND conname = 'ck_resposta_questionario_versao') THEN
+        ALTER TABLE resposta_questionario ADD CONSTRAINT ck_resposta_questionario_versao
+            CHECK (versao_questionario IN (1, 2));
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint
+                   WHERE conrelid = 'resposta_questionario'::regclass
+                     AND conname = 'ck_resposta_questionario_legado_v1') THEN
+        ALTER TABLE resposta_questionario ADD CONSTRAINT ck_resposta_questionario_legado_v1
+            CHECK (versao_questionario <> 1 OR
+                   (pontuacao IS NOT NULL AND nivel_saneamento IS NOT NULL));
+    END IF;
+END $$;
+
+-- CHECKs originais de faixa e classificacao continuam validando valores presentes.
+ALTER TABLE resposta_questionario
+    ALTER COLUMN pontuacao DROP NOT NULL,
+    ALTER COLUMN nivel_saneamento DROP NOT NULL;
+
+COMMENT ON COLUMN resposta_questionario.versao_questionario IS
+    '1 = questionario original (Gabriel); 2 = participativo. Filtrar explicitamente a versao em futuras analises.';
+COMMENT ON COLUMN resposta_questionario.vinculo_territorial IS
+    'Vinculo declarado com o distrito; NULL no legado. Categorias serao definidas no contrato V2.';
+COMMENT ON COLUMN resposta_questionario.respostas IS
+    'Respostas da versao indicada: JSONB suporta categorias, numeros e null (nao aplicavel).';
+-- END QUESTIONARIO MIGRATION

@@ -87,3 +87,80 @@ Para parar os serviços sem apagar os dados, execute em `backend/`:
 ```powershell
 docker-compose down
 ```
+
+## Etapa 01/08 - estrutura do questionario participativo V2
+
+O schema continua canonico em `seed/schema.sql`. O bloco delimitado por
+`BEGIN/END QUESTIONARIO MIGRATION` e executado tanto na instalacao completa
+quanto pela opcao `--questionario-only` de `seed/init_db.py`. Nao ha framework
+novo, carga de respostas ou migracao automatica na inicializacao da API.
+
+- `versao_questionario INTEGER NOT NULL DEFAULT 1`, limitado a 1 ou 2:
+  registros anteriores e INSERTs do endpoint atual continuam V1 (Gabriel).
+  Gravacoes futuras V2 deverao informar explicitamente a versao 2.
+- `vinculo_territorial TEXT` e `comentario VARCHAR(500)` opcionais, sem valor
+  fabricado para o legado. O vinculo permite distinguir moradores e nao moradores;
+  seu vocabulario e obrigatoriedade V2 ficam para a definicao posterior do contrato.
+- `pontuacao NUMERIC(5,2)` e `nivel_saneamento` preservam valores e validacoes
+  anteriores. Um CHECK exige ambos para V1; V2 pode deixa-los nulos. Valores
+  presentes continuam sujeitos a faixa 0-100 e as quatro classificacoes legadas.
+- `respostas JSONB NOT NULL` permanece flexivel para categorias, inteiros e
+  JSON null (nao aplicavel). Nao se definem ainda chaves/alternativas V2 nem
+  validacoes de notas por pergunta. O contrato futuro devera validar notas 0-10.
+- PK, sequencia BIGSERIAL, FK para `territorio`, timestamp e indice territorial
+  sao preservados. Nao ha alteracao de geometria, indicadores ou classificacao.
+- O GET existente filtra V1 internamente, inclusive no total da paginacao, pois
+  seu contrato exige pontuacao/classificacao e respostas textuais. POST e modelos
+  Pydantic permanecem iguais. Nao ha endpoint V2 nesta etapa.
+- Futuras analises devem filtrar explicitamente `versao_questionario = 2` (ou 1
+  para o legado); a coluna torna a separacao possivel, mas nao impede consultas
+  SQL arbitrarias sem filtro. Nenhum calculo agregado foi implementado.
+
+### Aplicacao manual, exclusivamente no banco local
+
+Antes de subir a API atualizada em uma base existente, aplique a migracao.
+O GET passa a depender da coluna de versao. A partir de `backend/`, com as
+configuracoes locais conferidas e o banco local ja iniciado:
+
+```powershell
+# Prepara a imagem local com os arquivos atualizados, sem iniciar a nova API.
+docker compose build api
+# Base existente: altera apenas resposta_questionario e seus metadados.
+docker compose run --rm --no-deps api python seed/init_db.py --questionario-only
+# Inicia a API depois da migracao bem-sucedida.
+docker compose up -d --no-deps api
+```
+
+Para uma instalacao nova, substitua o comando de migracao por:
+
+```powershell
+docker compose run --rm --no-deps api python seed/init_db.py
+```
+
+A opcao restrita exige `territorio` existente; tambem cria a tabela de respostas
+se ela ainda nao existir. O modo completo conserva o pipeline anterior de
+territorios/fontes/indicadores; nao o use apenas para migrar o questionario de
+uma base existente. O carregador `seed/load_db.py` permanece independente.
+
+Cada execucao do inicializador e transacional. A migracao e reexecutavel e nao
+apaga registros. ALTER TABLE exige bloqueio; `lock_timeout=10s` cancela a
+operacao se o bloqueio nao for obtido. Nesse caso, aguarde uma janela local sem
+concorrencia e repita. Nao ha rollback destrutivo automatico: nao reverta a
+estrutura depois de receber dados V2.
+
+### Testes locais isolados
+
+`tests/test_questionario_migration.py` usa unittest e as dependencias existentes.
+Aponte `TEST_DATABASE_URL` exclusivamente para uma instancia de testes
+PostgreSQL/PostGIS, nunca para a base da aplicacao. Nao carrega `.env`.
+
+```powershell
+# Defina TEST_DATABASE_URL com a conexao da instancia isolada antes de executar.
+python -m unittest discover -s tests -p test_questionario_migration.py -v
+```
+
+Cada cenario cria um schema de teste dentro de uma transacao e faz rollback ao
+terminar, sem DROP TABLE, DELETE, TRUNCATE ou fixtures permanentes. Cobre base
+legada, instalacao nova, reexecucao, preservacao de dados/constraints, V1/V2,
+JSONB, limite de comentario, FK e funcoes reais do POST/GET com validacao dos
+modelos Pydantic. Nao substitui testes HTTP ou de navegador.

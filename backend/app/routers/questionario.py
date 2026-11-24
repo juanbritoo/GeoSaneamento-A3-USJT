@@ -77,7 +77,8 @@ def consultar_questionarios(
     limite: int = Query(50, ge=1, le=200, description="Máximo de registros por página."),
     deslocamento: int = Query(0, ge=0, description="Quantidade de registros a pular."),
 ):
-    filtros: list[str] = []
+    # O contrato existente representa apenas V1 (pontuacao e respostas textuais).
+    filtros: list[str] = ["r.versao_questionario = 1"]
     parametros: list = []
     if id_territorial is not None:
         filtros.append("r.id_territorial = %s")
