@@ -232,12 +232,6 @@ function App() {
 
         <main
           className="app-map"
-          style={{
-            flex: 1,
-            display: 'flex',
-            backgroundColor: '#FFFFFF',
-            position: 'relative'
-          }}
         >
 
           <div
