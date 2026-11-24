@@ -1,362 +1,175 @@
+﻿import { useEffect, useRef, useState } from 'react';
+import { ClipboardList, RotateCcw, X } from 'lucide-react';
+import { atualizarResposta, naoMorador, perguntasAplicaveis, perguntasV2, prepararPayloadV2, respostaValida, textoResposta } from './perguntasV2';
+import './Questionario.css';
 
-import { useState } from "react";
-import { CircleCheck, X } from "lucide-react";
-import { enviarQuestionario } from "../../services/api";
-import "./Questionario.css";
-
-const NIVEIS = {
-  critico: "Crítico",
-  precario: "Precário",
-  regular: "Regular",
-  adequado: "Adequado",
-};
-
-const perguntas = [
-  {
-    id: "abastecimento",
-    titulo: "Sua região sofre com falta de água?",
-    descricao: "Considere as condições de abastecimento da sua residência.",
-    opcoes: [
-      "Sim, frequentemente",
-      "Às vezes",
-      "Raramente",
-      "Não, nunca",
-    ],
-  },
-  {
-    id: "esgoto",
-    titulo: "Já presenciou esgoto a céu aberto na sua rua?",
-    descricao: "Considere situações observadas no seu bairro.",
-    opcoes: [
-      "Sim, frequentemente",
-      "Sim, algumas vezes",
-      "Raramente",
-      "Não",
-    ],
-  },
-  {
-    id: "abastecimentoFonte",
-    titulo: "Qual é a principal fonte de água da sua residência?",
-    descricao: "Selecione a alternativa que melhor representa sua situação.",
-    opcoes: [
-      "Rede pública de abastecimento",
-      "Poço artesiano",
-      "Nascente",
-      "Caminhão-pipa",
-      "Outra fonte",
-      "Não sei informar",
-    ],
-  },
-  {
-    id: "esgotoDestino",
-    titulo: "Qual é o destino do esgoto da sua residência?",
-    descricao: "Selecione a alternativa que melhor representa sua situação.",
-    opcoes: [
-      "Rede pública de esgoto",
-      "Fossa séptica",
-      "Fossa rudimentar",
-      "Despejo em rios ou córregos",
-      "Não sei informar",
-    ],
-  },
-  {
-    id: "avaliacao",
-    titulo: "Como você avalia o saneamento do seu bairro?",
-    descricao: "Considere água, esgoto e coleta de resíduos.",
-    opcoes: [
-      "Muito bom",
-      "Bom",
-      "Regular",
-      "Ruim",
-      "Muito ruim",
-    ],
-  },
-];
-
-export default function Questionario({
-  aberto,
-  onFechar,
-  distritos = [],
-  distritoSelecionado = null,
-  onSelecionarDistrito,
-}) {
+export default function Questionario({ aberto, onFechar, distritos = [], distritoSelecionado = null, onSelecionarDistrito }) {
+  const [territorio, setTerritorio] = useState(null);
   const [etapa, setEtapa] = useState(0);
-  const [respostas, setRespostas] = useState({});
-  const [concluido, setConcluido] = useState(false);
-  const [enviando, setEnviando] = useState(false);
-  const [erroEnvio, setErroEnvio] = useState("");
-  const [resultado, setResultado] = useState(null);
+  const [dados, setDados] = useState({});
+  const [revisao, setRevisao] = useState(null);
+  const [erro, setErro] = useState('');
+  const modalRef = useRef(null);
+  const tituloRef = useRef(null);
+  const conteudoRef = useRef(null);
+  const perguntas = perguntasAplicaveis(dados.vinculo_territorial);
+  const pergunta = perguntas[etapa];
+  const valor = dados[pergunta.id];
+  const distritoValido = distritos.find((d) => d.id_territorial === distritoSelecionado?.id_territorial && /^[0-9]{9}$/.test(d.id_territorial));
+  const progresso = revisao ? 100 : territorio ? Math.round(((etapa + 1) / perguntas.length) * 100) : 0;
 
-  if (!aberto) {
-    return null;
-  }
+  useEffect(() => {
+    if (!aberto) return;
+    const anterior = document.activeElement;
+    const overlay = modalRef.current.parentElement;
+    const irmaos = [...overlay.parentElement.children].filter((el) => el !== overlay);
+    const inertes = irmaos.map((el) => el.inert);
+    irmaos.forEach((el) => { el.inert = true; });
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      irmaos.forEach((el, i) => { el.inert = inertes[i]; });
+      document.body.style.overflow = overflow;
+      anterior?.focus();
+    };
+  }, [aberto]);
 
-  const perguntaAtual = perguntas[etapa];
-  const respostaAtual = respostas[perguntaAtual.id];
-
-  const progresso = concluido
-    ? 100
-    : ((etapa + 1) / perguntas.length) * 100;
-
-  function selecionarResposta(valor) {
-    setRespostas((anteriores) => ({
-      ...anteriores,
-      [perguntaAtual.id]: valor,
-    }));
-  }
-
-  async function avancar() {
-    if (!respostaAtual) return;
-
-    if (etapa < perguntas.length - 1) {
-      setEtapa((atual) => atual + 1);
-      return;
+  useEffect(() => {
+    if (aberto) {
+      conteudoRef.current?.scrollTo({ top: 0 });
+      tituloRef.current?.focus();
     }
+  }, [aberto, etapa, territorio, revisao]);
 
-    if (!distritoSelecionado) {
-      setErroEnvio("Selecione o distrito antes de concluir.");
-      return;
-    }
+  useEffect(() => {
+    if (!territorio) return;
+    const proteger = (evento) => { evento.preventDefault(); evento.returnValue = ''; };
+    window.addEventListener('beforeunload', proteger);
+    return () => window.removeEventListener('beforeunload', proteger);
+  }, [territorio]);
 
-    setEnviando(true);
-    setErroEnvio("");
-
-    try {
-      const registro = await enviarQuestionario(
-        distritoSelecionado.id_territorial,
-        respostas
-      );
-      setResultado(registro);
-      setConcluido(true);
-    } catch (erro) {
-      setErroEnvio(
-        erro.message || "Não foi possível enviar o questionário."
-      );
-    } finally {
-      setEnviando(false);
-    }
-  }
-
-  function voltar() {
-    if (etapa > 0) {
-      setEtapa((atual) => atual - 1);
-    }
-  }
-
-  function fechar() {
+  function reiniciar() {
+    setTerritorio(null);
     setEtapa(0);
-    setRespostas({});
-    setConcluido(false);
-    setErroEnvio("");
-    setResultado(null);
-    onFechar();
+    setDados({});
+    setRevisao(null);
+    setErro('');
   }
 
-  function fecharAoClicarFora(evento) {
-    if (evento.target === evento.currentTarget) {
-      fechar();
+  function descartar(fechar = false) {
+    if (territorio && !window.confirm('As respostas ainda não foram enviadas. Deseja descartá-las?')) return;
+    reiniciar();
+    if (fechar) onFechar();
+  }
+
+  function selecionar(id, resposta) {
+    if (id === 'vinculo_territorial' && naoMorador(resposta) && !naoMorador(dados[id]) &&
+        perguntasV2.some((p) => p.domiciliar && dados[p.id] !== undefined) &&
+        !window.confirm('Ao mudar para não morador, as respostas sobre sua residência serão apagadas. Deseja continuar?')) return;
+    setDados((anteriores) => atualizarResposta(anteriores, id, resposta));
+    setErro('');
+  }
+
+  function avancar() {
+    if (!respostaValida(pergunta, valor)) return;
+    if (etapa < perguntas.length - 1) setEtapa(etapa + 1);
+    else {
+      try { setRevisao(prepararPayloadV2(territorio.id_territorial, dados)); }
+      catch (e) { setErro(e.message); }
     }
   }
+
+  function teclado(evento) {
+    if (evento.key === 'Escape') { evento.preventDefault(); descartar(true); }
+    if (evento.key !== 'Tab') return;
+    const controles = [...modalRef.current.querySelectorAll('button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled)')];
+    const primeiro = controles[0];
+    const ultimo = controles.at(-1);
+    if (evento.shiftKey && (document.activeElement === primeiro || document.activeElement === tituloRef.current)) {
+      evento.preventDefault(); ultimo?.focus();
+    } else if (!evento.shiftKey && document.activeElement === ultimo) {
+      evento.preventDefault(); primeiro?.focus();
+    }
+  }
+
+  if (!aberto) return null;
 
   return (
-    <div
-      className="questionario-overlay"
-      onMouseDown={fecharAoClicarFora}
-    >
-      <section
-        className="questionario-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="questionario-titulo"
-      >
+    <div className="questionario-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) descartar(true); }}>
+      <section ref={modalRef} className="questionario-modal" role="dialog" aria-modal="true" aria-labelledby="questionario-titulo" onKeyDown={teclado}>
         <header className="questionario-header">
           <div className="questionario-identidade">
             <img className="questionario-icone" src="/icon_gota.png" alt="" />
-
-            <div>
-              <h2 id="questionario-titulo">
-                GeoSaneamento
-              </h2>
-
-              <p>Pesquisa de saneamento básico</p>
-            </div>
+            <div><h2 id="questionario-titulo">Diagnóstico participativo</h2><p>GeoSaneamento</p></div>
           </div>
-
-          <button
-            type="button"
-            className="questionario-fechar"
-            onClick={fechar}
-            aria-label="Fechar questionário"
-          >
-            <X size={22} aria-hidden="true" />
-          </button>
+          <button type="button" className="questionario-fechar" onClick={() => descartar(true)} aria-label="Fechar questionário"><X size={22} aria-hidden="true" /></button>
         </header>
-
-        <div className="questionario-conteudo">
-          {!concluido ? (
-            <>
-              <div className="questionario-introducao">
-                <span className="questionario-etiqueta">
-                  QUESTIONÁRIO
-                </span>
-
-                <h3>
-                  Sua opinião é importante!
-                </h3>
-
-                <p>
-                  Ajude a compreender as condições de
-                  saneamento básico da sua região.
-                </p>
-              </div>
-
-              <div className="questionario-regiao">
-                <label htmlFor="questionario-distrito">
-                  Região avaliada
-                </label>
-
-                <select
-                  id="questionario-distrito"
-                  value={distritoSelecionado?.id_territorial ?? ""}
-                  onChange={(evento) =>
-                    onSelecionarDistrito?.(
-                      distritos.find(
-                        (distrito) =>
-                          distrito.id_territorial === evento.target.value
-                      ) ?? null
-                    )
-                  }
-                >
-                  <option value="">Selecione um distrito...</option>
-                  {distritos.map((distrito) => (
-                    <option
-                      key={distrito.id_territorial}
-                      value={distrito.id_territorial}
-                    >
-                      {distrito.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="questionario-progresso">
-                <div className="questionario-progresso-info">
-                  <span>
-                    Pergunta {etapa + 1} de {perguntas.length}
-                  </span>
-
-                  <span>
-                    {Math.round(progresso)}%
-                  </span>
-                </div>
-
-                <div className="questionario-progresso-trilho">
-                  <div
-                    className="questionario-progresso-preenchido"
-                    style={{ width: `${progresso}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="questionario-pergunta">
-                <h3>{perguntaAtual.titulo}</h3>
-
-                <p>{perguntaAtual.descricao}</p>
-
-                <div className="questionario-opcoes">
-                  {perguntaAtual.opcoes.map((opcao) => (
-                    <label
-                      key={opcao}
-                      className={`questionario-opcao ${
-                        respostaAtual === opcao
-                          ? "selecionada"
-                          : ""
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name={perguntaAtual.id}
-                        value={opcao}
-                        checked={respostaAtual === opcao}
-                        onChange={() =>
-                          selecionarResposta(opcao)
-                        }
-                      />
-
-                      <span>{opcao}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {erroEnvio && (
-                <p className="questionario-erro" role="alert">
-                  {erroEnvio}
-                </p>
-              )}
-
-              <footer className="questionario-footer">
-                <button
-                  type="button"
-                  className="questionario-botao-secundario"
-                  onClick={voltar}
-                  disabled={etapa === 0}
-                >
-                  Voltar
-                </button>
-
-                <button
-                  type="button"
-                  className="questionario-botao-principal"
-                  onClick={avancar}
-                  disabled={
-                    !respostaAtual ||
-                    enviando ||
-                    (etapa === perguntas.length - 1 && !distritoSelecionado)
-                  }
-                >
-                  {etapa === perguntas.length - 1
-                    ? enviando
-                      ? "Enviando..."
-                      : "Concluir"
-                    : "Próxima pergunta"}
-                </button>
-              </footer>
-            </>
-          ) : (
-            <div className="questionario-sucesso">
-              <div className="questionario-sucesso-icone">
-                <CircleCheck size={36} aria-hidden="true" />
-              </div>
-
-              <h3>Questionário concluído!</h3>
-
-              <p>
-                Obrigado por participar do GeoSaneamento.
-                Sua contribuição é importante para compreender
-                as condições de saneamento básico.
-              </p>
-
-              {resultado && (
-                <p className="questionario-resultado">
-                  {resultado.nome_territorio}: nível de saneamento{" "}
-                  <strong>
-                    {NIVEIS[resultado.nivel_saneamento] ??
-                      resultado.nivel_saneamento}
-                  </strong>{" "}
-                  ({Math.round(resultado.pontuacao)}/100)
-                </p>
-              )}
-
-              <button
-                type="button"
-                className="questionario-botao-principal"
-                onClick={fechar}
-              >
-                Fechar questionário
-              </button>
+        <div className="questionario-conteudo" ref={conteudoRef}>
+          {!territorio ? <>
+            <div className="questionario-introducao">
+              <h3 ref={tituloRef} tabIndex={-1}>Sua experiência importa</h3>
+              <p>Compartilhe sua experiência com o saneamento da região. Suas respostas ajudarão a complementar os indicadores existentes e compreender a realidade vivenciada pela população.</p>
             </div>
-          )}
+            <div className="questionario-regiao">
+              <label htmlFor="questionario-distrito">Região avaliada</label>
+              <select id="questionario-distrito" value={distritoSelecionado?.id_territorial ?? ''} onChange={(e) => onSelecionarDistrito?.(distritos.find((d) => d.id_territorial === e.target.value) ?? null)}>
+                <option value="">Selecione um distrito...</option>
+                {distritos.map((d) => <option key={d.id_territorial} value={d.id_territorial}>{d.nome}</option>)}
+              </select>
+              <p>Selecione um distrito para iniciar. Para trocá-lo depois, será necessário reiniciar.</p>
+            </div>
+            <p className="questionario-aviso">Nesta etapa, você poderá revisar as respostas localmente. Elas ainda não serão enviadas.</p>
+            <button type="button" className="questionario-botao-principal" disabled={!distritoValido} onClick={() => { if (distritoValido) setTerritorio({ ...distritoValido }); }}>Iniciar questionário</button>
+          </> : <>
+            <div className="questionario-territorio">
+              <p>Região avaliada: <strong>{territorio.nome}</strong></p>
+              <button type="button" className="questionario-botao-secundario" onClick={() => descartar()}><RotateCcw size={16} aria-hidden="true" /> Reiniciar</button>
+            </div>
+            <div className="questionario-progresso">
+              <div className="questionario-progresso-info"><span>{revisao ? 'Revisão local' : `Pergunta ${etapa + 1} de ${perguntas.length}`}</span><span>{progresso}%</span></div>
+              <div className="questionario-progresso-trilho" role="progressbar" aria-label="Progresso do questionário" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progresso}>
+                <div className="questionario-progresso-preenchido" style={{ width: `${progresso}%` }} />
+              </div>
+            </div>
+            {revisao ? <div className="questionario-revisao">
+              <h3 ref={tituloRef} tabIndex={-1}><ClipboardList size={24} aria-hidden="true" /> Revise suas respostas</h3>
+              <p className="questionario-aviso" role="status"><strong>Questionário ainda não enviado.</strong> Esta revisão é local; nenhuma resposta foi armazenada no servidor. Ao fechar, as respostas serão descartadas mediante confirmação.</p>
+              <dl>{perguntas.map((p) => <div key={p.id}><dt>{p.titulo}</dt><dd>{textoResposta(p, p.id === 'comentario' ? revisao.comentario : p.id === 'vinculo_territorial' ? revisao.vinculo_territorial : revisao.respostas[p.id])}</dd></div>)}</dl>
+              {naoMorador(revisao.vinculo_territorial) && <p>As sete perguntas domiciliares não se aplicam ao vínculo informado e foram preparadas como não aplicáveis.</p>}
+              <footer className="questionario-footer">
+                <button type="button" className="questionario-botao-secundario" onClick={() => { setRevisao(null); setEtapa(0); }}>Editar respostas</button>
+                <button type="button" className="questionario-botao-principal" onClick={() => descartar(true)}>Fechar revisão</button>
+              </footer>
+            </div> : <>
+              <div className="questionario-pergunta" key={pergunta.id}>
+                <p className="questionario-etiqueta">{pergunta.dimensao}</p>
+                <h3 id="questionario-pergunta-titulo" ref={tituloRef} tabIndex={-1}>{pergunta.titulo}</h3>
+                {pergunta.tipo === 'categoria' && <div className="questionario-opcoes" role="radiogroup" aria-labelledby="questionario-pergunta-titulo">
+                  {pergunta.opcoes.map((opcao) => <label key={opcao.valor} className={`questionario-opcao ${valor === opcao.valor ? 'selecionada' : ''}`}>
+                    <input type="radio" name={pergunta.id} value={opcao.valor} checked={valor === opcao.valor} onChange={() => selecionar(pergunta.id, opcao.valor)} /><span>{opcao.texto}</span>
+                  </label>)}
+                </div>}
+                {pergunta.tipo === 'nota' && <div className="questionario-avaliacao">
+                  <output className="questionario-nota" htmlFor="questionario-slider" aria-live="polite">{typeof valor === 'number' ? `Nota ${valor}` : valor === null ? 'Não sei avaliar / Não se aplica' : 'Nenhuma nota selecionada'}</output>
+                  <p id="questionario-nota-ajuda">Mova o controle ou confirme a nota zero. Use as setas do teclado para ajustar. Nenhuma nota é atribuída automaticamente.</p>
+                  <input id="questionario-slider" type="range" min={0} max={10} step={1} value={typeof valor === 'number' ? valor : 0} aria-labelledby="questionario-pergunta-titulo" aria-describedby="questionario-nota-ajuda questionario-extremos" aria-valuetext={typeof valor === 'number' ? `Nota ${valor} de 10` : 'Sem nota numérica selecionada'} onChange={(e) => selecionar(pergunta.id, Number(e.target.value))} />
+                  <div className="questionario-extremos" id="questionario-extremos"><span>0: {pergunta.minimo}.</span><span>10: {pergunta.maximo}.</span></div>
+                  {typeof valor !== 'number' && <button type="button" className="questionario-botao-secundario" onClick={() => selecionar(pergunta.id, 0)}>Usar nota 0</button>}
+                  <button type="button" className="questionario-botao-secundario" aria-pressed={valor === null} onClick={() => selecionar(pergunta.id, null)}>Não sei avaliar / Não se aplica</button>
+                </div>}
+                {pergunta.tipo === 'texto' && <>
+                  <p id="questionario-comentario-ajuda">Opcional. Não inclua nomes, endereços completos ou informações pessoais.</p>
+                  <textarea aria-labelledby="questionario-pergunta-titulo" aria-describedby="questionario-comentario-ajuda questionario-contador" rows={5} maxLength={pergunta.limite} value={valor ?? ''} placeholder={pergunta.placeholder} onChange={(e) => selecionar(pergunta.id, e.target.value)} />
+                  <p id="questionario-contador" className="questionario-contador" aria-live="polite">{[...(valor ?? '')].length} / {pergunta.limite} caracteres</p>
+                </>}
+              </div>
+              {erro && <p className="questionario-erro" role="alert">{erro}</p>}
+              <footer className="questionario-footer">
+                <button type="button" className="questionario-botao-secundario" onClick={() => setEtapa(etapa - 1)} disabled={etapa === 0}>Voltar</button>
+                <button type="button" className="questionario-botao-principal" disabled={!respostaValida(pergunta, valor)} onClick={avancar}>{pergunta.opcional ? 'Revisar respostas (sem enviar)' : 'Próxima pergunta'}</button>
+              </footer>
+            </>}
+          </>}
         </div>
       </section>
     </div>

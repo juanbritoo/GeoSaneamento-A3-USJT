@@ -308,52 +308,6 @@
 
 /* Tela de conclusão */
 
-.questionario-sucesso {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  padding: 24px 10px;
-
-  text-align: center;
-}
-
-.questionario-sucesso-icone {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 72px;
-  height: 72px;
-
-  margin-bottom: 20px;
-
-  border-radius: 50%;
-
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-
-}
-
-.questionario-sucesso h3 {
-  margin: 0 0 12px;
-
-  color: var(--color-text);
-  font-size: 24px;
-}
-
-.questionario-sucesso p {
-  max-width: 420px;
-
-  margin: 0 0 24px;
-
-  color: var(--color-text);
-  font-size: 14px;
-  line-height: 1.7;
-}
-
-/* Região avaliada */
-
 .questionario-regiao {
   display: flex;
   flex-direction: column;
@@ -451,4 +405,35 @@
   .questionario-botao-secundario {
     width: 100%;
   }
+}
+
+.questionario-introducao { margin-bottom: 24px; }
+.questionario-regiao p { margin: 4px 0; font-size: 13px; line-height: 1.5; }
+.questionario-territorio { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.questionario-territorio p { margin: 0; }
+.questionario-territorio button { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.questionario-aviso { padding: 14px; background: var(--color-primary-light); border-radius: 10px; line-height: 1.6; }
+.questionario-avaliacao { display: grid; gap: 16px; }
+.questionario-avaliacao p { margin: 0; font-size: 14px; line-height: 1.5; }
+.questionario-nota { display: block; padding: 16px; border-radius: 10px; background: var(--color-background-secondary); color: var(--color-primary); font-weight: 700; font-size: 22px; text-align: center; }
+.questionario-avaliacao input[type='range'] { width: 100%; min-width: 0; margin: 0; min-height: 44px; accent-color: var(--color-primary); cursor: pointer; }
+.questionario-extremos { display: flex; justify-content: space-between; gap: 24px; font-size: 13px; }
+.questionario-extremos span { flex: 1; }
+.questionario-extremos span:last-child { text-align: right; }
+.questionario-avaliacao [aria-pressed='true'] { border-color: var(--color-primary); background: var(--color-primary-light); }
+.questionario-pergunta textarea { box-sizing: border-box; width: 100%; resize: vertical; min-height: 140px; max-height: 40dvh; padding: 14px; border: 1px solid var(--color-border); border-radius: 10px; font: inherit; line-height: 1.5; color: var(--color-text); background: var(--color-background); }
+.questionario-pergunta .questionario-contador { text-align: right; margin-top: 8px; }
+.questionario-revisao h3 { display: flex; align-items: center; gap: 10px; }
+.questionario-revisao dl > div { padding: 16px 0; border-bottom: 1px solid var(--color-border); }
+.questionario-revisao dt { font-weight: 600; line-height: 1.5; }
+.questionario-revisao dd { margin: 8px 0 0; white-space: pre-wrap; line-height: 1.5; }
+.questionario-modal :is(input, select, textarea, [tabindex='-1']):focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+
+@media (max-width: 640px) {
+  .questionario-territorio { align-items: stretch; flex-direction: column; }
+  .questionario-territorio button { justify-content: center; }
+  .questionario-regiao select, .questionario-pergunta textarea { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .questionario-progresso-preenchido, .questionario-opcao, .questionario-modal button { transition: none; }
 }
