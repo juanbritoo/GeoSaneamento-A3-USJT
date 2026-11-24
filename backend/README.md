@@ -164,3 +164,143 @@ terminar, sem DROP TABLE, DELETE, TRUNCATE ou fixtures permanentes. Cobre base
 legada, instalacao nova, reexecucao, preservacao de dados/constraints, V1/V2,
 JSONB, limite de comentario, FK e funcoes reais do POST/GET com validacao dos
 modelos Pydantic. Nao substitui testes HTTP ou de navegador.
+
+## Etapa 02/08 - contratos e persistencia V2
+
+Esta secao atualiza o comportamento da API descrito na etapa 01. Nao ha novas
+rotas, migracoes ou dependencias. A migracao da etapa 01 deve estar aplicada
+antes de iniciar esta versao da API. `app/classificacao.py` permanece intacto.
+
+### POST /api/v1/questionario
+
+Sem `versao_questionario` ou com `versao_questionario: 1`, continua aceitando o
+JSON V1 apresentado acima, calculando pontuacao e classificacao e retornando o
+mesmo contrato original (sem campos novos na resposta). A versao 2 deve ser
+explicita e utiliza `QuestionarioEntradaV2` e `RespostasQuestionarioV2`, ambos
+com campos extras proibidos. O codigo territorial deve ser string de nove
+digitos e corresponder a um registro de nivel `distrito`.
+
+Exemplo V2 de morador:
+
+```json
+{
+  "id_territorial": "355030801",
+  "versao_questionario": 2,
+  "vinculo_territorial": "morador_mais_1_ano",
+  "respostas": {
+    "abastecimento_agua_rede_geral": "sim",
+    "esgotamento_sanitario_rede_geral": "nao_sei",
+    "destino_lixo_coleta_direta": "sim",
+    "existencia_banheiro_exclusivo": "sim",
+    "falta_agua_30_dias": "1_2",
+    "esgoto_ceu_aberto_30_dias": "nunca",
+    "satisfacao_saneamento": "neutro",
+    "regularidade_agua": 0,
+    "qualidade_agua_percebida": 10,
+    "condicoes_esgotamento": null
+  },
+  "comentario": "  Relato opcional  "
+}
+```
+
+Vinculos aceitos: `morador_mais_1_ano`, `morador_menos_1_ano`, `trabalha_estuda`
+e `sem_vinculo_frequente`. Os dois primeiros seguem as regras de moradores.
+Todas as dez chaves de `respostas` sao obrigatorias, inclusive quando o valor
+for `null`: omitir uma chave retorna 422. Nao ha notas preenchidas por padrao.
+
+| Campo | Valores |
+|---|---|
+| As quatro perguntas comparaveis | `sim`, `nao`, `nao_sei`; `null` somente para nao moradores |
+| `falta_agua_30_dias` | `nenhum`, `1_2`, `3_7`, `8_15`, `mais_15`, `nao_sei`; `null` somente para nao moradores |
+| `esgoto_ceu_aberto_30_dias` | `nunca`, `uma_duas_vezes`, `semanalmente`, `diariamente`, `nao_sei` |
+| `satisfacao_saneamento` | `muito_satisfeito`, `satisfeito`, `neutro`, `insatisfeito`, `muito_insatisfeito`, `nao_sei` |
+| `regularidade_agua`, `qualidade_agua_percebida`, `condicoes_esgotamento` | Inteiro JSON 0-10 ou `null` |
+
+Notas rejeitam booleanos, strings e decimais, inclusive `1.0`. Zero e uma nota
+valida, nunca representa desconhecimento. Use `null` para notas desconhecidas.
+Nas categorias aplicaveis, desconhecimento e `nao_sei`, nao `null`.
+
+Nao moradores devem enviar as quatro perguntas comparaveis, falta de agua,
+regularidade e qualidade da agua como `null`. Podem informar observacao de
+esgoto, satisfacao e condicoes de esgotamento, usando `nao_sei` nas categorias
+ou `null` na nota quando nao souberem avaliar. Exemplo:
+
+```json
+{
+  "id_territorial": "355030801",
+  "versao_questionario": 2,
+  "vinculo_territorial": "trabalha_estuda",
+  "respostas": {
+    "abastecimento_agua_rede_geral": null,
+    "esgotamento_sanitario_rede_geral": null,
+    "destino_lixo_coleta_direta": null,
+    "existencia_banheiro_exclusivo": null,
+    "falta_agua_30_dias": null,
+    "esgoto_ceu_aberto_30_dias": "semanalmente",
+    "satisfacao_saneamento": "nao_sei",
+    "regularidade_agua": null,
+    "qualidade_agua_percebida": null,
+    "condicoes_esgotamento": null
+  }
+}
+```
+
+Comentario pode ser omitido ou `null`. A entrada aceita no maximo 500 caracteres
+antes da normalizacao; remove espacos nas extremidades e converte texto vazio
+ou somente espacos em `null`. Nao altera espacos internos. As regras
+complementares ficam em `app/validacao_questionario.py`.
+
+Sucesso retorna 201. `QuestionarioRespostaV2` contem `id`, `id_territorial`,
+`nome_territorio`, `versao_questionario`, `vinculo_territorial`, `respostas`,
+`comentario` normalizado e `criado_em`. Nao retorna pontuacao/classificacao;
+ambas sao gravadas como SQL NULL. As notas permanecem numeros no JSONB, e os
+valores nao aplicaveis permanecem JSON null. Vinculo e comentario ficam nas
+colunas especificas. A resposta POST devolve o comentario apenas ao solicitante.
+
+### GET /api/v1/questionario
+
+| Consulta | Comportamento |
+|---|---|
+| Sem versao ou `?versao_questionario=1` | Contrato V1 original |
+| `?versao_questionario=2` | `QuestionarioListaV2`, somente V2 |
+| `?versao_questionario=2&id_territorial=355030801&limite=10&deslocamento=0` | Filtro territorial e paginacao V2 |
+| `?versao_questionario=1&nivel_saneamento=adequado` | Filtro de classificacao V1 |
+| `?versao_questionario=2&nivel_saneamento=adequado` | 422: filtros incompativeis |
+
+Ambas as listas retornam `total`, `limite`, `deslocamento` e `itens`. Limite:
+1-200 (padrao 50); deslocamento: minimo 0 (padrao 0). Total e itens usam o
+mesmo filtro de versao. Ordenacao: data decrescente e id decrescente.
+Cada item V2 tem os campos da resposta POST **exceto comentario**. O campo nao
+e consultado no SQL nem existe no modelo coletivo `QuestionarioItemV2`.
+Nenhuma consulta coletiva desta etapa divulga comentarios livres.
+
+### Erros, Swagger e testes
+
+- 200: consulta; 201: registro.
+- 404: no POST, identificador bem formado sem distrito correspondente (inclui
+  territorio de outro nivel). GET sem correspondencias retorna lista vazia.
+- 422: contrato, categoria, nota, identificador malformado ou parametros invalidos.
+- 503: indisponibilidade do banco, com mensagens publicas dos handlers existentes,
+  sem detalhes SQL.
+
+O Swagger em `/docs` apresenta os modelos e exemplos V1/V2 na mesma operacao.
+O exemplo interativo V2 usa notas numericas; os exemplos acima demonstram `null`.
+Para enviar um JSON salvo localmente, por exemplo:
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://localhost:8000/api/v1/questionario -ContentType 'application/json; charset=utf-8' -InFile questionario-v2.json
+Invoke-RestMethod 'http://localhost:8000/api/v1/questionario?versao_questionario=2'
+```
+
+Execute os testes somente com `TEST_DATABASE_URL` apontando para uma instancia
+isolada de PostgreSQL/PostGIS, a partir de `backend/`:
+
+```powershell
+python -m unittest discover -s tests -p 'test_questionario*.py' -v
+```
+
+A suite V2 exercita a aplicacao ASGI real (validacao de entrada, serializacao,
+status, OpenAPI e handlers) com cursor direcionado ao banco isolado, sem abrir
+o pool da aplicacao nem precisar de httpx. Fixtures e DDL ficam em transacoes
+revertidas ao finalizar. A suite de migracao da etapa 01 permanece inalterada.
+Nao ha teste de navegador nem de servidor HTTP/TCP nesta suite.

@@ -1,7 +1,10 @@
 from datetime import datetime
-from typing import Any, Literal, Optional
+from enum import Enum
+from typing import Annotated, Any, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from .validacao_questionario import normalizar_comentario, validar_respostas_v2
 
 from .classificacao import PONTOS, NivelSaneamento
 
@@ -80,6 +83,7 @@ class QuestionarioEntrada(BaseModel):
         examples=["355030801"],
     )
     respostas: RespostasQuestionario
+    versao_questionario: Literal[1] = 1
 
 
 class QuestionarioResposta(BaseModel):
@@ -99,3 +103,70 @@ class QuestionarioLista(BaseModel):
     limite: int
     deslocamento: int
     itens: list[QuestionarioResposta]
+
+
+class VinculoTerritorial(str, Enum):
+    MORADOR_MAIS_1_ANO = "morador_mais_1_ano"
+    MORADOR_MENOS_1_ANO = "morador_menos_1_ano"
+    TRABALHA_ESTUDA = "trabalha_estuda"
+    SEM_VINCULO_FREQUENTE = "sem_vinculo_frequente"
+
+
+RespostaComparavel = Literal["sim", "nao", "nao_sei"]
+NotaQuestionario = Annotated[int, Field(strict=True, ge=0, le=10)]
+
+
+class RespostasQuestionarioV2(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    abastecimento_agua_rede_geral: RespostaComparavel | None
+    esgotamento_sanitario_rede_geral: RespostaComparavel | None
+    destino_lixo_coleta_direta: RespostaComparavel | None
+    existencia_banheiro_exclusivo: RespostaComparavel | None
+    falta_agua_30_dias: Literal["nenhum", "1_2", "3_7", "8_15", "mais_15", "nao_sei"] | None
+    esgoto_ceu_aberto_30_dias: Literal["nunca", "uma_duas_vezes", "semanalmente", "diariamente", "nao_sei"]
+    satisfacao_saneamento: Literal["muito_satisfeito", "satisfeito", "neutro", "insatisfeito", "muito_insatisfeito", "nao_sei"]
+    regularidade_agua: NotaQuestionario | None
+    qualidade_agua_percebida: NotaQuestionario | None
+    condicoes_esgotamento: NotaQuestionario | None
+
+
+class QuestionarioEntradaV2(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id_territorial: str = Field(pattern=r"^[0-9]{9}$")
+    versao_questionario: Literal[2]
+    vinculo_territorial: VinculoTerritorial
+    respostas: RespostasQuestionarioV2
+    comentario: str | None = Field(default=None, max_length=500)
+
+    @field_validator("comentario", mode="before")
+    @classmethod
+    def limpar_comentario(cls, value):
+        return normalizar_comentario(value)
+
+    @model_validator(mode="after")
+    def validar_vinculo(self):
+        validar_respostas_v2(self.vinculo_territorial, self.respostas)
+        return self
+
+
+class QuestionarioItemV2(BaseModel):
+    id: int
+    id_territorial: str
+    nome_territorio: str
+    versao_questionario: Literal[2]
+    vinculo_territorial: VinculoTerritorial
+    respostas: RespostasQuestionarioV2
+    criado_em: datetime
+
+
+class QuestionarioRespostaV2(QuestionarioItemV2):
+    comentario: str | None
+
+
+class QuestionarioListaV2(BaseModel):
+    total: int
+    limite: int
+    deslocamento: int
+    itens: list[QuestionarioItemV2]
