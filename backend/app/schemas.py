@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from enum import Enum
 from typing import Annotated, Any, Literal, Optional
 
@@ -170,3 +170,86 @@ class QuestionarioListaV2(BaseModel):
     limite: int
     deslocamento: int
     itens: list[QuestionarioItemV2]
+
+
+class PeriodoParticipativo(BaseModel):
+    data_inicio: date | None
+    data_fim: date | None
+    fuso_horario: Literal["America/Sao_Paulo"] = "America/Sao_Paulo"
+
+
+class ContadoresParticipativos(BaseModel):
+    total_questionarios: int
+    total_moradores: int
+    total_nao_moradores: int
+    total_vinculo_nao_informado: int
+    total_comentarios: int
+
+
+class IndicadorParticipativoPrincipal(BaseModel):
+    codigo: Literal[
+        "ABASTECIMENTO_AGUA_REDE_GERAL", "ESGOTAMENTO_SANITARIO_REDE_GERAL",
+        "DESTINO_LIXO_COLETA_DIRETA", "EXISTENCIA_BANHEIRO_EXCLUSIVO",
+    ]
+    valor: float | None
+    unidade: Literal["%"] = "%"
+    total_sim: int
+    total_nao: int
+    total_nao_sei: int
+    respostas_validas: int
+
+
+class MediaParticipativa(BaseModel):
+    campo: str
+    valor: float | None
+    unidade: Literal["nota_0_10"] = "nota_0_10"
+    respostas_validas: int
+
+
+class CategoriaParticipativa(BaseModel):
+    codigo: str
+    total: int
+    percentual: float | None
+
+
+class DistribuicaoParticipativa(BaseModel):
+    campo: str
+    respostas_validas: int
+    total_nao_sei: int
+    categorias: list[CategoriaParticipativa]
+
+
+class PercentualParticipativo(BaseModel):
+    codigo: str
+    valor: float | None
+    unidade: Literal["%"] = "%"
+    total_favoravel: int
+    respostas_validas: int
+
+
+class ComplementaresParticipativos(BaseModel):
+    medias: list[MediaParticipativa]
+    distribuicoes: list[DistribuicaoParticipativa]
+    percentuais: list[PercentualParticipativo]
+
+
+class IndicadoresParticipativosResposta(BaseModel):
+    territorio: DistritoResumo
+    periodo: PeriodoParticipativo
+    versao_questionario: Literal[2] = 2
+    unidade_contagem: Literal["questionarios"] = "questionarios"
+    contadores: ContadoresParticipativos
+    principais: list[IndicadorParticipativoPrincipal]
+    complementares: ComplementaresParticipativos
+
+
+class ResumoDistritoParticipativo(BaseModel):
+    territorio: DistritoResumo
+    contadores: ContadoresParticipativos
+
+
+class ResumoTerritorialParticipativo(BaseModel):
+    periodo: PeriodoParticipativo
+    versao_questionario: Literal[2] = 2
+    unidade_contagem: Literal["questionarios"] = "questionarios"
+    distritos: list[ResumoDistritoParticipativo]

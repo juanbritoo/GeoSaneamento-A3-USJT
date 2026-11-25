@@ -304,3 +304,156 @@ status, OpenAPI e handlers) com cursor direcionado ao banco isolado, sem abrir
 o pool da aplicacao nem precisar de httpx. Fixtures e DDL ficam em transacoes
 revertidas ao finalizar. A suite de migracao da etapa 01 permanece inalterada.
 Nao ha teste de navegador nem de servidor HTTP/TCP nesta suite.
+
+## Etapa 04/08 - indicadores participativos por distrito
+
+As duas consultas abaixo agregam exclusivamente questionarios V2, sem modificar
+respostas, schema, frontend ou contratos de entrada. Nao consultam indicadores
+oficiais e nao calculam correlacao. A etapa 03 continua sem envio pelo frontend.
+
+### Rotas e periodo
+
+- `GET /api/v1/questionario/indicadores?id_territorial=355030801`
+- `GET /api/v1/questionario/resumo-territorial`
+
+Ambas aceitam `data_inicio` e `data_fim` opcionais em `AAAA-MM-DD`. As datas
+se referem a `criado_em`, no fuso `America/Sao_Paulo`. Inicio e fim sao
+inclusivos: aplica-se `>=` inicio do primeiro dia e `<` inicio do dia seguinte
+ao fim. Sem uma das datas, aquele limite fica aberto; sem ambas, todo o
+historico V2 e considerado. Periodo invertido ou data invalida retorna 422.
+
+O primeiro endpoint exige codigo de nove digitos e territorio existente de
+nivel `distrito`: codigo malformado/ausente retorna 422, distrito inexistente
+ou territorio de outro nivel retorna 404. Distrito existente sem dados retorna
+200, contadores zero e medidas sem denominador valido como `null`.
+Indisponibilidade do banco retorna 503 pelos handlers existentes, sem detalhes
+SQL. As rotas e os contratos de resposta estao documentados no Swagger.
+
+```powershell
+Invoke-RestMethod 'http://localhost:8000/api/v1/questionario/indicadores?id_territorial=355030801&data_inicio=2026-11-01&data_fim=2026-11-30'
+Invoke-RestMethod 'http://localhost:8000/api/v1/questionario/resumo-territorial?data_inicio=2026-11-01&data_fim=2026-11-30'
+```
+
+### Contrato de resposta e contadores
+
+`IndicadoresParticipativosResposta` contem `territorio` (`id_territorial`,
+`nome`), `periodo` (`data_inicio`, `data_fim`, `fuso_horario`),
+`versao_questionario: 2`, `unidade_contagem: "questionarios"`, `contadores`,
+`principais` e `complementares`.
+
+Os contadores sao `total_questionarios`, `total_moradores`,
+`total_nao_moradores`, `total_comentarios` e `total_vinculo_nao_informado`.
+Moradores incluem os vinculos `morador_mais_1_ano` e `morador_menos_1_ano`;
+nao moradores incluem `trabalha_estuda` e `sem_vinculo_frequente`. Vinculos
+nulos ou fora do contrato entram no ultimo contador, sem serem classificados
+artificialmente como moradores/nao moradores. Nao entram nos indicadores.
+Comentario so conta se contiver algum caractere que nao seja espaco em branco.
+Nenhum texto livre, id de resposta ou resposta individual e retornado.
+
+**Contagens representam questionarios, nao pessoas unicas.** Envios repetidos
+continuam sendo registros distintos; nao existe deduplicacao de participantes.
+Os indicadores descrevem a amostra participativa, sem inferir representatividade
+estatistica da populacao do distrito.
+
+`ResumoTerritorialParticipativo` contem o mesmo periodo, versao e unidade de
+contagem, mais `distritos`: lista de objetos com `territorio` e `contadores`.
+Inclui todos os distritos cadastrados, mesmo sem respostas no periodo, ordenados
+por nome e codigo. Nao inclui municipios, comentarios ou geometrias. Os filtros
+incidem sobre as respostas do LEFT JOIN, preservando os distritos com zero.
+
+### Indicadores principais
+
+Cada item de `principais` tem `codigo`, `valor`, `unidade: "%"`, `total_sim`,
+`total_nao`, `total_nao_sei` e `respostas_validas`. Codigos:
+
+- `ABASTECIMENTO_AGUA_REDE_GERAL`
+- `ESGOTAMENTO_SANITARIO_REDE_GERAL`
+- `DESTINO_LIXO_COLETA_DIRETA`
+- `EXISTENCIA_BANHEIRO_EXCLUSIVO`
+
+Somente moradores V2 participam desses calculos. Para cada campo, de forma
+independente: `respostas_validas = total_sim + total_nao` e
+`valor = 100 * total_sim / respostas_validas`. `nao_sei` e contado separadamente;
+null, campo ausente e valores fora do contrato nao entram no denominador.
+Quando o denominador e zero, valor e `null`, nunca zero artificial.
+
+Exemplo de um item (cenario de teste: 72 sim, 28 nao e 20 desconhecidas):
+
+```json
+{
+  "codigo": "ABASTECIMENTO_AGUA_REDE_GERAL",
+  "valor": 72.0,
+  "unidade": "%",
+  "total_sim": 72,
+  "total_nao": 28,
+  "total_nao_sei": 20,
+  "respostas_validas": 100
+}
+```
+
+### Indicadores complementares
+
+`complementares` possui tres listas: `medias`, `distribuicoes` e `percentuais`.
+Nao e calculada uma nota geral combinando as tres avaliacoes.
+
+| Media (`campo`) | Populacao aplicavel |
+|---|---|
+| `regularidade_agua` | Moradores V2 |
+| `qualidade_agua_percebida` | Moradores V2 |
+| `condicoes_esgotamento` | Moradores e nao moradores V2 |
+
+Cada media retorna `campo`, `valor`, `unidade: "nota_0_10"` e
+`respostas_validas`. Zero e uma nota valida; somente valores JSON numericos
+inteiros entre 0 e 10 entram no AVG. Nulos, strings, booleanos, numeros fora da
+faixa e fracionarios sao excluidos sem provocar erro de conversao.
+
+| Distribuicao (`campo`) | Populacao aplicavel | Categorias validas |
+|---|---|---|
+| `falta_agua_30_dias` | Moradores V2 | `nenhum`, `1_2`, `3_7`, `8_15`, `mais_15` |
+| `esgoto_ceu_aberto_30_dias` | Moradores e nao moradores V2 | `nunca`, `uma_duas_vezes`, `semanalmente`, `diariamente` |
+| `satisfacao_saneamento` | Moradores e nao moradores V2 | `muito_satisfeito`, `satisfeito`, `neutro`, `insatisfeito`, `muito_insatisfeito` |
+
+Cada distribuicao retorna `campo`, `respostas_validas`, `total_nao_sei` e
+`categorias`, cada uma com `codigo`, `total` e `percentual`. O denominador e a
+soma das categorias validas daquele campo; `nao_sei` fica fora da lista de
+categorias e do denominador, mas seu total fica explicito. Todas as categorias
+validas aparecem, mesmo com contagem zero. Sem respostas validas, todos os
+percentuais da distribuicao sao `null`. Nao aplicaveis e categorias invalidas
+nao entram nos calculos.
+
+| Percentual (`codigo`) | Numerador | Denominador |
+|---|---|---|
+| `SATISFEITOS` | muito_satisfeito + satisfeito | Respostas validas de satisfacao |
+| `COM_FALTA_AGUA` | 1_2 + 3_7 + 8_15 + mais_15 | Respostas validas de falta de agua, incluindo nenhum |
+| `OBSERVARAM_ESGOTO_EXPOSTO` | uma_duas_vezes + semanalmente + diariamente | Respostas validas de observacao de esgoto, incluindo nunca |
+
+Cada percentual retorna `codigo`, `valor`, `unidade: "%"`, `total_favoravel`
+(contagem do evento indicado pelo codigo, nao um julgamento positivo) e
+`respostas_validas`. Usa o mesmo denominador da distribuicao correspondente,
+sem somar percentuais ja arredondados.
+
+Todas as medias e porcentagens sao arredondadas no PostgreSQL para duas casas
+decimais. JSON usa numeros, portanto zeros finais podem nao aparecer. Por
+arredondamento, a soma das categorias pode resultar em 99.99 ou 100.01.
+
+### Implementacao e testes locais
+
+`app/indicadores_participativos.py` concentra as agregacoes parametrizadas,
+usando COUNT, AVG, FILTER, GROUP BY, janelas e NULLIF. Os dados individuais
+permanecem no banco: Python recebe somente agregados. O detalhe usa uma unica
+instrucao SQL para os calculos, garantindo a mesma visao dos dados entre seus
+denominadores. Nao ha tabela materializada, migracao ou dependencia nova.
+A classificacao V1 e as rotas anteriores permanecem intactas.
+
+A partir de `backend/`, com `TEST_DATABASE_URL` definido exclusivamente para
+PostgreSQL/PostGIS isolado:
+
+```powershell
+python -m unittest discover -s tests -p 'test_*.py' -v
+```
+
+Inclui testes de calculos/denominadores, caso 72%, medias 0/10, nulos e JSON
+invalido, V1/nao moradores, comentarios privados, questionarios repetidos,
+distritos vazios, limites de data e fuso, validacao HTTP/ASGI e 503, alem das
+regressoes V1/V2 e migracao. Fixtures e schema de teste sao revertidos por
+rollback; nao executar na base utilizada pela aplicacao.
