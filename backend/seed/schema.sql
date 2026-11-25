@@ -137,4 +137,15 @@ CREATE INDEX IF NOT EXISTS idx_territorio_municipio ON territorio (id_municipio)
 CREATE INDEX IF NOT EXISTS idx_territorio_geom ON territorio USING GIST (geom);
 CREATE INDEX IF NOT EXISTS idx_valor_indicador_periodo ON valor_indicador (id_territorial, periodo, indicador);
 
+-- Cadastro/login: contas de cidadãos (perfil "cadastrado"). Visitantes não têm registro.
+CREATE TABLE IF NOT EXISTS usuario (
+    id_usuario BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome       TEXT NOT NULL,
+    email      TEXT NOT NULL,
+    senha_hash TEXT NOT NULL,
+    ativo      BOOLEAN NOT NULL DEFAULT TRUE,
+    criado_em  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
+-- E-mail único sem diferenciar maiúsculas de minúsculas.
+CREATE UNIQUE INDEX IF NOT EXISTS uq_usuario_email ON usuario (lower(email));

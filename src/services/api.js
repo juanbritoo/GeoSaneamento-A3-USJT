@@ -1,15 +1,79 @@
-
 const API_URL = (
     import.meta.env.VITE_API_URL || "http://localhost:8000"
 ).replace(/\/+$/, "");
 
-async function requisicaoAPI(endpoint, options = {}) {
+// ==========================================
+// SESSÃO (token JWT)
+// ==========================================
+
+const CHAVE_TOKEN = "geosaneamento.token";
+
+// Cópia em memória: a sessão continua funcionando mesmo se o navegador bloquear o localStorage.
+let tokenEmMemoria = null;
+let aoSessaoExpirar = null;
+
+export function lerToken() {
+    if (tokenEmMemoria) return tokenEmMemoria;
+
+    try {
+        tokenEmMemoria = window.localStorage.getItem(CHAVE_TOKEN);
+    } catch {
+        tokenEmMemoria = null;
+    }
+
+    return tokenEmMemoria;
+}
+
+export function salvarToken(token) {
+    tokenEmMemoria = token;
+
+    try {
+        window.localStorage.setItem(CHAVE_TOKEN, token);
+    } catch {
+        // Sem localStorage, a sessão dura apenas até recarregar a página.
+    }
+}
+
+export function removerToken() {
+    tokenEmMemoria = null;
+
+    try {
+        window.localStorage.removeItem(CHAVE_TOKEN);
+    } catch {
+        // Nada a fazer: o token em memória já foi descartado.
+    }
+}
+
+// O AuthProvider registra aqui o que fazer quando a API recusa o token (expirado/inválido).
+export function registrarAoSessaoExpirar(callback) {
+    aoSessaoExpirar = callback;
+
+    return () => {
+        if (aoSessaoExpirar === callback) aoSessaoExpirar = null;
+    };
+}
+
+// ==========================================
+// REQUISIÇÃO BASE
+// ==========================================
+
+// Opções próprias: `corpo` (objeto enviado como JSON) e `comToken` (padrão: true).
+// As demais opções vão direto para o fetch (method, signal...).
+async function requisicaoAPI(endpoint, { corpo, comToken = true, ...options } = {}) {
+    const headers = new Headers(options.headers);
+    const token = comToken ? lerToken() : null;
+
+    if (corpo !== undefined) headers.set("Content-Type", "application/json");
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+
     let resposta;
 
     try {
         resposta = await fetch(`${API_URL}${endpoint}`, {
             method: "GET",
             ...options,
+            headers,
+            body: corpo !== undefined ? JSON.stringify(corpo) : undefined,
         });
     } catch (erro) {
         if (erro.name === "AbortError") throw erro;
@@ -36,10 +100,19 @@ async function requisicaoAPI(endpoint, options = {}) {
     }
 
     if (!resposta.ok) {
+        // Token enviado e recusado: a sessão acabou. Limpa e avisa a interface.
+        if (resposta.status === 401 && token) {
+            removerToken();
+            aoSessaoExpirar?.();
+        }
+
+        // 422 (validação do FastAPI) traz uma lista em `detail`, não um texto.
         const detalhe =
             typeof dados?.detail === "string"
                 ? dados.detail
-                : `A API retornou HTTP ${resposta.status}.`;
+                : resposta.status === 422
+                    ? "Dados inválidos. Verifique os campos e tente novamente."
+                    : `A API retornou HTTP ${resposta.status}.`;
 
         const erroAPI = new Error(detalhe);
         erroAPI.status = resposta.status;
@@ -101,4 +174,28 @@ export function buscarGeoJSONDistritos() {
 
 export function buscarDistritos(options = {}) {
     return requisicaoAPI("/distritos", options);
+}
+
+// ==========================================
+// AUTENTICAÇÃO
+// ==========================================
+
+export function cadastrarUsuario({ nome, email, senha }) {
+    return requisicaoAPI("/auth/cadastro", {
+        method: "POST",
+        corpo: { nome, email, senha },
+        comToken: false,
+    });
+}
+
+export function entrarUsuario({ email, senha }) {
+    return requisicaoAPI("/auth/login", {
+        method: "POST",
+        corpo: { email, senha },
+        comToken: false,
+    });
+}
+
+export function buscarUsuarioAtual(options = {}) {
+    return requisicaoAPI("/auth/me", options);
 }

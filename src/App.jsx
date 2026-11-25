@@ -1,17 +1,23 @@
-
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Building2, ClipboardList, Layers, Map as MapIcon, MapPin, RotateCcw } from 'lucide-react';
 
 import Map from "./components/Map/Map";
 import IndicadoresDistrito, { CardIndicador } from "./components/IndicadoresDistrito";
 import Questionario from "./components/Questionario/Questionario";
+import AuthModal from "./components/Auth/AuthModal";
+import ContaUsuario from "./components/Auth/ContaUsuario";
+import { useAuth } from "./auth/useAuth";
 
 import logoImg from './logo_whiteVersion.png';
 import { buscarDistritos, buscarSaneamento } from "./services/api";
 import "./App.css";
 
 function App() {
+  const { autenticado, carregando: carregandoSessao } = useAuth();
   const [mostrarQuestionario, setMostrarQuestionario] = useState(false);
+  const [mostrarLogin, setMostrarLogin] = useState(false);
+  const [mensagemLogin, setMensagemLogin] = useState("");
+  const [abrirQuestionarioAposLogin, setAbrirQuestionarioAposLogin] = useState(false);
   const [distritoSelecionado, setDistritoSelecionado] = useState(null);
   const [dadosSaneamento, setDadosSaneamento] = useState(null);
   const [carregando, setCarregando] = useState(true);
@@ -70,6 +76,37 @@ function App() {
   }, []);
 
   // ==========================================
+  // LOGIN E PERMISSÕES
+  // ==========================================
+
+  function abrirLogin() {
+    setMensagemLogin("");
+    setAbrirQuestionarioAposLogin(false);
+    setMostrarLogin(true);
+  }
+
+  // Responder ao questionário é exclusivo de usuário cadastrado.
+  function abrirQuestionario() {
+    if (carregandoSessao) return;
+
+    if (autenticado) {
+      setMostrarQuestionario(true);
+      return;
+    }
+
+    setMensagemLogin("Entre ou cadastre-se para responder ao questionário.");
+    setAbrirQuestionarioAposLogin(true);
+    setMostrarLogin(true);
+  }
+
+  const fecharLogin = useCallback(() => setMostrarLogin(false), []);
+
+  // Quem entrou para responder o questionário já cai direto nele.
+  function aoAutenticar() {
+    if (abrirQuestionarioAposLogin) setMostrarQuestionario(true);
+  }
+
+  // ==========================================
   // RENDERIZAÇÃO
   // ==========================================
 
@@ -126,11 +163,12 @@ function App() {
           <button
             type="button"
             className="questionnaire-trigger"
-            onClick={() => setMostrarQuestionario(true)}
+            onClick={abrirQuestionario}
           >
             <ClipboardList size={22} aria-hidden="true" />
             Questionário
           </button>
+          <ContaUsuario onEntrar={abrirLogin} />
         </div>
       </header>
 
@@ -252,9 +290,21 @@ function App() {
       {/* ====================================== */}
 
       <Questionario
-        aberto={mostrarQuestionario}
+        aberto={mostrarQuestionario && autenticado}
         onFechar={() => setMostrarQuestionario(false)}
       />
+
+      {/* ====================================== */}
+      {/* LOGIN / CADASTRO */}
+      {/* ====================================== */}
+
+      {mostrarLogin && (
+        <AuthModal
+          mensagem={mensagemLogin}
+          onSucesso={aoAutenticar}
+          onFechar={fecharLogin}
+        />
+      )}
 
     </div>
   );

@@ -1,4 +1,3 @@
-
 import os
 from contextlib import asynccontextmanager
 
@@ -9,7 +8,7 @@ from fastapi.responses import JSONResponse
 from psycopg_pool import PoolTimeout
 
 from .db import pool
-from .routers import distritos, health, saneamento
+from .routers import auth, distritos, health, saneamento
 
 
 @asynccontextmanager
@@ -24,7 +23,7 @@ app = FastAPI(title="GeoSaneamento API", version="0.1.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000").split(","),
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
@@ -42,5 +41,6 @@ async def pool_indisponivel(_: Request, __: PoolTimeout):
 
 # Rotas registradas nos módulos por responsabilidade.
 app.include_router(health.router)
+app.include_router(auth.router)
 app.include_router(saneamento.router)
 app.include_router(distritos.router)
