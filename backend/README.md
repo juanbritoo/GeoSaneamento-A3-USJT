@@ -457,3 +457,46 @@ invalido, V1/nao moradores, comentarios privados, questionarios repetidos,
 distritos vazios, limites de data e fuso, validacao HTTP/ASGI e 503, alem das
 regressoes V1/V2 e migracao. Fixtures e schema de teste sao revertidos por
 rollback; nao executar na base utilizada pela aplicacao.
+
+## Integracao do frontend V2 (etapa 05/08)
+
+A partir desta etapa, o Diagnostico participativo envia efetivamente as respostas.
+A revisao local da etapa 03 permanece como conferencia anterior ao envio, sem as
+mensagens temporarias de demonstracao. `enviarQuestionarioV2(payload)` reutiliza
+o mecanismo de requisicoes e faz um unico POST em `/api/v1/questionario`, usando
+`VITE_API_URL` (padrao local: `http://localhost:8000`). O servico V1 permanece intacto.
+O backend local deve possuir a migracao da etapa 01 e os contratos da etapa 02;
+a origem do frontend precisa estar autorizada no CORS existente.
+
+O payload revisado conserva `versao_questionario: 2`, codigos internos, notas
+numericas (inclusive zero), campos nao aplicaveis `null` e comentario opcional.
+Nao calcula pontuacao ou classificacao. O usuario confirma explicitamente o envio.
+Durante a requisicao, editar, reiniciar, fechar, Escape e clique no fundo ficam
+bloqueados; uma trava sincrona impede requisicoes simultaneas. O aviso de saida
+da pagina depende do navegador e nao impede encerramento forcado.
+
+Somente HTTP 201 com identificacao coerente do registro permite a conclusao
+"Obrigado pela participacao!", com distrito e retorno ao mapa. HTTP 200, resposta
+invalida ou erro nao confirmam armazenamento. Erros 404 e 422 orientam revisar
+o distrito/formulario; 503 indica indisponibilidade. As respostas ficam em memoria
+para edicao ou nova tentativa manual, sem reenvio automatico nem persistencia local.
+Falhas de conexao ou respostas inconclusivas podem ocorrer depois do commit:
+o aviso informa essa possibilidade e uma nova tentativa exige confirmacao do
+risco de duplicidade. Nao ha garantia de idempotencia no contrato atual.
+
+Os indicadores e resumo territorial existentes consultam os registros persistidos
+nas proximas requisicoes GET. Esta etapa nao acrescenta indicadores na interface,
+nao altera o mapa nem consulta comentarios coletivos.
+
+Validacao local realizada com App completo, Edge headless, FastAPI e PostgreSQL/
+PostGIS isolado em tmpfs: envio de morador e nao moradores; notas 0/10/null;
+confirmacao 201; agregados/resumo atualizados; erros 404/422/503/rede; resposta
+200 e JSON 201 invalido; clique duplo, fechamento bloqueado, respostas preservadas,
+perda de resposta apos commit e tentativa consciente. Regressao: 18 testes Python
+(migracao, V1/V2 e agregacoes), lint e build aprovados. Mapa/seletor testados com
+dois distritos sinteticos; requisicoes externas de tiles interceptadas. Nenhum
+acesso ao banco da aplicacao. Toque fisico e leitor de tela nao foram testados.
+
+Para verificar localmente: na raiz, `npm run lint` e `npm run build`; para o backend,
+executar o comando de unittest acima somente com `TEST_DATABASE_URL` apontando
+para banco isolado. Nenhuma migracao ou dependencia adicional nesta etapa.
