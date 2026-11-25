@@ -500,3 +500,142 @@ acesso ao banco da aplicacao. Toque fisico e leitor de tela nao foram testados.
 Para verificar localmente: na raiz, `npm run lint` e `npm run build`; para o backend,
 executar o comando de unittest acima somente com `TEST_DATABASE_URL` apontando
 para banco isolado. Nenhuma migracao ou dependencia adicional nesta etapa.
+
+## Analise comparativa territorial (etapa 06/08)
+
+`GET /api/v1/correlacao` compara os quatro codigos principais de saneamento.
+Nao calcula correlacao estatistica. Retorna `periodo`, `periodo_oficial`, `aviso`
+e `distritos`; cada distrito inclui identificacao, `total_questionarios`, quatro
+`indicadores` e `resumo`. Sem identificador, inclui todos os distritos, mesmo
+vazios. Nao utiliza valores municipais como substitutos nem expoe comentarios.
+
+```text
+GET /api/v1/correlacao?id_territorial=355030801&data_inicio=2026-01-01&data_fim=2026-12-31&periodo_oficial=2026
+GET /api/v1/correlacao
+```
+
+Parametros opcionais: `id_territorial` (nove digitos), `data_inicio`/`data_fim`
+(AAAA-MM-DD, inclusivas em America/Sao_Paulo) e `periodo_oficial` (texto exato
+armazenado, 1-50 caracteres, sem espacos nas extremidades). Intervalo invertido,
+data ou identificador invalidos: 422. Distrito inexistente: 404. Banco indisponivel:
+503 sem detalhes SQL. Sucesso: 200, inclusive quando nao ha comparacoes elegiveis.
+
+### Elegibilidade, metodologia e periodo
+
+- Usa exclusivamente respostas V2 de moradores para cada percentual, com o mesmo
+  denominador `sim + nao` da etapa 04. Total de questionarios inclui todos os V2
+  filtrados, sem inferir pessoas/domicilios unicos. Zero percentual e valido.
+- Codigo e territorio devem coincidir. Valor e unidade do catalogo devem ser
+  percentuais (`%`, `Percentual` ou `percentual`), com valor finito entre 0 e 100.
+  Nao ha conversao de proporcoes, unidades absolutas ou recortes parciais.
+- O schema atual nao contem uma certificacao metodologica dedicada. A comparacao
+  exige declaracao explicita no JSONB `valor_indicador.dimensoes`, sem alterar o
+  schema ou os dados nesta etapa. O objeto deve conter exclusivamente:
+
+  ```json
+  {"metodologia_comparavel_v2": "domicilios_ocupados:abastecimento_agua_rede_geral:v2"}
+  ```
+
+  Para os demais codigos, substituir o campo em minusculas por
+  `esgotamento_sanitario_rede_geral`, `destino_lixo_coleta_direta` ou
+  `existencia_banheiro_exclusivo`. Identificadores aceitos ficam centralizados em
+  `METODOLOGIAS_V2`. Esse marcador e uma convencao de validacao, nao uma evidencia
+  produzida automaticamente: somente o responsavel pela curadoria pode atribui-lo
+  apos conferir universo domiciliar ocupado, definicao da pergunta, numerador,
+  denominador, escala distrital e ausencia de recortes adicionais. Agua deve
+  representar rede geral como forma principal; esgoto deve representar rede geral;
+  lixo, coleta direta; banheiro, uso exclusivo dos moradores. O marcador nao
+  torna uma amostra voluntaria representativa nem iguala seus pesos aos do censo.
+  Dimensoes ausentes, outro marcador ou campos adicionais impedem a comparacao.
+  A carga distrital atual nao fornece esse marcador: nao presumir compatibilidade
+  apenas porque nomes/codigos coincidem. Nenhum dado foi marcado nesta etapa.
+- Periodo oficial anual (quatro digitos) deve coincidir com o ano da primeira e
+  ultima resposta valida daquele indicador. Respostas que atravessam anos ou
+  referencia de outro ano tornam-no nao comparavel. Referencias nao anuais nao
+  sao interpretadas implicitamente. Primeira/ultima resposta sao retornadas por
+  indicador; os filtros solicitados tambem aparecem na resposta. Mesmo ano nao
+  garante simultaneidade das coletas, advertida no campo `aviso`.
+- Com `periodo_oficial`, usa apenas o periodo exato; sem ele, prioriza fontes
+  classificadas como oficiais e nao mock, depois seleciona o ano mais recente
+  por codigo dentro desse grupo. Nao recua silenciosamente a anos antigos se o
+  mais recente for incompativel. Multiplas fontes no periodo selecionado ou
+  multiplos periodos sem ordenacao anual resultam em referencia ambigua, sem
+  escolha arbitraria. Fonte ausente/ambigua retorna metadados nulos e motivo.
+- Fonte precisa estar classificada como `oficial`, com procedencia preenchida e
+  `is_mock=false` para gerar alerta real. Referencias simuladas/nao oficiais
+  metodologica e temporalmente compativeis podem ter diferencas apenas no bloco
+  `simulacao`, com `status_simulado`. Status principal fica `nao_comparavel`,
+  divergencias principais nulas e exclusao integral do resumo oficial. O campo
+  `valor_oficial` conserva o nome do contrato mesmo para referencia simulada;
+  sempre interpretar junto com `is_mock`, `classificacao_fonte` e `simulacao`.
+
+### Classificacao e resumo
+
+Precedencia por indicador: nenhum V2 no distrito/periodo => `sem_dados`; menos
+que `MINIMO_RESPOSTAS_VALIDAS=30` respostas validas naquele campo =>
+`amostra_insuficiente`; referencia ausente/incompativel => `nao_comparavel`.
+Somente indicadores elegiveis calculam `oficial - participativo` e seu modulo.
+Decimal com arredondamento de metade para cima, duas casas; limites aplicados
+sobre a diferenca arredondada. Os percentuais participativos ja sao arredondados
+pela regra da etapa 04. Sem dados validos, valores permanecem `null`, nunca zero.
+
+Limites centralizados em `app/correlacao.py`: `LIMITE_POSSIVEL_PP=10` e
+`LIMITE_ELEVADA_PP=20`. Modulo <10: `sem_alerta`; >=10 e <20:
+`possivel_divergencia`; >=20: `divergencia_elevada`. Alterar constantes exige
+revisao tecnica/testes; nenhum parametro publico permite relaxar os criterios.
+
+O resumo conta somente comparacoes oficiais elegiveis. A media e descritiva;
+a maior divergencia absoluta determina status, `indicador_critico` e
+`exibir_alerta`. Empate usa o primeiro codigo em ordem alfabetica. Sem elegiveis,
+media/maximo/critico sao nulos, contagens zero e alerta falso; status e `sem_dados`
+se nao ha V2, `amostra_insuficiente` se todos ficam abaixo do minimo, ou
+`nao_comparavel` nos demais casos. Nunca retorna `sem_alerta` sem comparacoes.
+
+Exemplo de indicador em fixture isolada (72 sim, 28 nao, 20 desconhecidas;
+referencia validada de 92%, ano 2026):
+
+```json
+{
+  "codigo": "ABASTECIMENTO_AGUA_REDE_GERAL",
+  "valor_oficial": 92.0,
+  "valor_participativo": 72.0,
+  "unidade": "%",
+  "unidade_oficial": "%",
+  "respostas_validas": 100,
+  "primeira_resposta": "2026-11-24",
+  "ultima_resposta": "2026-11-24",
+  "divergencia_pp": 20.0,
+  "divergencia_absoluta_pp": 20.0,
+  "fonte": "Fonte fixture",
+  "periodo": "2026",
+  "id_fonte": "teste_oficial",
+  "procedencia": "Fonte distrital validada apenas para teste",
+  "classificacao_fonte": "oficial",
+  "is_mock": false,
+  "status": "divergencia_elevada",
+  "motivo": null,
+  "simulacao": null
+}
+```
+
+Alertas representam diferencas observadas em amostras voluntarias, **nao
+comprovacao estatistica de irregularidades**. Minimo de 30 nao garante
+representatividade, independencia, ausencia de duplicidade ou significancia.
+Nao ha teste de hipotese, causalidade, painel comparativo ou pins nesta etapa.
+
+### Implementacao e testes
+
+Duas consultas parametrizadas para um ou todos os distritos: participativos em
+lote com `base_sql`/`PRINCIPAIS` da etapa 04, COUNT/FILTER/GROUP BY e formula
+existente; referencias em lote com os mesmos joins territoriais/catalogo/fonte
+da consulta de saneamento. Nao chama o endpoint de cada distrito nem muda as
+agregacoes anteriores. Teste de equivalencia confere percentual/denominador
+contra `agregar_indicadores`; outro confere duas consultas para todos os distritos.
+Sem nova tabela, migracao, dependencia ou acesso ao banco da aplicacao.
+
+Suite local: `python -m unittest discover -s tests -p 'test_*.py' -v`, em backend,
+com `TEST_DATABASE_URL` exclusivamente isolado. Resultado: 26 testes aprovados
+(8 novos e 18 regressoes), incluindo ASGI real, SQL/PostGIS, limites, privacidade,
+periodos, fontes, metodo, simulacoes, 503 e isolamento municipal. Fixtures/DDL
+revertidos por rollback. Nao executado teste de carga, navegador ou servidor TCP
+nesta etapa de backend; frontend inalterado. Nenhuma migracao nova necessaria.

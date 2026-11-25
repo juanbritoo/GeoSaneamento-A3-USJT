@@ -253,3 +253,62 @@ class ResumoTerritorialParticipativo(BaseModel):
     versao_questionario: Literal[2] = 2
     unidade_contagem: Literal["questionarios"] = "questionarios"
     distritos: list[ResumoDistritoParticipativo]
+
+StatusCorrelacao = Literal[
+    'sem_dados', 'amostra_insuficiente', 'nao_comparavel', 'sem_alerta',
+    'possivel_divergencia', 'divergencia_elevada',
+]
+
+
+class SimulacaoCorrelacao(BaseModel):
+    divergencia_pp: float
+    divergencia_absoluta_pp: float
+    status_simulado: Literal['sem_alerta', 'possivel_divergencia', 'divergencia_elevada']
+
+
+class IndicadorCorrelacao(BaseModel):
+    codigo: str
+    valor_oficial: float | None
+    valor_participativo: float | None
+    unidade: Literal['%']
+    unidade_oficial: str | None
+    respostas_validas: int
+    primeira_resposta: date | None
+    ultima_resposta: date | None
+    divergencia_pp: float | None
+    divergencia_absoluta_pp: float | None
+    fonte: str | None
+    periodo: str | None
+    id_fonte: str | None
+    procedencia: str | None
+    classificacao_fonte: str | None
+    is_mock: bool | None
+    status: StatusCorrelacao
+    motivo: str | None
+    simulacao: SimulacaoCorrelacao | None
+
+
+class ResumoCorrelacao(BaseModel):
+    indicadores_comparados: int
+    indicadores_divergentes: int
+    divergencia_media_absoluta_pp: float | None
+    maior_divergencia_absoluta_pp: float | None
+    indicador_critico: str | None
+    status: StatusCorrelacao
+    exibir_alerta: bool
+
+
+class DistritoCorrelacao(BaseModel):
+    id_territorial: str
+    nome_territorio: str
+    total_questionarios: int
+    indicadores: list[IndicadorCorrelacao]
+    resumo: ResumoCorrelacao
+
+
+class CorrelacaoResposta(BaseModel):
+    periodo: PeriodoParticipativo
+    periodo_oficial: str | None
+    distritos: list[DistritoCorrelacao]
+    aviso: str = ('Diferencas observadas em amostras voluntarias, nao comprovacao estatistica de irregularidades. '
+                  'Questionarios nao representam pessoas ou domicilios unicos. Mesmo ano nao garante simultaneidade das coletas.')

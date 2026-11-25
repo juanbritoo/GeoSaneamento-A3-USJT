@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from psycopg_pool import PoolTimeout
 
 from .db import pool
-from .routers import distritos, health, indicadores_participativos, questionario, saneamento
+from .routers import correlacao, distritos, health, indicadores_participativos, questionario, saneamento
 
 
 @asynccontextmanager
@@ -47,3 +47,5 @@ app.include_router(distritos.router)
 app.include_router(questionario.router)
 
 app.include_router(indicadores_participativos.router)
+
+app.include_router(correlacao.router)
