@@ -498,3 +498,44 @@
     font-size: 14px;
   }
 }
+
+.indicator-card { background: var(--color-background); padding: 16px; box-shadow: var(--shadow-card); }
+.indicator-heading { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 14px; font-weight: 600; line-height: 1.4; }
+.indicator-card h4 { align-items: center; gap: 12px; }
+.indicator-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; background: var(--color-primary-light); color: var(--color-primary); flex-shrink: 0; }
+.indicator-value { font-size: 30px; font-variant-numeric: tabular-nums; }
+.indicator-period { display: flex; align-items: center; gap: 6px; color: var(--color-text-secondary); }
+.indicator-badges span { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; font-size: 12px; }
+.indicator-source > summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; list-style: none; }
+.indicator-source[open] > summary > svg { transform: rotate(180deg); }
+.indicator-source { font-size: 12px; color: var(--color-text-secondary); }
+.indicator-source summary { color: var(--color-text); }
+.indicator-retry { min-height: 44px; }
+.territorial-panel { border-radius: 12px; box-shadow: var(--shadow-card); }
+@media (prefers-reduced-motion: reduce) { .app-header *, .app-sidebar * { transition: none; } }
+
+/* Cobertura distrital de referência */
+.map-area .district-polygon { transition: fill 150ms, fill-opacity 150ms, stroke 150ms, stroke-width 150ms; }
+.map-area .cobertura-tooltip { box-sizing: border-box; white-space: normal; width: 210px; max-width: calc(100vw - 40px); padding: 12px; border-radius: 12px; background: #fff; box-shadow: 0 3px 12px rgb(20 33 61 / 12%); line-height: 1.4; }
+.cobertura-tooltip-titulo { display: flex; align-items: center; gap: 6px; padding-bottom: 10px; border-bottom: 1px solid #E2E8F0; font-size: 14px; font-weight: 700; overflow-wrap: anywhere; }
+.cobertura-tooltip-titulo svg { flex-shrink: 0; }
+.cobertura-tooltip-indice { display: flex; align-items: center; gap: 8px; margin: 12px 0 10px; }
+.cobertura-tooltip-valor { color: var(--cobertura-cor); font-size: 26px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cobertura-tooltip-rotulo { display: flex; flex-direction: column; min-width: 0; font-size: 11px; color: #64748B; }
+.cobertura-tooltip-rotulo strong { color: var(--cobertura-cor); overflow-wrap: anywhere; }
+.cobertura-tooltip-barra { height: 5px; overflow: hidden; border-radius: 999px; background: #E2E8F0; }
+.cobertura-tooltip-barra > span { display: block; height: 100%; border-radius: inherit; background: var(--cobertura-cor); }
+.cobertura-legenda { position: absolute; bottom: 28px; left: 12px; z-index: 800; width: min(300px, calc(100% - 24px)); border: 1px solid var(--color-border); border-radius: 12px; background: white; color: var(--color-text); box-shadow: 0 2px 10px rgb(20 33 61 / 12%); font: 12px var(--font-family); }
+.cobertura-legenda summary { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; cursor: pointer; font-weight: 600; list-style: none; }
+.cobertura-legenda summary::-webkit-details-marker { display: none; }
+.cobertura-legenda summary svg { flex-shrink: 0; }
+.cobertura-legenda summary svg:last-child { margin-left: auto; transition: transform 150ms; }
+.cobertura-legenda[open] summary svg:last-child { transform: rotate(180deg); }
+.cobertura-legenda summary:focus-visible { outline: 2px solid #123F80; outline-offset: -3px; border-radius: 12px; }
+.cobertura-legenda-conteudo { max-height: min(210px, 20dvh); overflow-y: auto; padding: 0 12px 10px; }
+.cobertura-legenda ul { list-style: none; padding: 0; margin: 0; }
+.cobertura-legenda li { display: flex; align-items: center; gap: 8px; margin: 7px 0; }
+.cobertura-cor { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.cobertura-legenda p { margin: 8px 0 0; line-height: 1.4; }
+@media (max-width: 900px) { .cobertura-legenda-conteudo { max-height: 70px; } }
+@media (prefers-reduced-motion: reduce) { .map-area .district-polygon, .cobertura-legenda summary svg { transition: none; } }

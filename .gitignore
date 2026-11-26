@@ -33,3 +33,10 @@ backend/.env.*
 /backend/geosaneamento.sql
 
 /backend/geosaneamento_supabase.sql
+
+# Ambientes e caches Python
+.venv/
+.venv-*/
+__pycache__/
+*.pyc
+.pytest_cache/

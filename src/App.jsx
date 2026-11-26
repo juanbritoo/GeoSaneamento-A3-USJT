@@ -1,9 +1,11 @@
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Building2, ClipboardList, Layers, Map as MapIcon, MapPin, RotateCcw } from 'lucide-react';
 
 import Map from "./components/Map/Map";
-import IndicadoresDistrito, { CardIndicador } from "./components/IndicadoresDistrito";
+import { CardIndicador } from "./components/IndicadoresDistrito";
+import PainelComparativo from "./components/PainelComparativo/PainelComparativo";
+import SeletorDistrito from "./components/SeletorDistrito/SeletorDistrito";
 import Questionario from "./components/Questionario/Questionario";
 
 import logoImg from './logo_whiteVersion.png';
@@ -20,6 +22,18 @@ function App() {
   const [carregandoDistritos, setCarregandoDistritos] = useState(true);
   const [erroDistritos, setErroDistritos] = useState("");
   const painelRef = useRef(null);
+  const [abaPainel, setAbaPainel] = useState('oficiais');
+  const selecionarNoMapa = useCallback((distrito, aba) => {
+    setDistritoSelecionado(distrito);
+    if (aba === 'comparativa') {
+      setAbaPainel('comparativa');
+      requestAnimationFrame(() => {
+        const guia = painelRef.current?.querySelector('[role="tab"][aria-selected="true"]');
+        guia?.focus({ preventScroll: true });
+        guia?.scrollIntoView({ block: 'nearest' });
+      });
+    }
+  }, []);
 
   useEffect(() => {
     // A identificacao deve aparecer mesmo se os indicadores estavam rolados.
@@ -93,35 +107,7 @@ function App() {
         </nav>
         <div className="app-header-actions">
           <div className="district-selector">
-            <select
-              aria-label="Selecione um distrito"
-              aria-describedby={erroDistritos ? 'district-error' : undefined}
-              aria-busy={carregandoDistritos}
-              value={distritoSelecionado?.id_territorial ?? ''}
-              disabled={carregandoDistritos || !!erroDistritos || distritos.length === 0}
-              onChange={(event) => setDistritoSelecionado(
-                distritos.find((distrito) => distrito.id_territorial === event.target.value) ?? null
-              )}
-            >
-              <option value="">
-                {carregandoDistritos ? 'Carregando distritos...' : erroDistritos
-                  ? 'Distritos indisponíveis' : distritos.length === 0
-                    ? 'Nenhum distrito disponível' : 'Selecione um distrito...'}
-              </option>
-              {distritoSelecionado && !distritos.some((distrito) =>
-                distrito.id_territorial === distritoSelecionado.id_territorial
-              ) && (
-                <option value={distritoSelecionado.id_territorial}>
-                  {distritoSelecionado.nome}
-                </option>
-              )}
-              {distritos.map((distrito) => (
-                <option key={distrito.id_territorial} value={distrito.id_territorial}>
-                  {distrito.nome}
-                </option>
-              ))}
-            </select>
-            {erroDistritos && <p id="district-error" role="alert">{erroDistritos}</p>}
+            <SeletorDistrito distritos={distritos} value={distritoSelecionado} onChange={setDistritoSelecionado} label="Selecione um distrito" loading={carregandoDistritos} error={erroDistritos} allowClear />
           </div>
           <button
             type="button"
@@ -184,9 +170,11 @@ function App() {
           </section>
 
           {distritoSelecionado ? (
-              <IndicadoresDistrito
+              <PainelComparativo
                 key={distritoSelecionado.id_territorial}
                 idTerritorial={distritoSelecionado.id_territorial}
+                aba={abaPainel}
+                onMudarAba={setAbaPainel}
               />
           ) : (
             <section className="indicators-section" aria-label="Indicadores municipais">
@@ -239,7 +227,7 @@ function App() {
           >
             <Map
               distritoSelecionado={distritoSelecionado}
-              onSelecionarDistrito={setDistritoSelecionado}
+              onSelecionarDistrito={selecionarNoMapa}
             />
           </div>
 
@@ -256,7 +244,6 @@ function App() {
         onFechar={() => setMostrarQuestionario(false)}
         distritos={distritos}
         distritoSelecionado={distritoSelecionado}
-        onSelecionarDistrito={setDistritoSelecionado}
       />
 
     </div>

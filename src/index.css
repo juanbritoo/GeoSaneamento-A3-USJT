@@ -5,6 +5,20 @@
   --color-background-secondary: #f5f8ff;
   --color-text: #14213d;
   --color-border: #e2e8f0;
+  --color-primary-hover: #1a5dc7;
+  --color-primary-dark: #123f80;
+  --color-text-secondary: #64748b;
+  --color-success: #15803d;
+  --color-success-light: #f0fdf4;
+  --color-warning: #b7791f;
+  --color-warning-light: #fff7e6;
+  --color-alert: #c75c27;
+  --color-alert-light: #fff1e8;
+  --color-error: #b91c1c;
+  --color-error-light: #fef2f2;
+  --color-neutral: #94a3b8;
+  --shadow-card: 0 2px 8px rgb(20 33 61 / 5%);
+  --shadow-floating: 0 4px 16px rgb(20 33 61 / 12%);
   --font-family: Arial, "Segoe UI", sans-serif;
 
   font-family: var(--font-family);

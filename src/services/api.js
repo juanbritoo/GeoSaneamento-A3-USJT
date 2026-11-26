@@ -3,7 +3,7 @@ const API_URL = (
     import.meta.env.VITE_API_URL || "http://localhost:8000"
 ).replace(/\/+$/, "");
 
-async function requisicaoAPI(endpoint, options = {}) {
+async function requisicaoAPI(endpoint, options = {}, statusEsperado) {
     let resposta;
 
     try {
@@ -46,6 +46,12 @@ async function requisicaoAPI(endpoint, options = {}) {
         erroAPI.detalhe = dados?.detail ?? null;
 
         throw erroAPI;
+    }
+
+    if (statusEsperado !== undefined && resposta.status !== statusEsperado) {
+        const erroStatus = new Error("A API nao confirmou o registro com o status esperado.");
+        erroStatus.status = resposta.status;
+        throw erroStatus;
     }
 
     if (!conteudoJSON) {
@@ -103,19 +109,32 @@ export function buscarDistritos(options = {}) {
     return requisicaoAPI("/distritos", options);
 }
 
-export function enviarQuestionario(idTerritorial, respostas) {
-    return requisicaoAPI("/api/v1/questionario", {
+export async function enviarQuestionarioV2(payload) {
+    const registro = await requisicaoAPI("/api/v1/questionario", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            id_territorial: String(idTerritorial),
-            respostas: {
-                abastecimento: respostas.abastecimento,
-                esgoto: respostas.esgoto,
-                abastecimento_fonte: respostas.abastecimentoFonte,
-                esgoto_destino: respostas.esgotoDestino,
-                avaliacao: respostas.avaliacao,
-            },
-        }),
-    });
+        body: JSON.stringify(payload),
+    }, 201);
+
+    if (!Number.isInteger(registro?.id) || registro.id <= 0 ||
+        registro.versao_questionario !== 2 || registro.id_territorial !== payload.id_territorial ||
+        typeof registro.nome_territorio !== "string" || !registro.nome_territorio.trim()) {
+        throw new Error("A resposta da API nao permitiu confirmar o registro enviado.");
+    }
+    eventosQuestionarioV2.dispatchEvent(new Event('registrado'));
+    return registro;
+}
+
+export const eventosQuestionarioV2 = new EventTarget();
+
+export function buscarCorrelacao(options = {}, idTerritorial) {
+    const parametros = new URLSearchParams();
+    if (idTerritorial) parametros.set('id_territorial', idTerritorial);
+    const query = parametros.size ? '?' + parametros.toString() : '';
+    return requisicaoAPI('/api/v1/correlacao' + query, options);
+}
+
+export function buscarIndicadoresParticipativos(idTerritorial, options = {}) {
+    const parametros = new URLSearchParams({ id_territorial: idTerritorial });
+    return requisicaoAPI('/api/v1/questionario/indicadores?' + parametros.toString(), options);
 }
