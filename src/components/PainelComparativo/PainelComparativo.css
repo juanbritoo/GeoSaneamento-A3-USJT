@@ -54,3 +54,8 @@
 .comparativo-motivo svg { vertical-align: middle; margin-right: 4px; }
 @media (min-width: 641px) and (max-width: 900px) { .comparativo-abas button { flex-direction: row; font-size: 13px; } }
 @media (prefers-reduced-motion: reduce) { .comparativo-abas button { transition: none; } }
+
+.comparativo-simulacao { border-style: dashed; }
+.comparativo-simulacao.sem_alerta { border-color: var(--color-primary, #2563eb); }
+.comparativo-simulacao.possivel_divergencia { background: var(--color-warning-light); border-color: var(--color-warning); }
+.comparativo-simulacao.divergencia_elevada { background: var(--color-alert-light); border-color: var(--color-alert); }

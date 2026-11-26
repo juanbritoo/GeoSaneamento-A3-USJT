@@ -148,22 +148,13 @@ operacao se o bloqueio nao for obtido. Nesse caso, aguarde uma janela local sem
 concorrencia e repita. Nao ha rollback destrutivo automatico: nao reverta a
 estrutura depois de receber dados V2.
 
-### Testes locais isolados
+### Validação local
 
-`tests/test_questionario_migration.py` usa unittest e as dependencias existentes.
-Aponte `TEST_DATABASE_URL` exclusivamente para uma instancia de testes
-PostgreSQL/PostGIS, nunca para a base da aplicacao. Nao carrega `.env`.
-
-```powershell
-# Defina TEST_DATABASE_URL com a conexao da instancia isolada antes de executar.
-python -m unittest discover -s tests -p test_questionario_migration.py -v
-```
-
-Cada cenario cria um schema de teste dentro de uma transacao e faz rollback ao
-terminar, sem DROP TABLE, DELETE, TRUNCATE ou fixtures permanentes. Cobre base
-legada, instalacao nova, reexecucao, preservacao de dados/constraints, V1/V2,
-JSONB, limite de comentario, FK e funcoes reais do POST/GET com validacao dos
-modelos Pydantic. Nao substitui testes HTTP ou de navegador.
+As suítes próprias de migração/questionário foram retiradas na etapa 10 por
+delimitação de responsabilidades. Os resultados históricos permanecem em
+`CODEX_PASSOS.md`. Verificações atuais usam consultas SQL, HTTP e o roteiro
+isolado de [demonstração](seed/DEMO_QUESTIONARIO.md). Testes de outros integrantes
+podem ser executados, sem modificar seus arquivos.
 
 ## Etapa 02/08 - contratos e persistencia V2
 
@@ -292,18 +283,6 @@ Invoke-RestMethod -Method Post -Uri http://localhost:8000/api/v1/questionario -C
 Invoke-RestMethod 'http://localhost:8000/api/v1/questionario?versao_questionario=2'
 ```
 
-Execute os testes somente com `TEST_DATABASE_URL` apontando para uma instancia
-isolada de PostgreSQL/PostGIS, a partir de `backend/`:
-
-```powershell
-python -m unittest discover -s tests -p 'test_questionario*.py' -v
-```
-
-A suite V2 exercita a aplicacao ASGI real (validacao de entrada, serializacao,
-status, OpenAPI e handlers) com cursor direcionado ao banco isolado, sem abrir
-o pool da aplicacao nem precisar de httpx. Fixtures e DDL ficam em transacoes
-revertidas ao finalizar. A suite de migracao da etapa 01 permanece inalterada.
-Nao ha teste de navegador nem de servidor HTTP/TCP nesta suite.
 
 ## Etapa 04/08 - indicadores participativos por distrito
 
@@ -445,18 +424,9 @@ instrucao SQL para os calculos, garantindo a mesma visao dos dados entre seus
 denominadores. Nao ha tabela materializada, migracao ou dependencia nova.
 A classificacao V1 e as rotas anteriores permanecem intactas.
 
-A partir de `backend/`, com `TEST_DATABASE_URL` definido exclusivamente para
-PostgreSQL/PostGIS isolado:
-
-```powershell
-python -m unittest discover -s tests -p 'test_*.py' -v
-```
-
-Inclui testes de calculos/denominadores, caso 72%, medias 0/10, nulos e JSON
-invalido, V1/nao moradores, comentarios privados, questionarios repetidos,
-distritos vazios, limites de data e fuso, validacao HTTP/ASGI e 503, alem das
-regressoes V1/V2 e migracao. Fixtures e schema de teste sao revertidos por
-rollback; nao executar na base utilizada pela aplicacao.
+A validação funcional isolada por SQL/HTTP está documentada em
+[DEMO_QUESTIONARIO.md](seed/DEMO_QUESTIONARIO.md). As antigas suítes próprias
+não fazem mais parte do repositório; sua execução passada permanece no histórico.
 
 ## Integracao do frontend V2 (etapa 05/08)
 
@@ -492,14 +462,14 @@ Validacao local realizada com App completo, Edge headless, FastAPI e PostgreSQL/
 PostGIS isolado em tmpfs: envio de morador e nao moradores; notas 0/10/null;
 confirmacao 201; agregados/resumo atualizados; erros 404/422/503/rede; resposta
 200 e JSON 201 invalido; clique duplo, fechamento bloqueado, respostas preservadas,
-perda de resposta apos commit e tentativa consciente. Regressao: 18 testes Python
-(migracao, V1/V2 e agregacoes), lint e build aprovados. Mapa/seletor testados com
+perda de resposta apos commit e tentativa consciente. Os resultados históricos
+de regressão estão preservados em CODEX_PASSOS.md; as suítes próprias foram retiradas na etapa 10. Mapa/seletor testados com
 dois distritos sinteticos; requisicoes externas de tiles interceptadas. Nenhum
 acesso ao banco da aplicacao. Toque fisico e leitor de tela nao foram testados.
 
 Para verificar localmente: na raiz, `npm run lint` e `npm run build`; para o backend,
-executar o comando de unittest acima somente com `TEST_DATABASE_URL` apontando
-para banco isolado. Nenhuma migracao ou dependencia adicional nesta etapa.
+seguir o roteiro SQL/HTTP em banco isolado de DEMO_QUESTIONARIO.md. Nenhuma
+migração ou dependência adicional é necessária para o questionário integrado.
 
 ## Analise comparativa territorial (etapa 06/08)
 
@@ -629,13 +599,23 @@ Duas consultas parametrizadas para um ou todos os distritos: participativos em
 lote com `base_sql`/`PRINCIPAIS` da etapa 04, COUNT/FILTER/GROUP BY e formula
 existente; referencias em lote com os mesmos joins territoriais/catalogo/fonte
 da consulta de saneamento. Nao chama o endpoint de cada distrito nem muda as
-agregacoes anteriores. Teste de equivalencia confere percentual/denominador
-contra `agregar_indicadores`; outro confere duas consultas para todos os distritos.
+agregacoes anteriores. Os resultados históricos das verificações de equivalência
+e quantidade de consultas permanecem em CODEX_PASSOS.md.
 Sem nova tabela, migracao, dependencia ou acesso ao banco da aplicacao.
 
-Suite local: `python -m unittest discover -s tests -p 'test_*.py' -v`, em backend,
-com `TEST_DATABASE_URL` exclusivamente isolado. Resultado: 26 testes aprovados
-(8 novos e 18 regressoes), incluindo ASGI real, SQL/PostGIS, limites, privacidade,
-periodos, fontes, metodo, simulacoes, 503 e isolamento municipal. Fixtures/DDL
-revertidos por rollback. Nao executado teste de carga, navegador ou servidor TCP
-nesta etapa de backend; frontend inalterado. Nenhuma migracao nova necessaria.
+As suítes próprias desta evolução foram removidas na etapa 10. A manutenção de
+testes automatizados cabe ao integrante designado, conforme AGENTS.md.
+
+## Seed participativo local (etapa 10 simplificada)
+
+`seed/seed_questionario_demo.py` usa a `DATABASE_URL` do container `api` atual.
+Insere somente os 564 questionários do lote original, identificados por IDs
+negativos reservados e comentários demonstrativos quando presentes. A carga é
+transacional e idempotente; colisões com conteúdo diferente cancelam a operação.
+Não cria ambientes, territórios ou referências, nem altera dados existentes.
+
+Os sete grupos são preservados, mas os status dependem das referências e respostas
+já presentes. Dados fictícios entram nos agregados atuais; o motor não exclui IDs
+negativos. Não há garantia de sete estados visuais, nem de ausência de pin em
+Vila Mariana se já houver participação. Consulte o comando em
+[DEMO_QUESTIONARIO.md](seed/DEMO_QUESTIONARIO.md).

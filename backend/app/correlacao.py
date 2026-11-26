@@ -104,6 +104,15 @@ def comparar(participativo, candidatos):
         item.update(status='sem_dados', motivo='Sem questionarios V2 no periodo selecionado.')
     elif item['respostas_validas'] < MINIMO_RESPOSTAS_VALIDAS:
         item.update(status='amostra_insuficiente', motivo=f'Menos de {MINIMO_RESPOSTAS_VALIDAS} respostas validas neste indicador.')
+    elif (ref and ref['is_mock'] and ref['unidade'] in UNIDADES_PERCENTUAIS
+          and ref['unidade_catalogo'] in UNIDADES_PERCENTUAIS
+          and item['valor_oficial'] is not None and 0 <= item['valor_oficial'] <= 100):
+        delta = arredondar(ref['valor'] - Decimal(str(item['valor_participativo'])))
+        item.update(
+            motivo=('Divergência simulada; sem alerta real. Metodologia e períodos não são '
+                    'validados nesta simulação; consulte as datas e a fonte. ' + (motivo or '')),
+            simulacao={'divergencia_pp': delta, 'divergencia_absoluta_pp': abs(delta),
+                       'status_simulado': classificar(abs(delta))})
     elif motivo:
         item['motivo'] = motivo
     else:
@@ -146,4 +155,9 @@ def analisar(cur, id_territorial=None, data_inicio=None, data_fim=None, periodo_
         distrito['indicadores'].append(comparar(p, por_chave.get((p['id_territorial'], p['codigo']), [])))
     for distrito in distritos.values():
         distrito['resumo'] = resumir(distrito['indicadores'], distrito['total_questionarios'])
+        simulados = [dict(i['simulacao'], codigo=i['codigo'], status=i['simulacao']['status_simulado'])
+                     for i in distrito['indicadores'] if i['simulacao'] is not None]
+        distrito['resumo_simulado'] = (
+            dict(resumir(simulados, distrito['total_questionarios']), exibir_alerta=False)
+            if simulados else None)
     return list(distritos.values())

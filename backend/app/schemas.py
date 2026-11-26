@@ -298,12 +298,17 @@ class ResumoCorrelacao(BaseModel):
     exibir_alerta: bool
 
 
+class ResumoCorrelacaoSimulada(ResumoCorrelacao):
+    exibir_alerta: Literal[False] = False
+
+
 class DistritoCorrelacao(BaseModel):
     id_territorial: str
     nome_territorio: str
     total_questionarios: int
     indicadores: list[IndicadorCorrelacao]
     resumo: ResumoCorrelacao
+    resumo_simulado: ResumoCorrelacaoSimulada | None = None
 
 
 class CorrelacaoResposta(BaseModel):

@@ -126,15 +126,11 @@ npm run lint
 npm run build
 ```
 
-Regressões Python existentes, a partir de `backend/`, somente com
-`TEST_DATABASE_URL` configurado para PostgreSQL/PostGIS **isolado**:
-
-```powershell
-python -m unittest discover -s tests -p 'test_*.py' -v
-```
-
-Não apontar testes ou fixtures ao banco da aplicação. Nesta entrega, testes
-auxiliares frontend foram executados fora do repositório, conforme `AGENTS.md`.
+As quatro suítes próprias do questionário foram retiradas na etapa 10. Testes de
+outros integrantes devem ser preservados; sua manutenção pertence ao responsável
+designado. Para validação por SQL, HTTP e navegador em ambiente isolado, siga
+[Seed demonstrativo](backend/seed/DEMO_QUESTIONARIO.md). Não aponte fixtures ao
+banco da aplicação.
 
 Validação da etapa 08: lint e build aprovados, 26 regressões backend aprovadas e
 fluxo real em ambiente isolado de questionário → HTTP 201 → PostgreSQL → agregação

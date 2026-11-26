@@ -89,6 +89,7 @@ function Percepcao({ dados }) {
 
 function Comparacao({ dados }) {
   const resumo = dados.resumo;
+  const simulacao = dados.resumo_simulado;
   const alertaTerritorial = resumo.exibir_alerta && divergente(resumo.status);
   return <>
     <section className={`comparativo-resumo ${alertaTerritorial ? `comparativo-alerta ${resumo.status}` : ''}`} aria-label="Resumo da análise">
@@ -101,20 +102,27 @@ function Comparacao({ dados }) {
       {resumo.indicadores_comparados === 0 && <p>Sem indicadores elegíveis para comparação oficial.</p>}
       {alertaTerritorial && <p>Diferença observada na amostra; não comprova irregularidade.</p>}
     </section>
+    {simulacao?.indicadores_comparados > 0 && <section className={`comparativo-resumo comparativo-simulacao ${simulacao.status}`} aria-label="Resumo da simulação">
+      <h3><FlaskConical size={20} aria-hidden="true" />Divergência simulada — {STATUS[simulacao.status]}</h3>
+      <p>Sem alerta real. Referências simuladas, separadas da comparação oficial.</p>
+      <p>Indicadores comparados: {valor(simulacao.indicadores_comparados)} · Divergentes: {valor(simulacao.indicadores_divergentes)}</p>
+      <p>Maior divergência simulada: <strong>{valor(simulacao.maior_divergencia_absoluta_pp, ' p.p.')}</strong></p>
+      <p>{TITULOS[simulacao.indicador_critico] ?? simulacao.indicador_critico}</p>
+    </section>}
     {dados.indicadores.map((i) => {
       const simulada = i.is_mock === true || i.simulacao != null;
       const oficial = i.classificacao_fonte === 'oficial' && i.is_mock === false && !simulada;
       const alerta = alertaTerritorial && oficial && divergente(i.status);
       const unidadePercentual = ['%', 'Percentual', 'percentual'].includes(i.unidade_oficial);
-      return <article className={`comparativo-card ${alerta ? `comparativo-alerta ${i.status}` : ''}`} key={i.codigo}>
+      return <article className={`comparativo-card ${i.simulacao ? `comparativo-simulacao ${i.simulacao.status_simulado}` : alerta ? `comparativo-alerta ${i.status}` : ''}`} key={i.codigo}>
         <CabecalhoIndicador codigo={i.codigo} titulo={TITULOS[i.codigo]} />
-        <p className="comparativo-status">{simulada ? <FlaskConical size={16} aria-hidden="true" /> : alerta ? <TriangleAlert size={16} aria-hidden="true" /> : i.status === 'nao_comparavel' ? <CircleHelp size={16} aria-hidden="true" /> : <Info size={16} aria-hidden="true" />}{simulada ? 'Dado simulado — sem alerta real' : STATUS[i.status]}</p>
+        <p className="comparativo-status">{simulada ? <FlaskConical size={16} aria-hidden="true" /> : alerta ? <TriangleAlert size={16} aria-hidden="true" /> : i.status === 'nao_comparavel' ? <CircleHelp size={16} aria-hidden="true" /> : <Info size={16} aria-hidden="true" />}{i.simulacao ? `Divergência simulada — ${STATUS[i.simulacao.status_simulado]} — sem alerta real` : simulada ? 'Dado simulado — sem alerta real' : STATUS[i.status]}</p>
         {simulada && <p>Status da comparação oficial: {STATUS[i.status]}</p>}
         {!oficial && !simulada && <p>Referência não oficial ou procedência indisponível.</p>}
         <div className="comparativo-duas-barras"><Barra rotulo={simulada ? 'Referência simulada' : oficial ? 'Oficial' : 'Referência não oficial'} percentual={unidadePercentual ? i.valor_oficial : null} classe={oficial ? 'comparativo-oficial' : 'comparativo-simulada'} />
         {!unidadePercentual && i.valor_oficial != null && <p>Valor da fonte: {valor(i.valor_oficial)} {i.unidade_oficial ?? '(unidade não informada)'}. Unidade incompatível com a barra percentual.</p>}
         <Barra rotulo="Participativo" percentual={i.valor_participativo} /></div>
-        <p className="comparativo-diferenca">Diferença observada (oficial − participativo): <strong>{oficial ? diferenca(i.divergencia_pp) : 'Não disponível'}</strong></p>
+        <p className="comparativo-diferenca">Diferença {i.simulacao ? 'simulada (referência − participativo)' : 'observada (oficial − participativo)'}: <strong>{i.simulacao ? diferenca(i.simulacao.divergencia_pp) : oficial ? diferenca(i.divergencia_pp) : 'Não disponível'}</strong></p>
         <p>Respostas válidas: {valor(i.respostas_validas)}</p>
         {i.motivo && <p className="comparativo-motivo">{i.status === 'amostra_insuficiente' && <Info size={16} aria-hidden="true" />}{i.motivo}</p>}
         <details className="comparativo-detalhes"><summary>Fonte e período<ChevronDown size={16} aria-hidden="true" /></summary>

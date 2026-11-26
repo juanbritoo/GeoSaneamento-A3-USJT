@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { ChevronDown, Layers, TriangleAlert, UsersRound } from 'lucide-react';
+import { ChevronDown, FlaskConical, Layers, TriangleAlert, UsersRound } from 'lucide-react';
 import { Marker, Tooltip } from 'react-leaflet';
 import { DivIcon, DomEvent } from 'leaflet';
 import { buscarCorrelacao, eventosQuestionarioV2 } from '../../services/api';
@@ -57,6 +57,12 @@ function validarDados(dados) {
 }
 
 function visual(distrito) {
+  const simulado = distrito.resumo_simulado;
+  if (distrito.resumo.indicadores_comparados === 0 && simulado?.indicadores_comparados > 0 &&
+      simulado.exibir_alerta === false && Object.hasOwn(ESTADOS, simulado.status)) {
+    return { alerta: false, simulada: true, classe: simulado.status,
+      texto: `Divergência simulada — ${ESTADOS[simulado.status]}. Maior diferença: ${simulado.maior_divergencia_absoluta_pp?.toLocaleString('pt-BR')} p.p. Sem alerta real` };
+  }
   const { status, exibir_alerta } = distrito.resumo;
   const divergente = status === 'possivel_divergencia' || status === 'divergencia_elevada';
   const alerta = divergente && exibir_alerta === true;
@@ -103,9 +109,9 @@ function PinsParticipativos({ posicoes, onSelecionarDistrito, idSelecionado }) {
     const texto = `${d.nome_territorio}: ${d.total_questionarios.toLocaleString('pt-BR')} questionários. ${estado.texto}.`;
     const quantidade = d.total_questionarios.toLocaleString('pt-BR');
     const largura = 40 + quantidade.length * 8;
-    const conteudo = renderToStaticMarkup(<span className="participativa-pin-conteudo"><UsersRound size={14} aria-hidden="true" /><span>{quantidade}</span>{estado.alerta && <span className="participativa-pin-alerta" aria-hidden="true"><TriangleAlert size={11} /></span>}</span>);
+    const conteudo = renderToStaticMarkup(<span className="participativa-pin-conteudo"><UsersRound size={14} aria-hidden="true" /><span>{quantidade}</span>{(estado.alerta || estado.simulada) && <span className="participativa-pin-alerta" aria-hidden="true">{estado.simulada ? <FlaskConical size={11} /> : <TriangleAlert size={11} />}</span>}</span>);
     return { distrito: d, posicao, texto, icon: new DivIcon({
-      html: conteudo, className: `participativa-pin participativa-${estado.classe} ${d.id_territorial === idSelecionado ? 'participativa-selecionado' : ''}`,
+      html: conteudo, className: `participativa-pin participativa-${estado.classe} ${estado.simulada ? 'participativa-simulada' : ''} ${d.id_territorial === idSelecionado ? 'participativa-selecionado' : ''}`,
       iconSize: [largura, 30], iconAnchor: [largura / 2, 15], tooltipAnchor: [0, -17],
     }) };
   }).filter(Boolean), [consulta.distritos, posicoes, idSelecionado]);
@@ -121,6 +127,7 @@ function PinsParticipativos({ posicoes, onSelecionarDistrito, idSelecionado }) {
         <details className="participativa-legenda"><summary>Legenda dos pins<ChevronDown size={16} aria-hidden="true" /></summary>
           <ul>{Object.entries(ESTADOS).filter(([status]) => status !== 'sem_dados').map(([status, texto]) =>
             <li key={status}><span className={`participativa-amostra participativa-${status}`} aria-hidden="true">{status.includes('divergencia') || status === 'divergencia_elevada' ? <TriangleAlert size={12} /> : <UsersRound size={12} />}</span>{texto}</li>)}</ul>
+          <p><FlaskConical size={14} aria-hidden="true" /> Borda tracejada: Divergência simulada, com as mesmas cores, sem alerta real.</p>
           <p>Números indicam questionários, não pessoas únicas. Diferenças em amostras voluntárias não comprovam irregularidades.</p>
         </details>
       </>}

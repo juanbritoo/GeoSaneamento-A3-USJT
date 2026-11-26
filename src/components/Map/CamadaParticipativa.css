@@ -34,3 +34,5 @@
 @media (max-width: 640px) { .participativa-controle { top: 8px; right: 8px; max-width: min(244px, calc(100% - 64px)); } .participativa-toggle { gap: 6px; padding: 10px; font-size: 12px; } .participativa-informacoes { max-height: 136px; } }
 @media (prefers-reduced-motion: reduce) { .participativa-pin-conteudo, .participativa-switch, .participativa-switch::after { transition: none; } }
 
+
+.participativa-simulada .participativa-pin-conteudo { border-style: dashed; }
