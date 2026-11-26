@@ -9,7 +9,7 @@ import {
 } from "react-leaflet";
 
 import { renderToStaticMarkup } from "react-dom/server";
-import { Layers, ChevronDown, MapPin, FlaskConical } from "lucide-react";
+import { Layers, ChevronDown, MapPin } from "lucide-react";
 import CamadaParticipativa from "./CamadaParticipativa";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -83,7 +83,6 @@ function tooltipDistrito(nome, cobertura) {
       <div className="cobertura-tooltip-barra" aria-hidden="true">
         {cobertura && <span style={{ width: `${cobertura.media}%` }} />}
       </div>
-      {cobertura?.simulado && <div className="cobertura-tooltip-rodape"><FlaskConical size={12} aria-hidden="true" />Dados simulados</div>}
     </div>
   );
 }
@@ -386,9 +385,7 @@ function Map({
         <summary><Layers size={18} aria-hidden="true" /><span>Cobertura de saneamento</span><ChevronDown size={16} aria-hidden="true" /></summary>
         <div className="cobertura-legenda-conteudo">
           <ul>{FAIXAS_COBERTURA.map((faixa) => <li key={faixa.nome}><span className="cobertura-cor" style={{ backgroundColor: faixa.cor }} aria-hidden="true" /><span><strong>{faixa.nome}</strong> · {faixa.intervalo}</span></li>)}</ul>
-          <p>Faixas de metodologia própria do GeoSaneamento. Média dos quatro indicadores de referência do mesmo período, sem respostas do questionário.</p>
-          {Object.values(coberturas).some((c) => c?.simulado) && <p>Inclui dados simulados, identificados no tooltip dos distritos.</p>}
-          <p role="status">{estadoCobertura === 'carregando' ? 'Carregando cobertura…' : estadoCobertura === 'erro' ? 'Cobertura indisponível: não foi possível consultar a API. Recarregue a página para tentar novamente.' : 'Consulte o período e a menor cobertura no tooltip.'}</p>
+          {estadoCobertura !== 'pronto' && <p role="status">{estadoCobertura === 'carregando' ? 'Carregando cobertura…' : 'Cobertura indisponível: não foi possível consultar a API. Recarregue a página para tentar novamente.'}</p>}
         </div>
       </details>
 

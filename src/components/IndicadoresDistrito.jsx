@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CalendarDays, ChartNoAxesColumn, ChevronDown, Clock, Droplet, Droplets, FlaskConical, House, MessageSquare, Smile, Trash2, UsersRound, Waves } from "lucide-react";
+import { CalendarDays, ChartNoAxesColumn, ChevronDown, Clock, Droplet, Droplets, House, MessageSquare, Smile, Trash2, UsersRound, Waves } from "lucide-react";
 import { buscarSaneamento } from "../services/api";
 
 const formatoNumero = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 20 });
@@ -46,12 +46,11 @@ export function CardIndicador({ indicador, distrital = false }) {
         {indicador.valor != null && indicador.unidade && <span> {indicador.unidade}</span>}
       </p>
       <p className="indicator-period"><CalendarDays size={16} aria-hidden="true" />Período: {indicador.periodo ?? "Não informado"}</p>
-      {(indicador.classificacao_fonte || indicador.is_mock === true) && (
+      {indicador.classificacao_fonte && (
         <div className="indicator-badges">
           {indicador.classificacao_fonte && (
             <span>{classificacoes[indicador.classificacao_fonte] ?? indicador.classificacao_fonte}</span>
           )}
-          {indicador.is_mock === true && <span><FlaskConical size={14} aria-hidden="true" />Dado simulado</span>}
         </div>
       )}
       <details className="indicator-source">
