@@ -28,10 +28,17 @@
 .participativa-possivel_divergencia { --pin-cor: var(--color-warning); }
 .participativa-divergencia_elevada { --pin-cor: var(--color-alert); }
 .participativa-amostra { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex-shrink: 0; border-radius: 50%; background: white; color: var(--pin-cor); border: 1px solid var(--pin-cor); }
-.map-area .participativa-tooltip { white-space: normal; width: 200px; max-width: 240px; box-sizing: border-box; border-radius: 10px; padding: 12px; }
-.participativa-tooltip > span, .participativa-tooltip > small { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
-.participativa-tooltip > small { color: var(--color-text-secondary); }
 @media (max-width: 640px) { .participativa-controle { top: 8px; right: 8px; max-width: min(244px, calc(100% - 64px)); } .participativa-toggle { gap: 6px; padding: 10px; font-size: 12px; } .participativa-informacoes { max-height: 136px; } }
 @media (prefers-reduced-motion: reduce) { .participativa-pin-conteudo, .participativa-switch, .participativa-switch::after { transition: none; } }
 
 
+
+.participativa-tooltip-status { display: flex; align-items: center; gap: 6px; color: var(--pin-cor); font-size: 12px; font-weight: 600; }
+.participativa-tooltip-status svg { flex-shrink: 0; }
+.participativa-tooltip-diferenca { display: grid; gap: 3px; margin-top: 10px; font-size: 11px; color: var(--color-text-secondary); }
+.participativa-tooltip-diferenca strong { font-size: 18px; font-variant-numeric: tabular-nums; color: var(--pin-cor); }
+.participativa-tooltip-rodape { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid #E2E8F0; padding-top: 8px; margin-top: 10px; color: var(--color-text-secondary); }
+.participativa-tooltip-info { position: relative; display: inline-flex; cursor: help; }
+.participativa-tooltip-info > [role='tooltip'] { display: none; position: absolute; right: 0; bottom: calc(100% + 6px); width: 170px; padding: 8px; border: 1px solid #E2E8F0; border-radius: 8px; background: white; box-shadow: var(--shadow-card); font-size: 11px; }
+.participativa-tooltip-info:hover > [role='tooltip'], .participativa-tooltip-info:focus > [role='tooltip'] { display: block; }
+.participativa-tooltip-info:focus-visible { outline: 2px solid #2272ED; outline-offset: 2px; }

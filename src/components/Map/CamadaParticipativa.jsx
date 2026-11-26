@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { ChevronDown, Info, Layers, TriangleAlert, UsersRound } from 'lucide-react';
+import { ChevronDown, CircleCheck, CircleHelp, Info, Layers, MapPin, TriangleAlert, UsersRound } from 'lucide-react';
 import { Marker, Tooltip } from 'react-leaflet';
 import { DivIcon, DomEvent } from 'leaflet';
 import { buscarCorrelacao, eventosQuestionarioV2 } from '../../services/api';
@@ -70,6 +70,32 @@ function visual(distrito) {
     texto: divergente && !alerta ? 'Alerta não autorizado pelo backend' : ESTADOS[status] };
 }
 
+function ConteudoTooltipParticipativo({ distrito }) {
+  const estado = visual(distrito);
+  const resumo = estado.simulada ? distrito.resumo_simulado : distrito.resumo;
+  const diferenca = resumo?.maior_divergencia_absoluta_pp;
+  const disponivel = resumo?.indicadores_comparados > 0 && Number.isFinite(diferenca);
+  const Icone = estado.alerta || estado.destaque ? TriangleAlert
+    : estado.classe === 'sem_alerta' ? CircleCheck : CircleHelp;
+  const simulada = distrito.indicadores?.some((i) => i.is_mock || i.simulacao);
+  return <div className={`participativa-tooltip-conteudo participativa-${estado.classe}`}>
+    <div className="cobertura-tooltip-titulo"><MapPin size={16} color="#2272ED" aria-hidden="true" /><strong>{distrito.nome_territorio}</strong></div>
+    <div className="cobertura-tooltip-indice" style={{ '--cobertura-cor': '#2272ED' }}>
+      <strong className="cobertura-tooltip-valor">{distrito.total_questionarios.toLocaleString('pt-BR')}</strong>
+      <span className="cobertura-tooltip-rotulo">{distrito.total_questionarios === 1 ? 'Questionário' : 'Questionários'}</span>
+    </div>
+    <div className="participativa-tooltip-status"><Icone size={16} aria-hidden="true" /><span>{ESTADOS[estado.classe]}</span></div>
+    <div className="participativa-tooltip-diferenca"><span>Maior diferença identificada</span>
+      <strong>{disponivel ? `${diferenca.toLocaleString('pt-BR', { maximumFractionDigits: 2 })} p.p.` : 'Não disponível'}</strong>
+    </div>
+    <div className="participativa-tooltip-rodape"><small>Clique para analisar</small>
+      {simulada && <span className="participativa-tooltip-info" tabIndex={0} aria-label="Os dados de referência deste distrito são simulados para fins acadêmicos.">
+        <Info size={14} aria-hidden="true" /><span role="tooltip">Os dados de referência deste distrito são simulados para fins acadêmicos.</span>
+      </span>}
+    </div>
+  </div>;
+}
+
 function PinsParticipativos({ posicoes, onSelecionarDistrito, idSelecionado }) {
   const [consulta, setConsulta] = useState({ estado: 'carregando', distritos: [] });
   const [tentativa, setTentativa] = useState(0);
@@ -134,7 +160,7 @@ function PinsParticipativos({ posicoes, onSelecionarDistrito, idSelecionado }) {
     {pins.map(({ distrito, posicao, texto, icon }) => <Marker key={distrito.id_territorial} position={posicao} icon={icon}
       zIndexOffset={distrito.id_territorial === idSelecionado ? 1000 : 0} title={texto} alt={texto} keyboard autoPanOnFocus={false} riseOnHover
       eventHandlers={{ click: () => onSelecionarDistrito({ id_territorial: distrito.id_territorial, nome: distrito.nome_territorio }, 'comparativa') }}>
-      <Tooltip direction="top" className="participativa-tooltip"><strong>{distrito.nome_territorio}</strong><span><UsersRound size={14} aria-hidden="true" />{distrito.total_questionarios.toLocaleString('pt-BR')} questionários</span><span>{visual(distrito).texto}</span>{distrito.indicadores?.some((i) => i.is_mock || i.simulacao) && <span title="Os dados de referência deste distrito são simulados para fins acadêmicos." aria-label="Os dados de referência deste distrito são simulados para fins acadêmicos."><Info size={14} aria-hidden="true" /></span>}<small>Clique para analisar</small></Tooltip>
+      <Tooltip direction="top" opacity={1} interactive className="cobertura-tooltip participativa-tooltip"><ConteudoTooltipParticipativo distrito={distrito} /></Tooltip>
     </Marker>)}
   </>;
 }
