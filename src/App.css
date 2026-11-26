@@ -498,3 +498,18 @@
     font-size: 14px;
   }
 }
+
+.indicator-card { background: var(--color-background); padding: 16px; box-shadow: var(--shadow-card); }
+.indicator-heading { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 14px; font-weight: 600; line-height: 1.4; }
+.indicator-card h4 { align-items: center; gap: 12px; }
+.indicator-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; background: var(--color-primary-light); color: var(--color-primary); flex-shrink: 0; }
+.indicator-value { font-size: 30px; font-variant-numeric: tabular-nums; }
+.indicator-period { display: flex; align-items: center; gap: 6px; color: var(--color-text-secondary); }
+.indicator-badges span { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; font-size: 12px; }
+.indicator-source > summary { display: flex; align-items: center; justify-content: space-between; min-height: 44px; list-style: none; }
+.indicator-source[open] > summary > svg { transform: rotate(180deg); }
+.indicator-source { font-size: 12px; color: var(--color-text-secondary); }
+.indicator-source summary { color: var(--color-text); }
+.indicator-retry { min-height: 44px; }
+.territorial-panel { border-radius: 12px; box-shadow: var(--shadow-card); }
+@media (prefers-reduced-motion: reduce) { .app-header *, .app-sidebar * { transition: none; } }

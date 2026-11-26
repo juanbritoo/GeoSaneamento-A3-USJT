@@ -8,6 +8,7 @@ import {
   useMap
 } from "react-leaflet";
 
+import CamadaParticipativa from "./CamadaParticipativa";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -337,6 +338,8 @@ function Map({
               }
               onSelecionarDistrito={onSelecionarDistrito}
             />
+
+            <CamadaParticipativa idSelecionado={distritoSelecionado?.id_territorial} distritos={distritos} onSelecionarDistrito={onSelecionarDistrito} />
 
             <AjustarMapa geojson={distritos} />
 

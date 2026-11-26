@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChartNoAxesColumn, Droplet, House, Trash2, Waves } from "lucide-react";
+import { CalendarDays, ChartNoAxesColumn, ChevronDown, Clock, Droplet, Droplets, FlaskConical, House, MessageSquare, Smile, Trash2, UsersRound, Waves } from "lucide-react";
 import { buscarSaneamento } from "../services/api";
 
 const formatoNumero = new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 20 });
@@ -11,6 +11,17 @@ const indicadoresDistritais = {
   EXISTENCIA_BANHEIRO_EXCLUSIVO: { titulo: "Banheiro exclusivo", Icone: House },
 };
 
+const iconesComplementares = { regularidade_agua: Clock, qualidade_agua_percebida: Droplets, condicoes_esgotamento: Waves, falta_agua_30_dias: Droplet, esgoto_ceu_aberto_30_dias: Waves, satisfacao_saneamento: Smile, SATISFEITOS: Smile, COM_FALTA_AGUA: Droplet, OBSERVARAM_ESGOTO_EXPOSTO: Waves, total_questionarios: UsersRound, total_moradores: House, total_nao_moradores: UsersRound, total_comentarios: MessageSquare };
+
+export function IconeIndicador({ codigo, size = 20 }) {
+  const Icone = indicadoresDistritais[codigo]?.Icone ?? iconesComplementares[codigo] ?? ChartNoAxesColumn;
+  return <Icone size={size} aria-hidden="true" />;
+}
+
+export function CabecalhoIndicador({ codigo, titulo }) {
+  return <h4 className="indicator-heading"><span className="indicator-icon"><IconeIndicador codigo={codigo} /></span>{titulo ?? indicadoresDistritais[codigo]?.titulo ?? codigo}</h4>;
+}
+
 const classificacoes = {
   oficial: "Fonte oficial",
   nao_verificada: "Fonte não verificada",
@@ -19,7 +30,6 @@ const classificacoes = {
 
 export function CardIndicador({ indicador, distrital = false }) {
   const apresentacao = distrital ? indicadoresDistritais[indicador.codigo] : null;
-  const Icone = apresentacao?.Icone ?? ChartNoAxesColumn;
   const nome = indicador.nome || indicador.descricao || indicador.codigo || "Indicador sem nome";
   const dimensoes = indicador.dimensoes;
   const camposDimensoes = dimensoes != null && typeof dimensoes === "object" && !Array.isArray(dimensoes)
@@ -28,24 +38,24 @@ export function CardIndicador({ indicador, distrital = false }) {
 
   return (
     <article className="indicator-card">
-      <h4><Icone size={22} aria-hidden="true" />{apresentacao?.titulo ?? nome}</h4>
+      <CabecalhoIndicador codigo={distrital ? indicador.codigo : undefined} titulo={apresentacao?.titulo ?? nome} />
       <p className="indicator-value">
         {indicador.valor == null ? "Não informado" : (
           typeof indicador.valor === "number" ? formatoNumero.format(indicador.valor) : indicador.valor
         )}
         {indicador.valor != null && indicador.unidade && <span> {indicador.unidade}</span>}
       </p>
-      <p className="indicator-period">Período: {indicador.periodo ?? "Não informado"}</p>
+      <p className="indicator-period"><CalendarDays size={16} aria-hidden="true" />Período: {indicador.periodo ?? "Não informado"}</p>
       {(indicador.classificacao_fonte || indicador.is_mock === true) && (
         <div className="indicator-badges">
           {indicador.classificacao_fonte && (
             <span>{classificacoes[indicador.classificacao_fonte] ?? indicador.classificacao_fonte}</span>
           )}
-          {indicador.is_mock === true && <span>Dado simulado</span>}
+          {indicador.is_mock === true && <span><FlaskConical size={14} aria-hidden="true" />Dado simulado</span>}
         </div>
       )}
       <details className="indicator-source">
-        <summary>Detalhes da fonte</summary>
+        <summary>Detalhes da fonte<ChevronDown size={16} aria-hidden="true" /></summary>
         <dl>
           <div><dt>Fonte</dt><dd>{indicador.fonte || "Não informada"}</dd></div>
           {indicador.procedencia && <div><dt>Procedência</dt><dd>{indicador.procedencia}</dd></div>}
