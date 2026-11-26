@@ -137,4 +137,16 @@ CREATE INDEX IF NOT EXISTS idx_territorio_municipio ON territorio (id_municipio)
 CREATE INDEX IF NOT EXISTS idx_territorio_geom ON territorio USING GIST (geom);
 CREATE INDEX IF NOT EXISTS idx_valor_indicador_periodo ON valor_indicador (id_territorial, periodo, indicador);
 
+-- Respostas do questionário (POST /api/v1/questionario), já com a classificação calculada.
+-- Tabela nova e independente: não altera nem remove nada do que já existe.
+CREATE TABLE IF NOT EXISTS resposta_questionario (
+    id               BIGSERIAL PRIMARY KEY,
+    id_territorial   TEXT NOT NULL REFERENCES territorio(id_territorial),
+    respostas        JSONB NOT NULL,
+    pontuacao        NUMERIC(5, 2) NOT NULL CHECK (pontuacao BETWEEN 0 AND 100),
+    nivel_saneamento TEXT NOT NULL CHECK (nivel_saneamento IN ('critico', 'precario', 'regular', 'adequado')),
+    criado_em        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
+CREATE INDEX IF NOT EXISTS idx_resposta_questionario_territorio
+    ON resposta_questionario (id_territorial, criado_em DESC);

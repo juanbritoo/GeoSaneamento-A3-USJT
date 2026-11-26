@@ -102,3 +102,20 @@ export function buscarGeoJSONDistritos() {
 export function buscarDistritos(options = {}) {
     return requisicaoAPI("/distritos", options);
 }
+
+export function enviarQuestionario(idTerritorial, respostas) {
+    return requisicaoAPI("/api/v1/questionario", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            id_territorial: String(idTerritorial),
+            respostas: {
+                abastecimento: respostas.abastecimento,
+                esgoto: respostas.esgoto,
+                abastecimento_fonte: respostas.abastecimentoFonte,
+                esgoto_destino: respostas.esgotoDestino,
+                avaliacao: respostas.avaliacao,
+            },
+        }),
+    });
+}

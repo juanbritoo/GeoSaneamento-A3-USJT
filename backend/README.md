@@ -45,6 +45,32 @@ docker-compose up -d
 | `GET` | `/distritos` | Lista os distritos. |
 | `GET` | `/distritos/geojson` | Retorna as geometrias distritais em GeoJSON. |
 | `GET` | `/indicadores` | Lista o catálogo de indicadores. |
+| `POST` | `/api/v1/questionario` | Grava as respostas do questionário de um distrito, com pontuação e nível de saneamento. |
+| `GET` | `/api/v1/questionario` | Consulta as respostas gravadas (filtros `id_territorial`, `nivel_saneamento`; paginação `limite`/`deslocamento`). |
+
+## 📝 Questionário
+
+O `POST /api/v1/questionario` recebe o distrito e as respostas, calcula a pontuação (0 a 100) e classifica em `critico`, `precario`, `regular` ou `adequado`. O critério fica em `app/classificacao.py`.
+
+```json
+{
+  "id_territorial": "355030801",
+  "respostas": {
+    "abastecimento": "Às vezes",
+    "esgoto": "Raramente",
+    "abastecimento_fonte": "Rede pública de abastecimento",
+    "esgoto_destino": "Rede pública de esgoto",
+    "avaliacao": "Regular"
+  }
+}
+```
+
+Depois de atualizar o código, reconstrua a imagem e aplique o esquema para criar a tabela `resposta_questionario`:
+
+```powershell
+docker-compose up -d --build
+docker-compose exec api python seed/init_db.py
+```
 
 ## 🧪 Testes e encerramento
 

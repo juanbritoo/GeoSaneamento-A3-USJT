@@ -254,6 +254,9 @@ function App() {
       <Questionario
         aberto={mostrarQuestionario}
         onFechar={() => setMostrarQuestionario(false)}
+        distritos={distritos}
+        distritoSelecionado={distritoSelecionado}
+        onSelecionarDistrito={setDistritoSelecionado}
       />
 
     </div>
