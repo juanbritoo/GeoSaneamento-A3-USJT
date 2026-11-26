@@ -8,104 +8,123 @@ import {
   useMap
 } from "react-leaflet";
 
+import { renderToStaticMarkup } from "react-dom/server";
+import { Layers, ChevronDown, MapPin, FlaskConical } from "lucide-react";
 import CamadaParticipativa from "./CamadaParticipativa";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-import { buscarGeoJSONDistritos } from "../../services/api";
+import { buscarGeoJSONDistritos, buscarSaneamento } from "../../services/api";
 
 // ==========================================
 // ESTILOS DOS DISTRITOS
 // ==========================================
 
-const estiloNormal = {
-  color: "var(--color-primary)",
-  weight: 1.5,
-  fillColor: "var(--color-background)",
-  fillOpacity: 0.15
-};
+const FAIXAS_COBERTURA = [
+  { limite: 80, nome: 'Crítico', cor: '#DC2626', intervalo: 'Abaixo de 80%' },
+  { limite: 90, nome: 'Insatisfatório', cor: '#F97316', intervalo: '80% a < 90%' },
+  { limite: 95, nome: 'Regular', cor: '#EAB308', intervalo: '90% a < 95%' },
+  { limite: 98, nome: 'Bom', cor: '#84CC16', intervalo: '95% a < 98%' },
+  { limite: Infinity, nome: 'Excelente', cor: '#22A06B', intervalo: '98% a 100%' },
+  { nome: 'Indisponível', cor: '#94A3B8', intervalo: 'Dados insuficientes' },
+];
+const CODIGOS_COBERTURA = [
+  'ABASTECIMENTO_AGUA_REDE_GERAL', 'ESGOTAMENTO_SANITARIO_REDE_GERAL',
+  'DESTINO_LIXO_COLETA_DIRETA', 'EXISTENCIA_BANHEIRO_EXCLUSIVO',
+];
+const percentual = (valor) => valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
 
-const estiloHover = {
-  color: "var(--map-district-hover)",
-  weight: 3,
-  fillColor: "var(--color-primary-light)",
-  fillOpacity: 0.5
-};
+function classificarCobertura(media) {
+  return Number.isFinite(media) && media >= 0 && media <= 100
+    ? FAIXAS_COBERTURA.find((faixa) => media < faixa.limite)
+    : FAIXAS_COBERTURA[5];
+}
 
-const estiloSelecionado = {
-  color: "var(--color-primary)",
-  weight: 3,
-  fillColor: "var(--color-primary)",
-  fillOpacity: 0.25
-};
+function calcularCobertura(indicadores = []) {
+  const grupos = new globalThis.Map();
+  for (const indicador of indicadores) {
+    if (!CODIGOS_COBERTURA.includes(indicador.codigo) || !indicador.periodo?.trim()) continue;
+    const grupo = grupos.get(indicador.periodo) ?? [];
+    grupo.push(indicador);
+    grupos.set(indicador.periodo, grupo);
+  }
+  const completos = [...grupos.entries()].filter(([, itens]) =>
+    CODIGOS_COBERTURA.every((codigo) => itens.filter((i) => i.codigo === codigo).length === 1) &&
+    itens.every((i) => Number.isFinite(i.valor) && i.valor >= 0 && i.valor <= 100 &&
+      ['%', 'Percentual', 'percentual'].includes(i.unidade)));
+  // Sem ordem anual inequívoca, não escolher arbitrariamente entre períodos.
+  const anuais = completos.every(([periodo]) => /^[0-9]{4}$/.test(periodo));
+  if (!completos.length || (completos.length > 1 && !anuais)) return null;
+  completos.sort(([a], [b]) => b.localeCompare(a));
+  const [periodo, itens] = completos[0];
+  return { periodo, media: itens.reduce((soma, i) => soma + i.valor, 0) / 4,
+    menor: itens.reduce((menor, i) => i.valor < menor.valor ? i : menor),
+    simulado: itens.some((i) => i.is_mock === true) };
+}
 
-// ==========================================
-// CAMADA DOS DISTRITOS
-// ==========================================
+const estiloNormal = { color: '#FFFFFF', weight: 1, fillOpacity: 0.60 };
+const estiloHover = { color: '#334155', weight: 2, fillOpacity: 0.90 };
+const estiloSelecionado = { color: '#123F80', weight: 2.5, fillOpacity: 1 };
 
-function CamadaDistritos({
-  distritos,
-  idSelecionado,
-  onSelecionarDistrito
-}) {
+function estiloDistrito(cobertura, selecionado = false, hover = false) {
+  return { ...(selecionado ? estiloSelecionado : hover ? estiloHover : estiloNormal),
+    fillColor: classificarCobertura(cobertura?.media).cor };
+}
+
+function tooltipDistrito(nome, cobertura) {
+  const faixa = classificarCobertura(cobertura?.media);
+  return renderToStaticMarkup(
+    <div style={{ '--cobertura-cor': faixa.cor }}>
+      <div className="cobertura-tooltip-titulo"><MapPin size={16} color="#2272ED" aria-hidden="true" /><strong>{nome}</strong></div>
+      <div className="cobertura-tooltip-indice">
+        <span className="cobertura-tooltip-valor">{cobertura ? percentual(cobertura.media) : '—'}</span>
+        <div className="cobertura-tooltip-rotulo"><span>Índice médio</span><strong>{faixa.nome}</strong></div>
+      </div>
+      <div className="cobertura-tooltip-barra" aria-hidden="true">
+        {cobertura && <span style={{ width: `${cobertura.media}%` }} />}
+      </div>
+      {cobertura?.simulado && <div className="cobertura-tooltip-rodape"><FlaskConical size={12} aria-hidden="true" />Dados simulados</div>}
+    </div>
+  );
+}
+
+function CamadaDistritos({ distritos, coberturas, idSelecionado, onSelecionarDistrito }) {
   const camadaRef = useRef(null);
   const selecaoRef = useRef(null);
+  const coberturasRef = useRef(coberturas);
+  const hoverRef = useRef(null);
 
   useEffect(() => {
     selecaoRef.current = idSelecionado;
-
+    coberturasRef.current = coberturas;
     camadaRef.current?.eachLayer((camada) => {
-      const selecionado =
-        camada.feature.properties.id_territorial === idSelecionado;
-
-      camada.setStyle(
-        selecionado ? estiloSelecionado : estiloNormal
-      );
+      const { id_territorial, nome } = camada.feature.properties;
+      camada.setStyle(estiloDistrito(coberturas[id_territorial], id_territorial === idSelecionado, id_territorial === hoverRef.current));
+      camada.setTooltipContent(tooltipDistrito(nome, coberturas[id_territorial]));
     });
-  }, [idSelecionado, distritos]);
+  }, [idSelecionado, distritos, coberturas]);
 
   const configurarDistrito = useCallback((feature, camada) => {
     const { id_territorial, nome } = feature.properties;
-
-    const nomeTooltip = document.createElement("span");
-    nomeTooltip.textContent = nome;
-
-    camada.bindTooltip(nomeTooltip, {
-      sticky: true,
-      direction: "auto",
-      opacity: 0.95
+    camada.bindTooltip(tooltipDistrito(nome, coberturasRef.current[id_territorial]), {
+      sticky: true, direction: 'auto', opacity: 1, className: 'cobertura-tooltip',
     });
-
     camada.on({
       mouseover: () => {
-        if (selecaoRef.current !== id_territorial) {
-          camada.setStyle(estiloHover);
-        }
+        hoverRef.current = id_territorial;
+        camada.setStyle(estiloDistrito(coberturasRef.current[id_territorial], selecaoRef.current === id_territorial, true));
       },
-
       mouseout: () => {
-        camada.setStyle(
-          selecaoRef.current === id_territorial
-            ? estiloSelecionado
-            : estiloNormal
-        );
+        hoverRef.current = null;
+        camada.setStyle(estiloDistrito(coberturasRef.current[id_territorial], selecaoRef.current === id_territorial));
       },
-
-      click: () => {
-        onSelecionarDistrito({ id_territorial, nome });
-      }
+      click: () => onSelecionarDistrito({ id_territorial, nome }),
     });
   }, [onSelecionarDistrito]);
 
-  return (
-    <GeoJSON
-      className="district-polygon"
-      ref={camadaRef}
-      data={distritos}
-      style={estiloNormal}
-      onEachFeature={configurarDistrito}
-    />
-  );
+  return <GeoJSON className="district-polygon" ref={camadaRef} data={distritos}
+    style={(feature) => estiloDistrito(coberturas[feature.properties.id_territorial], feature.properties.id_territorial === idSelecionado)}
+    onEachFeature={configurarDistrito} />;
 }
 
 // ==========================================
@@ -253,6 +272,21 @@ function Map({
 }) {
   const [distritos, setDistritos] = useState(null);
   const [erroMapa, setErroMapa] = useState("");
+  const [coberturas, setCoberturas] = useState({});
+  const [estadoCobertura, setEstadoCobertura] = useState('carregando');
+  const consultaCobertura = useRef(null);
+
+  useEffect(() => {
+    let ativo = true;
+    consultaCobertura.current ??= buscarSaneamento('distrito');
+    consultaCobertura.current.then((dados) => {
+      if (!ativo) return;
+      if (dados?.escala !== 'distrito' || !Array.isArray(dados.territorios)) throw new Error('Resposta distrital inválida');
+      setCoberturas(Object.fromEntries(dados.territorios.map((t) => [t.id_territorial, calcularCobertura(t.indicadores)])));
+      setEstadoCobertura('pronto');
+    }).catch(() => { if (ativo) setEstadoCobertura('erro'); });
+    return () => { ativo = false; };
+  }, []);
 
   const [limites, setLimites] = useState(null);
 
@@ -333,6 +367,7 @@ function Map({
           <>
             <CamadaDistritos
               distritos={distritos}
+              coberturas={coberturas}
               idSelecionado={
                 distritoSelecionado?.id_territorial ?? null
               }
@@ -347,6 +382,15 @@ function Map({
           </>
         )}
       </MapContainer>
+      <details className="cobertura-legenda">
+        <summary><Layers size={18} aria-hidden="true" /><span>Cobertura de saneamento</span><ChevronDown size={16} aria-hidden="true" /></summary>
+        <div className="cobertura-legenda-conteudo">
+          <ul>{FAIXAS_COBERTURA.map((faixa) => <li key={faixa.nome}><span className="cobertura-cor" style={{ backgroundColor: faixa.cor }} aria-hidden="true" /><span><strong>{faixa.nome}</strong> · {faixa.intervalo}</span></li>)}</ul>
+          <p>Faixas de metodologia própria do GeoSaneamento. Média dos quatro indicadores de referência do mesmo período, sem respostas do questionário.</p>
+          {Object.values(coberturas).some((c) => c?.simulado) && <p>Inclui dados simulados, identificados no tooltip dos distritos.</p>}
+          <p role="status">{estadoCobertura === 'carregando' ? 'Carregando cobertura…' : estadoCobertura === 'erro' ? 'Cobertura indisponível: não foi possível consultar a API. Recarregue a página para tentar novamente.' : 'Consulte o período e a menor cobertura no tooltip.'}</p>
+        </div>
+      </details>
 
     </div>
   );
