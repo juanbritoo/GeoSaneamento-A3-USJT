@@ -101,7 +101,7 @@ def comparar(participativo, candidatos):
         else:
             motivo = None
     if participativo['total_questionarios'] == 0:
-        item.update(status='sem_dados', motivo='Sem questionarios V2 no periodo selecionado.')
+        item.update(status='sem_dados', motivo='Ainda não há contribuições da população no período selecionado.')
     elif item['respostas_validas'] < MINIMO_RESPOSTAS_VALIDAS:
         item.update(status='amostra_insuficiente', motivo=f'Menos de {MINIMO_RESPOSTAS_VALIDAS} respostas validas neste indicador.')
     elif (ref and ref['is_mock'] and ref['unidade'] in UNIDADES_PERCENTUAIS

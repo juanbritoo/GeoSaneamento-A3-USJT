@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { ChevronDown, FlaskConical, Layers, TriangleAlert, UsersRound } from 'lucide-react';
+import { ChevronDown, Info, Layers, TriangleAlert, UsersRound } from 'lucide-react';
 import { Marker, Tooltip } from 'react-leaflet';
 import { DivIcon, DomEvent } from 'leaflet';
 import { buscarCorrelacao, eventosQuestionarioV2 } from '../../services/api';
@@ -11,7 +11,7 @@ const ESTADOS = {
   amostra_insuficiente: 'Amostra insuficiente',
   nao_comparavel: 'Não comparável',
   possivel_divergencia: 'Possível divergência',
-  divergencia_elevada: 'Divergência elevada',
+  divergencia_elevada: 'Divergência identificada',
   sem_dados: 'Sem dados comparáveis',
 };
 
@@ -60,8 +60,8 @@ function visual(distrito) {
   const simulado = distrito.resumo_simulado;
   if (distrito.resumo.indicadores_comparados === 0 && simulado?.indicadores_comparados > 0 &&
       simulado.exibir_alerta === false && Object.hasOwn(ESTADOS, simulado.status)) {
-    return { alerta: false, simulada: true, classe: simulado.status,
-      texto: `Divergência simulada — ${ESTADOS[simulado.status]}. Maior diferença: ${simulado.maior_divergencia_absoluta_pp?.toLocaleString('pt-BR')} p.p. Sem alerta real` };
+    return { alerta: false, destaque: ['possivel_divergencia', 'divergencia_elevada'].includes(simulado.status), simulada: true, classe: simulado.status,
+      texto: ` ${ESTADOS[simulado.status]}. Maior diferença identificada: ${simulado.maior_divergencia_absoluta_pp?.toLocaleString('pt-BR')} p.p.` };
   }
   const { status, exibir_alerta } = distrito.resumo;
   const divergente = status === 'possivel_divergencia' || status === 'divergencia_elevada';
@@ -109,9 +109,9 @@ function PinsParticipativos({ posicoes, onSelecionarDistrito, idSelecionado }) {
     const texto = `${d.nome_territorio}: ${d.total_questionarios.toLocaleString('pt-BR')} questionários. ${estado.texto}.`;
     const quantidade = d.total_questionarios.toLocaleString('pt-BR');
     const largura = 40 + quantidade.length * 8;
-    const conteudo = renderToStaticMarkup(<span className="participativa-pin-conteudo"><UsersRound size={14} aria-hidden="true" /><span>{quantidade}</span>{(estado.alerta || estado.simulada) && <span className="participativa-pin-alerta" aria-hidden="true">{estado.simulada ? <FlaskConical size={11} /> : <TriangleAlert size={11} />}</span>}</span>);
+    const conteudo = renderToStaticMarkup(<span className="participativa-pin-conteudo"><UsersRound size={14} aria-hidden="true" /><span>{quantidade}</span>{(estado.alerta || estado.destaque) && <span className="participativa-pin-alerta" aria-hidden="true"><TriangleAlert size={11} /></span>}</span>);
     return { distrito: d, posicao, texto, icon: new DivIcon({
-      html: conteudo, className: `participativa-pin participativa-${estado.classe} ${estado.simulada ? 'participativa-simulada' : ''} ${d.id_territorial === idSelecionado ? 'participativa-selecionado' : ''}`,
+      html: conteudo, className: `participativa-pin participativa-${estado.classe} ${d.id_territorial === idSelecionado ? 'participativa-selecionado' : ''}`,
       iconSize: [largura, 30], iconAnchor: [largura / 2, 15], tooltipAnchor: [0, -17],
     }) };
   }).filter(Boolean), [consulta.distritos, posicoes, idSelecionado]);
@@ -127,7 +127,6 @@ function PinsParticipativos({ posicoes, onSelecionarDistrito, idSelecionado }) {
         <details className="participativa-legenda"><summary>Legenda dos pins<ChevronDown size={16} aria-hidden="true" /></summary>
           <ul>{Object.entries(ESTADOS).filter(([status]) => status !== 'sem_dados').map(([status, texto]) =>
             <li key={status}><span className={`participativa-amostra participativa-${status}`} aria-hidden="true">{status.includes('divergencia') || status === 'divergencia_elevada' ? <TriangleAlert size={12} /> : <UsersRound size={12} />}</span>{texto}</li>)}</ul>
-          <p><FlaskConical size={14} aria-hidden="true" /> Borda tracejada: Divergência simulada, com as mesmas cores, sem alerta real.</p>
           <p>Números indicam questionários, não pessoas únicas. Diferenças em amostras voluntárias não comprovam irregularidades.</p>
         </details>
       </>}
@@ -135,7 +134,7 @@ function PinsParticipativos({ posicoes, onSelecionarDistrito, idSelecionado }) {
     {pins.map(({ distrito, posicao, texto, icon }) => <Marker key={distrito.id_territorial} position={posicao} icon={icon}
       zIndexOffset={distrito.id_territorial === idSelecionado ? 1000 : 0} title={texto} alt={texto} keyboard autoPanOnFocus={false} riseOnHover
       eventHandlers={{ click: () => onSelecionarDistrito({ id_territorial: distrito.id_territorial, nome: distrito.nome_territorio }, 'comparativa') }}>
-      <Tooltip direction="top" className="participativa-tooltip"><strong>{distrito.nome_territorio}</strong><span><UsersRound size={14} aria-hidden="true" />{distrito.total_questionarios.toLocaleString('pt-BR')} questionários</span><span>{visual(distrito).texto}</span><small>Clique para analisar</small></Tooltip>
+      <Tooltip direction="top" className="participativa-tooltip"><strong>{distrito.nome_territorio}</strong><span><UsersRound size={14} aria-hidden="true" />{distrito.total_questionarios.toLocaleString('pt-BR')} questionários</span><span>{visual(distrito).texto}</span>{distrito.indicadores?.some((i) => i.is_mock || i.simulacao) && <span title="Os dados de referência deste distrito são simulados para fins acadêmicos." aria-label="Os dados de referência deste distrito são simulados para fins acadêmicos."><Info size={14} aria-hidden="true" /></span>}<small>Clique para analisar</small></Tooltip>
     </Marker>)}
   </>;
 }

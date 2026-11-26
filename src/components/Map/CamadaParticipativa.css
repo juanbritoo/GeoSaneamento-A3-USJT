@@ -35,4 +35,3 @@
 @media (prefers-reduced-motion: reduce) { .participativa-pin-conteudo, .participativa-switch, .participativa-switch::after { transition: none; } }
 
 
-.participativa-simulada .participativa-pin-conteudo { border-style: dashed; }

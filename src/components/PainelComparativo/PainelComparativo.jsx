@@ -1,11 +1,11 @@
 ﻿import { useEffect, useState } from 'react';
-import { CalendarDays, ChartNoAxesCombined, ChevronDown, CircleHelp, Database, FlaskConical, Info, TriangleAlert, UsersRound } from 'lucide-react';
+import { CalendarDays, ChartNoAxesCombined, ChevronDown, CircleHelp, Database, Info, TriangleAlert, UsersRound } from 'lucide-react';
 import IndicadoresDistrito, { CabecalhoIndicador, IconeIndicador } from '../IndicadoresDistrito';
 import { perguntasV2 } from '../Questionario/perguntasV2';
 import { buscarCorrelacao, buscarIndicadoresParticipativos, eventosQuestionarioV2 } from '../../services/api';
 import './PainelComparativo.css';
 
-const ABAS = [['oficiais', 'Dados oficiais', 'Oficiais', Database], ['popular', 'Percepção popular', 'Percepção', UsersRound], ['comparativa', 'Análise comparativa', 'Comparação', ChartNoAxesCombined]];
+const ABAS = [['oficiais', 'Dados de referência', 'Referência', Database], ['popular', 'Percepção popular', 'Percepção', UsersRound], ['comparativa', 'Análise comparativa', 'Comparação', ChartNoAxesCombined]];
 const TITULOS = {
   ABASTECIMENTO_AGUA_REDE_GERAL: 'Abastecimento pela rede geral',
   ESGOTAMENTO_SANITARIO_REDE_GERAL: 'Esgotamento pela rede geral',
@@ -20,7 +20,7 @@ const TITULOS = {
 };
 const STATUS = { sem_dados: 'Sem dados', amostra_insuficiente: 'Amostra insuficiente',
   nao_comparavel: 'Não comparável', sem_alerta: 'Sem alerta',
-  possivel_divergencia: 'Possível divergência', divergencia_elevada: 'Divergência elevada' };
+  possivel_divergencia: 'Possível divergência', divergencia_elevada: 'Divergência identificada' };
 const numero = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 const valor = (n, unidade = '') => Number.isFinite(n) ? `${numero.format(n)}${unidade}` : 'Não disponível';
 const diferenca = (n) => Number.isFinite(n) ? `${n > 0 ? '+' : ''}${numero.format(n)} p.p.` : 'Não disponível';
@@ -67,8 +67,7 @@ function Percepcao({ dados }) {
   const eventos = { SATISFEITOS: 'Satisfeitos', COM_FALTA_AGUA: 'Com falta de água', OBSERVARAM_ESGOTO_EXPOSTO: 'Observaram esgoto exposto' };
   return <>
     <dl className="comparativo-contadores">{contadores.map(([codigo, titulo]) => <div key={codigo}><dt><IconeIndicador codigo={codigo} size={18} />{titulo}</dt><dd>{valor(dados.contadores[codigo])}</dd></div>)}</dl>
-    <p className="comparativo-nota">Somente a quantidade de comentários é pública. Nenhum relato individual é exibido.</p>
-    {dados.contadores.total_questionarios === 0 && <p className="indicator-state">Ainda não há questionários V2 neste distrito.</p>}
+    {dados.contadores.total_questionarios === 0 && <p className="indicator-state">Este distrito ainda não recebeu contribuições da população.</p>}
     <h3>Condições de saneamento</h3>
     {dados.principais.map((i) => <article className="comparativo-card" key={i.codigo}><CabecalhoIndicador codigo={i.codigo} titulo={TITULOS[i.codigo]} />
       <p className="comparativo-valor">{valor(i.valor, '%')}</p>{i.valor !== null && <div className="comparativo-trilho" aria-hidden="true"><span style={{ width: `${i.valor}%` }} /></div>}<p className="comparativo-nota">{valor(i.respostas_validas)} respostas válidas</p></article>)}
@@ -87,54 +86,54 @@ function Percepcao({ dados }) {
   </>;
 }
 
+const AVISO_REFERENCIA = 'Os dados de referência deste distrito são simulados para fins acadêmicos.';
+
+function InfoReferencia() {
+  return <span className="comparativo-info" tabIndex={0} aria-label={AVISO_REFERENCIA}>
+    <Info size={14} aria-hidden="true" /><span role="tooltip">{AVISO_REFERENCIA}</span>
+  </span>;
+}
+
 function Comparacao({ dados }) {
-  const resumo = dados.resumo;
-  const simulacao = dados.resumo_simulado;
-  const alertaTerritorial = resumo.exibir_alerta && divergente(resumo.status);
+  const resumos = dados.resumo_simulado?.indicadores_comparados > 0
+    ? [...(dados.resumo.indicadores_comparados > 0 ? [{ resumo: dados.resumo, simulado: false }] : []),
+      { resumo: dados.resumo_simulado, simulado: true }]
+    : [{ resumo: dados.resumo, simulado: false }];
   return <>
-    <section className={`comparativo-resumo ${alertaTerritorial ? `comparativo-alerta ${resumo.status}` : ''}`} aria-label="Resumo da análise">
-      <h3>{alertaTerritorial ? <TriangleAlert size={20} aria-hidden="true" /> : <Info size={20} aria-hidden="true" />}{STATUS[resumo.status]}</h3>
-      <p>Questionários: {valor(dados.total_questionarios)}</p>
-      <p>Indicadores comparados: {valor(resumo.indicadores_comparados)}</p>
-      <p>Indicadores divergentes: {valor(resumo.indicadores_divergentes)}</p>
-      <p>Maior divergência elegível: <strong>{valor(resumo.maior_divergencia_absoluta_pp, ' p.p.')}</strong></p>
-      {resumo.indicador_critico && <p>{TITULOS[resumo.indicador_critico] ?? resumo.indicador_critico}</p>}
-      {resumo.indicadores_comparados === 0 && <p>Sem indicadores elegíveis para comparação oficial.</p>}
-      {alertaTerritorial && <p>Diferença observada na amostra; não comprova irregularidade.</p>}
-    </section>
-    {simulacao?.indicadores_comparados > 0 && <section className={`comparativo-resumo comparativo-simulacao ${simulacao.status}`} aria-label="Resumo da simulação">
-      <h3><FlaskConical size={20} aria-hidden="true" />Divergência simulada — {STATUS[simulacao.status]}</h3>
-      <p>Sem alerta real. Referências simuladas, separadas da comparação oficial.</p>
-      <p>Indicadores comparados: {valor(simulacao.indicadores_comparados)} · Divergentes: {valor(simulacao.indicadores_divergentes)}</p>
-      <p>Maior divergência simulada: <strong>{valor(simulacao.maior_divergencia_absoluta_pp, ' p.p.')}</strong></p>
-      <p>{TITULOS[simulacao.indicador_critico] ?? simulacao.indicador_critico}</p>
-    </section>}
+    {resumos.map(({ resumo, simulado }) => {
+      const destaque = divergente(resumo.status) && (simulado || resumo.exibir_alerta);
+      return <section key={String(simulado)} className={`comparativo-resumo ${destaque ? `comparativo-alerta ${resumo.status}` : ''}`} aria-label="Resumo da análise">
+        <h3>{destaque ? <TriangleAlert size={20} aria-hidden="true" /> : <Info size={20} aria-hidden="true" />}{STATUS[resumo.status]}{simulado && <InfoReferencia />}</h3>
+        <p>Questionários: {valor(dados.total_questionarios)}</p>
+        <p>Indicadores comparados: {valor(resumo.indicadores_comparados)}</p>
+        <p>Indicadores divergentes: {valor(resumo.indicadores_divergentes)}</p>
+        <p>Maior diferença identificada: <strong>{valor(resumo.maior_divergencia_absoluta_pp, ' p.p.')}</strong></p>
+        {resumo.indicador_critico && <p>{TITULOS[resumo.indicador_critico] ?? resumo.indicador_critico}</p>}
+        {resumo.indicadores_comparados === 0 && <p>Sem indicadores disponíveis para comparação.</p>}
+      </section>;
+    })}
     {dados.indicadores.map((i) => {
       const simulada = i.is_mock === true || i.simulacao != null;
-      const oficial = i.classificacao_fonte === 'oficial' && i.is_mock === false && !simulada;
-      const alerta = alertaTerritorial && oficial && divergente(i.status);
+      const status = i.simulacao?.status_simulado ?? i.status;
+      const destaque = divergente(status) && (i.simulacao != null || dados.resumo.exibir_alerta);
       const unidadePercentual = ['%', 'Percentual', 'percentual'].includes(i.unidade_oficial);
-      return <article className={`comparativo-card ${i.simulacao ? `comparativo-simulacao ${i.simulacao.status_simulado}` : alerta ? `comparativo-alerta ${i.status}` : ''}`} key={i.codigo}>
+      return <article className={`comparativo-card ${destaque ? `comparativo-alerta ${status}` : ''}`} key={i.codigo}>
         <CabecalhoIndicador codigo={i.codigo} titulo={TITULOS[i.codigo]} />
-        <p className="comparativo-status">{simulada ? <FlaskConical size={16} aria-hidden="true" /> : alerta ? <TriangleAlert size={16} aria-hidden="true" /> : i.status === 'nao_comparavel' ? <CircleHelp size={16} aria-hidden="true" /> : <Info size={16} aria-hidden="true" />}{i.simulacao ? `Divergência simulada — ${STATUS[i.simulacao.status_simulado]} — sem alerta real` : simulada ? 'Dado simulado — sem alerta real' : STATUS[i.status]}</p>
-        {simulada && <p>Status da comparação oficial: {STATUS[i.status]}</p>}
-        {!oficial && !simulada && <p>Referência não oficial ou procedência indisponível.</p>}
-        <div className="comparativo-duas-barras"><Barra rotulo={simulada ? 'Referência simulada' : oficial ? 'Oficial' : 'Referência não oficial'} percentual={unidadePercentual ? i.valor_oficial : null} classe={oficial ? 'comparativo-oficial' : 'comparativo-simulada'} />
+        <p className="comparativo-status">{destaque ? <TriangleAlert size={16} aria-hidden="true" /> : status === 'nao_comparavel' ? <CircleHelp size={16} aria-hidden="true" /> : <Info size={16} aria-hidden="true" />}{STATUS[status]}{simulada && <InfoReferencia />}</p>
+        <div className="comparativo-duas-barras"><Barra rotulo="Dados de referência" percentual={unidadePercentual ? i.valor_oficial : null} classe="comparativo-referencia" />
         {!unidadePercentual && i.valor_oficial != null && <p>Valor da fonte: {valor(i.valor_oficial)} {i.unidade_oficial ?? '(unidade não informada)'}. Unidade incompatível com a barra percentual.</p>}
-        <Barra rotulo="Participativo" percentual={i.valor_participativo} /></div>
-        <p className="comparativo-diferenca">Diferença {i.simulacao ? 'simulada (referência − participativo)' : 'observada (oficial − participativo)'}: <strong>{i.simulacao ? diferenca(i.simulacao.divergencia_pp) : oficial ? diferenca(i.divergencia_pp) : 'Não disponível'}</strong></p>
+        <Barra rotulo="Percepção popular" percentual={i.valor_participativo} /></div>
+        <p className="comparativo-diferenca">Diferença identificada: <strong>{diferenca(i.simulacao?.divergencia_pp ?? i.divergencia_pp)}</strong></p>
         <p>Respostas válidas: {valor(i.respostas_validas)}</p>
-        {i.motivo && <p className="comparativo-motivo">{i.status === 'amostra_insuficiente' && <Info size={16} aria-hidden="true" />}{i.motivo}</p>}
+        {!i.simulacao && i.motivo && <p className="comparativo-motivo">{i.motivo}</p>}
         <details className="comparativo-detalhes"><summary>Fonte e período<ChevronDown size={16} aria-hidden="true" /></summary>
           <p><Database size={16} aria-hidden="true" />Fonte: {i.fonte || 'Não informada'}</p>
           <p><CalendarDays size={16} aria-hidden="true" />Referência: {i.periodo || 'Não informada'}</p>
           <p>Respostas válidas de {data(i.primeira_resposta)} a {data(i.ultima_resposta)}</p>
           {i.procedencia && <p>Procedência: {i.procedencia}</p>}
         </details>
-        {alerta && <p>Alerta retornado pelo backend para a divergência observada neste indicador.</p>}
       </article>;
     })}
-    <p className="comparativo-nota">Barras mostram os valores informados pela API; a presença de duas barras não garante comparabilidade. Períodos e metodologias incompatíveis impedem a comparação oficial. Mesmo ano não garante simultaneidade das coletas.</p>
   </>;
 }
 
@@ -187,8 +186,8 @@ export default function PainelComparativo({ idTerritorial, aba, onMudarAba }) {
     </div>
     <div role="tabpanel" id={`conteudo-${aba}`} aria-labelledby={`aba-${aba}`} tabIndex={0}>
       {aba === 'oficiais' ? <IndicadoresDistrito key={idTerritorial} idTerritorial={idTerritorial} /> : <>
-        <p className="comparativo-aviso"><Info size={18} aria-hidden="true" />As respostas são voluntárias e não representam necessariamente toda a população. Questionários não equivalem a pessoas únicas.</p>
-        <p className="comparativo-nota">Período participativo: todo o histórico V2 disponível.</p>
+        <p className="comparativo-aviso"><Info size={18} aria-hidden="true" />As respostas são voluntárias e não representam necessariamente toda a população.</p>
+        <p className="comparativo-nota">Período analisado: todas as contribuições da população registradas até o momento.</p>
         <Consulta key={`${idTerritorial}:${aba}`} idTerritorial={idTerritorial} aba={aba} />
       </>}
     </div>

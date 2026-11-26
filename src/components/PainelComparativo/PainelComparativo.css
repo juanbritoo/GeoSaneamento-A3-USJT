@@ -45,9 +45,8 @@
 .comparativo-barra > div:first-child { display: flex; flex-direction: column; gap: 8px; font-size: 12px; }
 .comparativo-barra strong { font-size: 24px; font-weight: 700; color: var(--color-primary); font-variant-numeric: tabular-nums; line-height: 1.25; }
 .comparativo-barra .comparativo-trilho { margin-top: 8px; }
-.comparativo-oficial .comparativo-trilho > span, .comparativo-simulada .comparativo-trilho > span { background: #879bb8; }
-.comparativo-oficial strong, .comparativo-simulada strong { color: var(--color-text-secondary); }
-.comparativo-simulada .comparativo-trilho > span { background: repeating-linear-gradient(45deg, #879bb8, #879bb8 4px, #b9c7da 4px, #b9c7da 8px); }
+.comparativo-referencia .comparativo-trilho > span { background: #879bb8; }
+.comparativo-referencia strong { color: var(--color-text-secondary); }
 .comparativo-card .comparativo-diferenca { padding-top: 12px; border-top: 1px solid var(--color-border); margin-top: 16px; font-size: 13px; }
 .comparativo-diferenca strong { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
 .comparativo-motivo { font-size: 12px; color: var(--color-text-secondary); }
@@ -55,7 +54,7 @@
 @media (min-width: 641px) and (max-width: 900px) { .comparativo-abas button { flex-direction: row; font-size: 13px; } }
 @media (prefers-reduced-motion: reduce) { .comparativo-abas button { transition: none; } }
 
-.comparativo-simulacao { border-style: dashed; }
-.comparativo-simulacao.sem_alerta { border-color: var(--color-primary, #2563eb); }
-.comparativo-simulacao.possivel_divergencia { background: var(--color-warning-light); border-color: var(--color-warning); }
-.comparativo-simulacao.divergencia_elevada { background: var(--color-alert-light); border-color: var(--color-alert); }
+
+.comparativo-info { display: inline-flex; position: relative; margin-left: auto; color: var(--color-text-secondary); cursor: help; flex-shrink: 0; }
+.comparativo-info > [role='tooltip'] { display: none; position: absolute; right: 0; bottom: calc(100% + 6px); width: 200px; max-width: 60vw; padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 8px; background: white; color: var(--color-text-secondary); box-shadow: var(--shadow-card); font-size: 12px; font-weight: 400; z-index: 10; }
+.comparativo-info:hover > [role='tooltip'], .comparativo-info:focus > [role='tooltip'] { display: block; }

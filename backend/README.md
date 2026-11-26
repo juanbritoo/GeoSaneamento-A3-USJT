@@ -45,32 +45,8 @@ docker-compose up -d
 | `GET` | `/distritos` | Lista os distritos. |
 | `GET` | `/distritos/geojson` | Retorna as geometrias distritais em GeoJSON. |
 | `GET` | `/indicadores` | Lista o catálogo de indicadores. |
-| `POST` | `/api/v1/questionario` | Grava as respostas do questionário de um distrito, com pontuação e nível de saneamento. |
-| `GET` | `/api/v1/questionario` | Consulta as respostas gravadas (filtros `id_territorial`, `nivel_saneamento`; paginação `limite`/`deslocamento`). |
-
-## 📝 Questionário
-
-O `POST /api/v1/questionario` recebe o distrito e as respostas, calcula a pontuação (0 a 100) e classifica em `critico`, `precario`, `regular` ou `adequado`. O critério fica em `app/classificacao.py`.
-
-```json
-{
-  "id_territorial": "355030801",
-  "respostas": {
-    "abastecimento": "Às vezes",
-    "esgoto": "Raramente",
-    "abastecimento_fonte": "Rede pública de abastecimento",
-    "esgoto_destino": "Rede pública de esgoto",
-    "avaliacao": "Regular"
-  }
-}
-```
-
-Depois de atualizar o código, reconstrua a imagem e aplique o esquema para criar a tabela `resposta_questionario`:
-
-```powershell
-docker-compose up -d --build
-docker-compose exec api python seed/init_db.py
-```
+| `POST` | `/api/v1/questionario` | Grava respostas do questionário participativo V2, sem pontuação ou classificação. |
+| `GET` | `/api/v1/questionario` | Consulta as respostas gravadas (filtro `id_territorial`, versão exclusivamente 2; paginação `limite`/`deslocamento`). |
 
 ## 🧪 Testes e encerramento
 
@@ -95,26 +71,11 @@ O schema continua canonico em `seed/schema.sql`. O bloco delimitado por
 quanto pela opcao `--questionario-only` de `seed/init_db.py`. Nao ha framework
 novo, carga de respostas ou migracao automatica na inicializacao da API.
 
-- `versao_questionario INTEGER NOT NULL DEFAULT 1`, limitado a 1 ou 2:
-  registros anteriores e INSERTs do endpoint atual continuam V1 (Gabriel).
-  Gravacoes futuras V2 deverao informar explicitamente a versao 2.
-- `vinculo_territorial TEXT` e `comentario VARCHAR(500)` opcionais, sem valor
-  fabricado para o legado. O vinculo permite distinguir moradores e nao moradores;
-  seu vocabulario e obrigatoriedade V2 ficam para a definicao posterior do contrato.
-- `pontuacao NUMERIC(5,2)` e `nivel_saneamento` preservam valores e validacoes
-  anteriores. Um CHECK exige ambos para V1; V2 pode deixa-los nulos. Valores
-  presentes continuam sujeitos a faixa 0-100 e as quatro classificacoes legadas.
-- `respostas JSONB NOT NULL` permanece flexivel para categorias, inteiros e
-  JSON null (nao aplicavel). Nao se definem ainda chaves/alternativas V2 nem
-  validacoes de notas por pergunta. O contrato futuro devera validar notas 0-10.
-- PK, sequencia BIGSERIAL, FK para `territorio`, timestamp e indice territorial
-  sao preservados. Nao ha alteracao de geometria, indicadores ou classificacao.
-- O GET existente filtra V1 internamente, inclusive no total da paginacao, pois
-  seu contrato exige pontuacao/classificacao e respostas textuais. POST e modelos
-  Pydantic permanecem iguais. Nao ha endpoint V2 nesta etapa.
-- Futuras analises devem filtrar explicitamente `versao_questionario = 2` (ou 1
-  para o legado); a coluna torna a separacao possivel, mas nao impede consultas
-  SQL arbitrarias sem filtro. Nenhum calculo agregado foi implementado.
+A API grava explicitamente a versao 2 e consulta exclusivamente essa versao.
+Schema, colunas, constraints e registros anteriores permanecem preservados.
+As colunas historicas de pontuacao e nivel nao sao utilizadas pelo modelo ativo;
+novos registros V2 mantem esses valores nulos. Vinculo, comentario e respostas
+seguem os contratos V2 abaixo. PK, FK territorial, sequencia e indices permanecem.
 
 ### Aplicacao manual, exclusivamente no banco local
 
@@ -160,14 +121,12 @@ podem ser executados, sem modificar seus arquivos.
 
 Esta secao atualiza o comportamento da API descrito na etapa 01. Nao ha novas
 rotas, migracoes ou dependencias. A migracao da etapa 01 deve estar aplicada
-antes de iniciar esta versao da API. `app/classificacao.py` permanece intacto.
+antes de iniciar esta versao da API.
 
 ### POST /api/v1/questionario
 
-Sem `versao_questionario` ou com `versao_questionario: 1`, continua aceitando o
-JSON V1 apresentado acima, calculando pontuacao e classificacao e retornando o
-mesmo contrato original (sem campos novos na resposta). A versao 2 deve ser
-explicita e utiliza `QuestionarioEntradaV2` e `RespostasQuestionarioV2`, ambos
+O POST aceita exclusivamente `versao_questionario: 2`, obrigatoria, utilizando
+`QuestionarioEntradaV2` e `RespostasQuestionarioV2`, ambos
 com campos extras proibidos. O codigo territorial deve ser string de nove
 digitos e corresponder a um registro de nivel `distrito`.
 
@@ -252,15 +211,13 @@ colunas especificas. A resposta POST devolve o comentario apenas ao solicitante.
 
 | Consulta | Comportamento |
 |---|---|
-| Sem versao ou `?versao_questionario=1` | Contrato V1 original |
+| Sem versao | `QuestionarioListaV2`, somente V2 |
 | `?versao_questionario=2` | `QuestionarioListaV2`, somente V2 |
 | `?versao_questionario=2&id_territorial=355030801&limite=10&deslocamento=0` | Filtro territorial e paginacao V2 |
-| `?versao_questionario=1&nivel_saneamento=adequado` | Filtro de classificacao V1 |
-| `?versao_questionario=2&nivel_saneamento=adequado` | 422: filtros incompativeis |
 
-Ambas as listas retornam `total`, `limite`, `deslocamento` e `itens`. Limite:
+A lista retorna `total`, `limite`, `deslocamento` e `itens`. Limite:
 1-200 (padrao 50); deslocamento: minimo 0 (padrao 0). Total e itens usam o
-mesmo filtro de versao. Ordenacao: data decrescente e id decrescente.
+mesmo filtro exclusivo da versao 2; outra versao retorna 422. Ordenacao: data decrescente e id decrescente.
 Cada item V2 tem os campos da resposta POST **exceto comentario**. O campo nao
 e consultado no SQL nem existe no modelo coletivo `QuestionarioItemV2`.
 Nenhuma consulta coletiva desta etapa divulga comentarios livres.
@@ -274,7 +231,7 @@ Nenhuma consulta coletiva desta etapa divulga comentarios livres.
 - 503: indisponibilidade do banco, com mensagens publicas dos handlers existentes,
   sem detalhes SQL.
 
-O Swagger em `/docs` apresenta os modelos e exemplos V1/V2 na mesma operacao.
+O Swagger em `/docs` apresenta os modelos e exemplos V2 na mesma operacao.
 O exemplo interativo V2 usa notas numericas; os exemplos acima demonstram `null`.
 Para enviar um JSON salvo localmente, por exemplo:
 
@@ -422,7 +379,7 @@ usando COUNT, AVG, FILTER, GROUP BY, janelas e NULLIF. Os dados individuais
 permanecem no banco: Python recebe somente agregados. O detalhe usa uma unica
 instrucao SQL para os calculos, garantindo a mesma visao dos dados entre seus
 denominadores. Nao ha tabela materializada, migracao ou dependencia nova.
-A classificacao V1 e as rotas anteriores permanecem intactas.
+O prefixo das rotas permanece `/api/v1/`.
 
 A validação funcional isolada por SQL/HTTP está documentada em
 [DEMO_QUESTIONARIO.md](seed/DEMO_QUESTIONARIO.md). As antigas suítes próprias
@@ -434,7 +391,7 @@ A partir desta etapa, o Diagnostico participativo envia efetivamente as resposta
 A revisao local da etapa 03 permanece como conferencia anterior ao envio, sem as
 mensagens temporarias de demonstracao. `enviarQuestionarioV2(payload)` reutiliza
 o mecanismo de requisicoes e faz um unico POST em `/api/v1/questionario`, usando
-`VITE_API_URL` (padrao local: `http://localhost:8000`). O servico V1 permanece intacto.
+`VITE_API_URL` (padrao local: `http://localhost:8000`).
 O backend local deve possuir a migracao da etapa 01 e os contratos da etapa 02;
 a origem do frontend precisa estar autorizada no CORS existente.
 
